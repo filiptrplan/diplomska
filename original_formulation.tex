@@ -35,7 +35,7 @@ Te relacije predstavljajo začetni vhod za analizo. Izpeljana so iz sistema tipo
 
 	\item \textbf{Začetna relacija posoje regij (Borrow Region)} ($\psi \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$):
 	      \begin{itemize}
-		      \item $(R, L, P) \in \psi$ pomeni, da izraz za posojo (borrow expression) na točki $P$ ustvari posojo $L$ in jo poveže z regijo $R$. To dejstvo je vzpostavljeno na sredini točke ($P = M(stmt)$) stavka posoje $stmt$.
+		      \item $(R, L, P) \in \psi$ pomeni, da izraz za posojo (borrow expression) na točki $P$ ustvari posojo $L$ in jo poveže z regijo $R$. To dejstvo je vzpostavljeno na sredini stavka ($P = M(stmt)$).
 	      \end{itemize}
 
 	\item \textbf{Relacija žive regije (Region Live At)} ($\nabla_{R} \subseteq \mathcal{R} \times \mathcal{P}$):
@@ -45,12 +45,12 @@ Te relacije predstavljajo začetni vhod za analizo. Izpeljana so iz sistema tipo
 
 	\item \textbf{Relacija prekinitve posoje (Killed Loan)} ($\kappa \subseteq \mathcal{L} \times \mathcal{P}$):
 	      \begin{itemize}
-		      \item $(L, P) \in \kappa$ pomeni, da je posoja $L$ "prekinjena" (killed) na točki $P$. To se običajno zgodi na sredini točke ($P = M(stmt)$) prireditvenega stavka $stmt$, ki prepiše pot (path), prej povezano s posojo $L$, s čimer prekine alias.
+		      \item $(L, P) \in \kappa$ pomeni, da je posoja $L$ "prekinjena" (killed) na točki $P$. To se običajno zgodi na sredini točke ($P = M(stmt)$) prireditvenega stavka $stmt$, ki prepiše pot (path), prej povezano s posojo $L$.
 	      \end{itemize}
 
 	\item \textbf{Relacija razveljavitve posoje (Invalidates Loan)} ($\iota \subseteq \mathcal{P} \times \mathcal{L}$):
 	      \begin{itemize}
-		      \item $(P, L) \in \iota$ pomeni, da dejanje, ki se zgodi na točki $P$ (npr. mutacija), razveljavi (invalidates) pogoje posoje $L$. To se preveri na sredini točke ($P = M(stmt)$) potencialno razveljavljajočega stavka $stmt$.
+		      \item $(P, L) \in \iota$ pomeni, da dejanje, ki se zgodi na točki $P$ (npr. mutacija), razveljavi pogoje posoje $L$.
 	      \end{itemize}
 \end{itemize}
 
@@ -60,33 +60,33 @@ Te relacije predstavljajo začetni vhod za analizo. Izpeljana so iz sistema tipo
 	\item \textbf{Relacija vsebovanosti (Subset Relation)} ($\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$):
 	      \begin{itemize}
 		      \item $(R_1, R_2, P) \in \Gamma$ pomeni, da analiza sklepa, da mora biti $R_1$ podmnožica $R_2$ na točki $P$. Definirana je z zaprtjem naslednjih pravil:
-		      \item \textbf{Osnova (Base):} Če $(R_1, R_2, P) \in \beta$, potem $(R_1, R_2, P) \in \Gamma$.
-		      \item \textbf{Tranzitivnost (Transitivity):} Če $(R_1, R_2, P) \in \Gamma$ in $(R_2, R_3, P) \in \Gamma$, potem $(R_1, R_3, P) \in \Gamma$.
-		      \item \textbf{Propagacija (Refinirana) (Propagation (Refined)):} Če $(R_1, R_2, P) \in \Gamma$, $(P, Q) \in C_E$, $(R_1, Q) \in \nabla_R$, in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. (Propagira se samo, če sta obe regiji živi na naslednji točki $Q$).
+		      \item \textbf{Osnova:} Če $(R_1, R_2, P) \in \beta$, potem $(R_1, R_2, P) \in \Gamma$.
+		      \item \textbf{Tranzitivnost:} Če $(R_1, R_2, P) \in \Gamma$ in $(R_2, R_3, P) \in \Gamma$, potem $(R_1, R_3, P) \in \Gamma$.
+		      \item \textbf{Propagacija (ze z dodatnimi pravili):} Če $(R_1, R_2, P) \in \Gamma$, $(P, Q) \in C_E$, $(R_1, Q) \in \nabla_R$, in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. (Propagira se samo, če sta obe regiji živi na naslednji točki $Q$).
 	      \end{itemize}
 
 	\item \textbf{Relacija zahteve (Requires Relation)} ($\zeta \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$):
 	      \begin{itemize}
-		      \item $(R, L, P) \in \zeta$ pomeni, da regija $R$ zahteva (requires), da pogoji posoje $L$ veljajo na točki $P$. Definirana je z zaprtjem naslednjih pravil:
-		      \item \textbf{Osnova (Base):} Če $(R, L, P) \in \psi$, potem $(R, L, P) \in \zeta$.
-		      \item \textbf{Implikacija vsebovanosti (Subset Implication):} Če $(R_1, L, P) \in \zeta$ in $(R_1, R_2, P) \in \Gamma$, potem $(R_2, L, P) \in \zeta$. (Če $R_1 \subseteq R_2$, potem $R_2$ zahteva vse, kar zahteva $R_1$).
-		      \item \textbf{Propagacija (Refinirana) (Propagation (Refined)):} Če $(R, L, P) \in \zeta$, $(L, P) \notin \kappa$, $(P, Q) \in C_E$, in $(R, Q) \in \nabla_R$, potem $(R, L, Q) \in \zeta$. (Propagira se samo, če posoja ni prekinjena (killed) na $P$ in je regija živa na naslednji točki $Q$).
+		      \item $(R, L, P) \in \zeta$ pomeni, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Definirana je z zaprtjem naslednjih pravil:
+		      \item \textbf{Osnova:} Če $(R, L, P) \in \psi$, potem $(R, L, P) \in \zeta$.
+		      \item \textbf{Vsebovanost:} Če $(R_1, L, P) \in \zeta$ in $(R_1, R_2, P) \in \Gamma$, potem $(R_2, L, P) \in \zeta$. (Če $R_1 \subseteq R_2$, potem $R_2$ zahteva vse, kar zahteva $R_1$).
+		      \item \textbf{Propagacija:} Če $(R, L, P) \in \zeta$, $(L, P) \notin \kappa$, $(P, Q) \in C_E$, in $(R, Q) \in \nabla_R$, potem $(R, L, Q) \in \zeta$. (Propagira se samo, če posoja $L$ ni prekinjena na $P$ in je regija živa na naslednji točki $Q$).
 	      \end{itemize}
 
 	\item \textbf{Relacija živosti posoje (Loan Live At Relation)} ($\nabla_{L} \subseteq \mathcal{L} \times \mathcal{P}$):
 	      \begin{itemize}
 		      \item $(L, P) \in \nabla_{L}$ pomeni, da je posoja $L$ živa (live) na točki $P$.
-		      \item \textbf{Definicija (Definition):} $(L, P) \in \nabla_{L}$ če $\exists R \in \mathcal{R}$ tako da $(R, P) \in \nabla_{R}$ in $(R, L, P) \in \zeta$. (Posoja je živa, če jo zahteva neka živa regija).
+		      \item \textbf{Definicija:} $(L, P) \in \nabla_{L}$ če $\exists R \in \mathcal{R}$ tako da $(R, P) \in \nabla_{R}$ in $(R, L, P) \in \zeta$. (Posoja je živa, če jo zahteva neka živa regija).
 	      \end{itemize}
 \end{itemize}
 
-\subsection*{4. Pogoj napake (Error Condition)}
+\subsection*{4. Pogoji za napako}
 
 \begin{itemize}
 	\item \textbf{Relacija napake (Error Relation)} ($\epsilon \subseteq \mathcal{P}$):
 	      \begin{itemize}
 		      \item $P \in \epsilon$ pomeni, da se napaka preverjevalnika izposoj (borrow check error) pojavi na točki $P$.
-		      \item \textbf{Definicija (Definition):} $P \in \epsilon$ če $\exists L \in \mathcal{L}$ tako da $(P, L) \in \iota$ in $(L, P) \in \nabla_{L}$. (Napaka se pojavi, če dejanje na točki $P$ razveljavi (invalidates) posojo $L$, ki je živa (live) na točki $P$).
+		      \item \textbf{Definicija:} $P \in \epsilon$ če $\exists L \in \mathcal{L}$ tako da $(P, L) \in \iota$ in $(L, P) \in \nabla_{L}$. (Napaka se pojavi, če dejanje na točki $P$ razveljavi posojo $L$, ki je živa na točki $P$).
 	      \end{itemize}
 \end{itemize}
 
