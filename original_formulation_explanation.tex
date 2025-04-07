@@ -1,14 +1,62 @@
 \documentclass{article}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{listings}
 \usepackage{amsfonts} % For \mathcal
+\usepackage{csquotes}
 \usepackage[utf8]{inputenc} % For Slovenian characters
-
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=red]{hyperref} % Add this to your preamble
+\title{Formalizacija originalne formulacije Polonius-a}
+\lstset{
+    escapeinside={(*}{*)},
+    numbers=left,
+    basicstyle=\ttfamily
+}
 \begin{document}
+\section{Formalizacija originalne formulacije Polonius-a}
+To je moj poskus matematicne formalizacije originalne formulacije Polonius preverjalnika izposoj (\textit{borrow checker}).
+Objava je dostopna na \cite{AliasbasedFormulationBorrow}.
+\subsection{Osnovne množice in elementi}
+\subsubsection{Mnozica posoj $\mathcal{L}$}
+Mnozico vseh posoj (\textit{angl. loans}) oznacimo z $\mathcal{L}$. Pravimo, da \textbf{razveljavimo pogoje posoje}, ce:
+\begin{itemize}
+	\item Je referenca deljena (\textit{shared}), torej je oblike \verb|&x| in
+	      \begin{itemize}
+		      \item ustvarimo novo spremenljivo (\textit{mutable}) referenco (tukaj nevem tocno kako bi formaliziral, moram se pogledat mal borrow checker rules) \textbf{ali}
+		      \item pisemo v mesto, ki je bilo sposojeno
+	      \end{itemize}
+	\item Je referenca spremenljiva in jo spreminjamo na kakrsen koli nacin (ustvarjanje nove reference, pisanje, premikanje)
+\end{itemize}
 
-\section*{Formalizacija Polonius-a}
+Ta pravila naceloma sledijo NLL, ki je trenutno implementiran v glavni veji Rustovega prevajalnika. Bolj formalno jih
+opisujejo pravila razvljevljanja posoje (\textit{loan killed}). Iz NLL RFC-ja \cite{2094nllRustRFC}:
 
-\subsection*{1. Osnovne množice in elementi}
+\begin{displayquote}
+	For a statement at point P in the graph, we define the “transfer function” – that is, which loans it brings into or out of scope – as follows:
+	\begin{itemize}
+		\item ...
+		\item if this is an assignment lv = <rvalue>, then any loan for some path P of which lv is a prefix is killed.
+	\end{itemize}
+\end{displayquote}
+
+\subsubsection{Mnozica regij $\mathcal{R}$}
+V trenutni implementaciji preverjalnika izposoj, ki se imenuje NLL \cite{2094nllRustRFC} se posoje spremljajo s pomocjo
+t.i. \textit{lifetimes}. V tej formulaciji pa jih je avtor poimenoval regije (\textit{regions}).
+
+Mnozica regij je torej oznacena s $\mathcal{R} \subset 2^{\mathcal{L}}$.
+
+\begin{figure}[h]
+	\begin{lstlisting}
+let x = vec![1, 2];
+let p: &'a i32 = if random() {
+    &x[0] (* $L_{0} \in \text{'a}$ *)
+} else {
+    &x[1] (* $L_{1} \in \text{'a}$ *)
+};
+    \end{lstlisting}
+\end{figure}
+
+\subsubsection{Mnozica stavkov}
 \begin{itemize}
 	\item $\mathcal{L}$: Množica vseh možnih posoj (loans). Posamezno posojo označimo z $L$.
 	\item $\mathcal{R}$: Množica vseh regij (regions) (spremenljivke regij, npr. '0, '1, ...). Posamezno regijo označimo z $R$. Regija predstavlja množico posoj. Torej velja $\mathcal{R} \subset 2^{\mathcal{L}}$
@@ -24,7 +72,6 @@
 		      \item Povezave obstajajo od $M(stmt)$ do začetnih točk $S(stmt')$ naslednjih stavkov $stmt'$ v CFG.
 	      \end{itemize}
 \end{itemize}
-
 \subsection*{2. Začetne relacije (Input Relations)}
 Te relacije predstavljajo začetni vhod za analizo. Izpeljana so iz sistema tipov in prejsnje analize v MIR.
 \begin{itemize}
@@ -32,30 +79,24 @@ Te relacije predstavljajo začetni vhod za analizo. Izpeljana so iz sistema tipo
 	      \begin{itemize}
 		      \item $(R_1, R_2, P) \in \beta$ pomeni, da sistem tipov zahteva, da je regija $R_1$ podmnožica regije $R_2$ (označeno $R_1 \subseteq R_2$ ali $R_1 : R_2$) na točki $P$. To dejstvo je vzpostavljeno na sredini točke ($P = M(stmt)$) stavka $stmt$, ki inducira zahtevo.
 	      \end{itemize}
-
 	\item \textbf{Začetna relacija posoje regij (Borrow Region)} ($\psi \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$):
 	      \begin{itemize}
 		      \item $(R, L, P) \in \psi$ pomeni, da izraz za posojo (borrow expression) na točki $P$ ustvari posojo $L$ in jo poveže z regijo $R$. To dejstvo je vzpostavljeno na sredini stavka ($P = M(stmt)$).
 	      \end{itemize}
-
 	\item \textbf{Relacija žive regije (Region Live At)} ($\nabla_{R} \subseteq \mathcal{R} \times \mathcal{P}$):
 	      \begin{itemize}
 		      \item $(R, P) \in \nabla_{R}$ pomeni, da je regija $R$ živa (live) na točki $P$ (tj. spremenljivka, katere tip vključuje $R$, bo morda kasneje uporabljena). To določi standardna analiza živosti (liveness analysis) (podrobnosti tukaj izpuščene, glej NLL RFC).
 	      \end{itemize}
-
 	\item \textbf{Relacija prekinitve posoje (Killed Loan)} ($\kappa \subseteq \mathcal{L} \times \mathcal{P}$):
 	      \begin{itemize}
 		      \item $(L, P) \in \kappa$ pomeni, da je posoja $L$ "prekinjena" (killed) na točki $P$. To se običajno zgodi na sredini točke ($P = M(stmt)$) prireditvenega stavka $stmt$, ki prepiše pot (path), prej povezano s posojo $L$.
 	      \end{itemize}
-
 	\item \textbf{Relacija razveljavitve posoje (Invalidates Loan)} ($\iota \subseteq \mathcal{P} \times \mathcal{L}$):
 	      \begin{itemize}
 		      \item $(P, L) \in \iota$ pomeni, da dejanje, ki se zgodi na točki $P$ (npr. mutacija), razveljavi pogoje posoje $L$.
 	      \end{itemize}
 \end{itemize}
-
 \subsection*{3. Izpeljane relacije (Derived Relations) (Izračunane z analizo)}
-
 \begin{itemize}
 	\item \textbf{Relacija vsebovanosti (Subset Relation)} ($\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$):
 	      \begin{itemize}
@@ -64,7 +105,6 @@ Te relacije predstavljajo začetni vhod za analizo. Izpeljana so iz sistema tipo
 		      \item \textbf{Tranzitivnost:} Če $(R_1, R_2, P) \in \Gamma$ in $(R_2, R_3, P) \in \Gamma$, potem $(R_1, R_3, P) \in \Gamma$.
 		      \item \textbf{Propagacija (ze z dodatnimi pravili):} Če $(R_1, R_2, P) \in \Gamma$, $(P, Q) \in C_E$, $(R_1, Q) \in \nabla_R$, in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. (Propagira se samo, če sta obe regiji živi na naslednji točki $Q$).
 	      \end{itemize}
-
 	\item \textbf{Relacija zahteve (Requires Relation)} ($\zeta \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$):
 	      \begin{itemize}
 		      \item $(R, L, P) \in \zeta$ pomeni, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Definirana je z zaprtjem naslednjih pravil:
@@ -72,16 +112,13 @@ Te relacije predstavljajo začetni vhod za analizo. Izpeljana so iz sistema tipo
 		      \item \textbf{Vsebovanost:} Če $(R_1, L, P) \in \zeta$ in $(R_1, R_2, P) \in \Gamma$, potem $(R_2, L, P) \in \zeta$. (Če $R_1 \subseteq R_2$, potem $R_2$ zahteva vse, kar zahteva $R_1$).
 		      \item \textbf{Propagacija:} Če $(R, L, P) \in \zeta$, $(L, P) \notin \kappa$, $(P, Q) \in C_E$, in $(R, Q) \in \nabla_R$, potem $(R, L, Q) \in \zeta$. (Propagira se samo, če posoja $L$ ni prekinjena na $P$ in je regija živa na naslednji točki $Q$).
 	      \end{itemize}
-
 	\item \textbf{Relacija živosti posoje (Loan Live At Relation)} ($\nabla_{L} \subseteq \mathcal{L} \times \mathcal{P}$):
 	      \begin{itemize}
 		      \item $(L, P) \in \nabla_{L}$ pomeni, da je posoja $L$ živa (live) na točki $P$.
 		      \item \textbf{Definicija:} $(L, P) \in \nabla_{L}$ če $\exists R \in \mathcal{R}$ tako da $(R, P) \in \nabla_{R}$ in $(R, L, P) \in \zeta$. (Posoja je živa, če jo zahteva neka živa regija).
 	      \end{itemize}
 \end{itemize}
-
 \subsection*{4. Pogoji za napako}
-
 \begin{itemize}
 	\item \textbf{Relacija napake (Error Relation)} ($\epsilon \subseteq \mathcal{P}$):
 	      \begin{itemize}
@@ -89,5 +126,7 @@ Te relacije predstavljajo začetni vhod za analizo. Izpeljana so iz sistema tipo
 		      \item \textbf{Definicija:} $P \in \epsilon$ če $\exists L \in \mathcal{L}$ tako da $(P, L) \in \iota$ in $(L, P) \in \nabla_{L}$. (Napaka se pojavi, če dejanje na točki $P$ razveljavi posojo $L$, ki je živa na točki $P$).
 	      \end{itemize}
 \end{itemize}
-
+\section{Viri}
+\bibliography{thesis}
+\bibliographystyle{unsrt}
 \end{document}
