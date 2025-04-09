@@ -58,9 +58,12 @@ let p: &'a i32 = if random() {
 
 \subsubsection{Graf poteka}
 Graf poteka (\textit{angl. CFG - control flow graph}) je izracunan v prejsnjih fazah analize kode.
-Zgrajen je iz osnovnih blokov, te pa so zgrajeni iz stavkov \cite{MIRDataflowRust}.
+Zgrajen je iz osnovnih blokov, te pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
+ki nam bodo kasneje prisle prav. Te so zracunane tekom analize poteka podatkov
+(\textit{dataflow analysis})\cite{MIRDataflowRust}. Graf poteka oznacimo s $C = (C_{V}, C_{E})$
 
-TODO: Malo se preberi ali je res to pravilno
+% TODO: Malo se preberi ali je res to pravilno. Kako dejansko dobimo input za CFG in 
+% kaksne informacije mu pripadajo?
 
 \subsubsection{Mnozica stavkov in tock}
 Mnozico vseh stavkov v MIR oznacimo s $\mathcal{S}$. Tocke v grafu poteka (\textit{CFG - control flow graph})
