@@ -56,7 +56,21 @@ let p: &'a i32 = if random() {
     \end{lstlisting}
 \end{figure}
 
-\subsubsection{Mnozica stavkov}
+\subsubsection{Graf poteka}
+Graf poteka (\textit{angl. CFG - control flow graph}) je izracunan v prejsnjih fazah analize kode.
+Zgrajen je iz osnovnih blokov, te pa so zgrajeni iz stavkov \cite{MIRDataflowRust}.
+
+TODO: Malo se preberi ali je res to pravilno
+
+\subsubsection{Mnozica stavkov in tock}
+Mnozico vseh stavkov v MIR oznacimo s $\mathcal{S}$. Tocke v grafu poteka (\textit{CFG - control flow graph})
+oznacimo s $\mathcal{P}$. Lahko so dveh tipov:
+\begin{itemize}
+	\item \textbf{na zacetku stavka:} to oznacuje trenutek preden se stavek izvede. Oznacimo s $S(stmt)$
+	\item \textbf{med stavkom:} to oznacuje trenutek med izvajanjem stavka. Oznacimo s $M(stmt)$
+\end{itemize}
+
+
 \begin{itemize}
 	\item $\mathcal{L}$: Množica vseh možnih posoj (loans). Posamezno posojo označimo z $L$.
 	\item $\mathcal{R}$: Množica vseh regij (regions) (spremenljivke regij, npr. '0, '1, ...). Posamezno regijo označimo z $R$. Regija predstavlja množico posoj. Torej velja $\mathcal{R} \subset 2^{\mathcal{L}}$
