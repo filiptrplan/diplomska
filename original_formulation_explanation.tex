@@ -22,7 +22,8 @@ Množico vseh posoj (\textit{angl. loans}) označimo z $\mathcal{L}$. Pravimo, d
 \begin{itemize}
 	\item Je referenca deljena (\textit{shared}), torej je oblike \verb|&x| in
 	      \begin{itemize}
-		      \item ustvarimo novo spremenljivo (\textit{mutable}) referenco (* tukaj ne vem točno kako bi formaliziral, moram še pogledati malo borrow checker rules *) \textbf{ali}
+		      \item ustvarimo novo spremenljivo (\textit{mutable}) referenco
+		            (* tukaj ne vem točno kako bi formaliziral, moram še pogledati malo borrow checker rules *) \textbf{ali}
 		      \item pišemo v mesto, ki je bilo sposojeno
 	      \end{itemize}
 	\item Je referenca spremenljiva in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
@@ -32,7 +33,8 @@ Ta pravila načeloma sledijo NLL, ki je trenutno implementiran v glavni veji Rus
 opisujejo pravila razveljavljanja posoje (\textit{loan killed}). Iz NLL RFC-ja \cite{2094nllRustRFC}:
 
 \begin{displayquote}
-	For a statement at point P in the graph, we define the “transfer function” – that is, which loans it brings into or out of scope – as follows:
+	For a statement at point P in the graph, we define the “transfer function” – that is,
+	which loans it brings into or out of scope – as follows:
 	\begin{itemize}
 		\item ...
 		\item if this is an assignment lv = <rvalue>, then any loan for some path P of which lv is a prefix is killed.
@@ -56,16 +58,8 @@ let p: &'a i32 = if random() {
     \end{lstlisting}
 \end{figure}
 
-\subsubsection{Graf poteka}
-Graf poteka (\textit{angl. CFG - control flow graph}) je izračunan v prejšnjih fazah analize kode.
-Zgrajen je iz osnovnih blokov, te pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
-ki nam bodo kasneje prišle prav. Te so izračunane tekom analize poteka podatkov
-(\textit{dataflow analysis})\cite{MIRDataflowRust}. Graf poteka označimo s $C = (C_{V}, C_{E})$
-
-% TODO: Malo se preberi ali je res to pravilno. Kako dejansko dobimo input za CFG in
-% kaksne informacije mu pripadajo?
-
 \subsubsection{Množica stavkov in točk}
+
 Množico vseh stavkov v MIR označimo s $\mathcal{S}$. Točke v grafu poteka (\textit{CFG - control flow graph})
 označimo s $\mathcal{P}$. Lahko so dveh tipov:
 \begin{itemize}
@@ -73,24 +67,27 @@ označimo s $\mathcal{P}$. Lahko so dveh tipov:
 	\item \textbf{med stavkom:} to označuje trenutek med izvajanjem stavka. Označimo s $M(stmt)$
 \end{itemize}
 
+\subsubsection{Graf poteka}
 
+Graf poteka (\textit{angl. CFG - control flow graph}) je izračunan v prejšnjih fazah analize kode.
+Zgrajen je iz osnovnih blokov, te pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
+ki nam bodo kasneje prišle prav. Te so izračunane tekom analize poteka podatkov
+(\textit{dataflow analysis})\cite{MIRDataflowRust}. Graf poteka označimo s $C = (C_{V}, C_{E})$.
+
+% TODO: Malo se preberi ali je res to pravilno. Kako dejansko dobimo input za CFG in
+% kaksne informacije mu pripadajo?
+
+Privzeto se ustvarijo naslednje povezave (to bi moral potrditi v kodi rustc, v clanku tako pise):
 \begin{itemize}
-	\item $\mathcal{L}$: Množica vseh možnih posoj (loans). Posamezno posojo označimo z $L$.
-	\item $\mathcal{R}$: Množica vseh regij (regions) (spremenljivke regij, npr. '0, '1, ...). Posamezno regijo označimo z $R$. Regija predstavlja množico posoj. Torej velja $\mathcal{R} \subset 2^{\mathcal{L}}$
-	\item $\mathcal{S}$: Množica vseh stavkov (statements) v MIR. Stavek $stmt \in \mathcal{S}$ je identificiran kot $BB_{i,j}$, $j$-ti stavek v $i$-tem osnovnem bloku (basic block).
-	\item $\mathcal{P}$: Množica vseh točk (points) v grafu poteka kontrol (control flow graph - CFG) programa. Točke so lahko na začetku ali sredi stavka.
-	      \begin{itemize}
-		      \item $S(stmt)$: Točka na začetku stavka $stmt$ (start of statement) (pred izvedbo).
-		      \item $M(stmt)$: Točka na sredini stavka $stmt$ (middle of statement) (med izvedbo).
-	      \end{itemize}
-	\item $C = (C_V, C_E)$: Graf poteka kontrol (Control Flow Graph), kjer je $C_V = \mathcal{P}$ množica točk (vozlišč) in $C_E \subseteq \mathcal{P} \times \mathcal{P}$ množica povezav poteka kontrol. Dodatno:
-	      \begin{itemize}
-		      \item Za vsak $stmt \in \mathcal{S}$, velja $(S(stmt), M(stmt)) \in C_E$.
-		      \item Povezave obstajajo od $M(stmt)$ do začetnih točk $S(stmt')$ naslednjih stavkov $stmt'$ v CFG.
-	      \end{itemize}
+	\item Za vsak stavek se ustvari povezava med njegovim zacetkom in sredino:
+	      $\forall stmt \in \mathcal{S}: (S(stmt), M(stmt)) \in C_{E}$
+	\item Ce $M(stmt)$ predstavlja \textit{terminator} potem dodamo povezavo iz njega v $S(stmt')$
+	      zacetnih stavkov osnovnih blokov, ki mu sledijo.
 \end{itemize}
-\subsection*{2. Začetne relacije (Input Relations)}
-Te relacije predstavljajo začetni vhod za analizo. Izpeljane so iz sistema tipov in prejšnje analize v MIR.
+
+\subsection*{2. Začetne relacije (\textit{Input Relations})}
+Te relacije predstavljajo začetni vhod za analizo. Izpeljane so iz analize toka podatkov
+v prejsnjih fazah analize.
 \begin{itemize}
 	\item \textbf{Začetna relacija vsebovanosti (Base Subset)} ($\beta \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$):
 	      \begin{itemize}
