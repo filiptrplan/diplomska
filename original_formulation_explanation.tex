@@ -14,22 +14,22 @@
 }
 \begin{document}
 \section{Formalizacija originalne formulacije Polonius-a}
-To je moj poskus matematicne formalizacije originalne formulacije Polonius preverjalnika izposoj (\textit{borrow checker}).
+To je moj poskus matematične formalizacije originalne formulacije Polonius preverjalnika izposoj (\textit{borrow checker}).
 Objava je dostopna na \cite{AliasbasedFormulationBorrow}.
 \subsection{Osnovne množice in elementi}
-\subsubsection{Mnozica posoj $\mathcal{L}$}
-Mnozico vseh posoj (\textit{angl. loans}) oznacimo z $\mathcal{L}$. Pravimo, da \textbf{razveljavimo pogoje posoje}, ce:
+\subsubsection{Množica posoj $\mathcal{L}$}
+Množico vseh posoj (\textit{angl. loans}) označimo z $\mathcal{L}$. Pravimo, da \textbf{razveljavimo pogoje posoje}, če:
 \begin{itemize}
 	\item Je referenca deljena (\textit{shared}), torej je oblike \verb|&x| in
 	      \begin{itemize}
-		      \item ustvarimo novo spremenljivo (\textit{mutable}) referenco (tukaj nevem tocno kako bi formaliziral, moram se pogledat mal borrow checker rules) \textbf{ali}
-		      \item pisemo v mesto, ki je bilo sposojeno
+		      \item ustvarimo novo spremenljivo (\textit{mutable}) referenco (* tukaj ne vem točno kako bi formaliziral, moram še pogledati malo borrow checker rules *) \textbf{ali}
+		      \item pišemo v mesto, ki je bilo sposojeno
 	      \end{itemize}
-	\item Je referenca spremenljiva in jo spreminjamo na kakrsen koli nacin (ustvarjanje nove reference, pisanje, premikanje)
+	\item Je referenca spremenljiva in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
 \end{itemize}
 
-Ta pravila naceloma sledijo NLL, ki je trenutno implementiran v glavni veji Rustovega prevajalnika. Bolj formalno jih
-opisujejo pravila razvljevljanja posoje (\textit{loan killed}). Iz NLL RFC-ja \cite{2094nllRustRFC}:
+Ta pravila načeloma sledijo NLL, ki je trenutno implementiran v glavni veji Rustovega prevajalnika. Bolj formalno jih
+opisujejo pravila razveljavljanja posoje (\textit{loan killed}). Iz NLL RFC-ja \cite{2094nllRustRFC}:
 
 \begin{displayquote}
 	For a statement at point P in the graph, we define the “transfer function” – that is, which loans it brings into or out of scope – as follows:
@@ -39,38 +39,38 @@ opisujejo pravila razvljevljanja posoje (\textit{loan killed}). Iz NLL RFC-ja \c
 	\end{itemize}
 \end{displayquote}
 
-\subsubsection{Mnozica regij $\mathcal{R}$}
-V trenutni implementaciji preverjalnika izposoj, ki se imenuje NLL \cite{2094nllRustRFC} se posoje spremljajo s pomocjo
+\subsubsection{Množica regij $\mathcal{R}$}
+V trenutni implementaciji preverjalnika izposoj, ki se imenuje NLL \cite{2094nllRustRFC} se posoje spremljajo s pomočjo
 t.i. \textit{lifetimes}. V tej formulaciji pa jih je avtor poimenoval regije (\textit{regions}).
 
-Mnozica regij je torej oznacena s $\mathcal{R} \subset 2^{\mathcal{L}}$.
+Množica regij je torej označena s $\mathcal{R} \subset 2^{\mathcal{L}}$.
 
 \begin{figure}[h]
 	\begin{lstlisting}
 let x = vec![1, 2];
 let p: &'a i32 = if random() {
-    &x[0] (* $L_{0} \in \text{'a}$ *)
+    &x[0] (* $L_{0} \in \text{'a}$ (*@\llap{prva posoja}@*) *)
 } else {
-    &x[1] (* $L_{1} \in \text{'a}$ *)
+    &x[1] (* $L_{1} \in \text{'a}$ (*@\llap{druga posoja}@*) *)
 };
     \end{lstlisting}
 \end{figure}
 
 \subsubsection{Graf poteka}
-Graf poteka (\textit{angl. CFG - control flow graph}) je izracunan v prejsnjih fazah analize kode.
+Graf poteka (\textit{angl. CFG - control flow graph}) je izračunan v prejšnjih fazah analize kode.
 Zgrajen je iz osnovnih blokov, te pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
-ki nam bodo kasneje prisle prav. Te so zracunane tekom analize poteka podatkov
-(\textit{dataflow analysis})\cite{MIRDataflowRust}. Graf poteka oznacimo s $C = (C_{V}, C_{E})$
+ki nam bodo kasneje prišle prav. Te so izračunane tekom analize poteka podatkov
+(\textit{dataflow analysis})\cite{MIRDataflowRust}. Graf poteka označimo s $C = (C_{V}, C_{E})$
 
-% TODO: Malo se preberi ali je res to pravilno. Kako dejansko dobimo input za CFG in 
+% TODO: Malo se preberi ali je res to pravilno. Kako dejansko dobimo input za CFG in
 % kaksne informacije mu pripadajo?
 
-\subsubsection{Mnozica stavkov in tock}
-Mnozico vseh stavkov v MIR oznacimo s $\mathcal{S}$. Tocke v grafu poteka (\textit{CFG - control flow graph})
-oznacimo s $\mathcal{P}$. Lahko so dveh tipov:
+\subsubsection{Množica stavkov in točk}
+Množico vseh stavkov v MIR označimo s $\mathcal{S}$. Točke v grafu poteka (\textit{CFG - control flow graph})
+označimo s $\mathcal{P}$. Lahko so dveh tipov:
 \begin{itemize}
-	\item \textbf{na zacetku stavka:} to oznacuje trenutek preden se stavek izvede. Oznacimo s $S(stmt)$
-	\item \textbf{med stavkom:} to oznacuje trenutek med izvajanjem stavka. Oznacimo s $M(stmt)$
+	\item \textbf{na začetku stavka:} to označuje trenutek preden se stavek izvede. Označimo s $S(stmt)$
+	\item \textbf{med stavkom:} to označuje trenutek med izvajanjem stavka. Označimo s $M(stmt)$
 \end{itemize}
 
 
@@ -78,7 +78,7 @@ oznacimo s $\mathcal{P}$. Lahko so dveh tipov:
 	\item $\mathcal{L}$: Množica vseh možnih posoj (loans). Posamezno posojo označimo z $L$.
 	\item $\mathcal{R}$: Množica vseh regij (regions) (spremenljivke regij, npr. '0, '1, ...). Posamezno regijo označimo z $R$. Regija predstavlja množico posoj. Torej velja $\mathcal{R} \subset 2^{\mathcal{L}}$
 	\item $\mathcal{S}$: Množica vseh stavkov (statements) v MIR. Stavek $stmt \in \mathcal{S}$ je identificiran kot $BB_{i,j}$, $j$-ti stavek v $i$-tem osnovnem bloku (basic block).
-	\item $\mathcal{P}$: Množica vseh točk (points) v grafu poteka kontrol (control flow graph - CFG) programa. Tocke so lahko na zacetku ali sredi stavka.
+	\item $\mathcal{P}$: Množica vseh točk (points) v grafu poteka kontrol (control flow graph - CFG) programa. Točke so lahko na začetku ali sredi stavka.
 	      \begin{itemize}
 		      \item $S(stmt)$: Točka na začetku stavka $stmt$ (start of statement) (pred izvedbo).
 		      \item $M(stmt)$: Točka na sredini stavka $stmt$ (middle of statement) (med izvedbo).
@@ -90,7 +90,7 @@ oznacimo s $\mathcal{P}$. Lahko so dveh tipov:
 	      \end{itemize}
 \end{itemize}
 \subsection*{2. Začetne relacije (Input Relations)}
-Te relacije predstavljajo začetni vhod za analizo. Izpeljana so iz sistema tipov in prejsnje analize v MIR.
+Te relacije predstavljajo začetni vhod za analizo. Izpeljane so iz sistema tipov in prejšnje analize v MIR.
 \begin{itemize}
 	\item \textbf{Začetna relacija vsebovanosti (Base Subset)} ($\beta \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$):
 	      \begin{itemize}
@@ -120,7 +120,7 @@ Te relacije predstavljajo začetni vhod za analizo. Izpeljana so iz sistema tipo
 		      \item $(R_1, R_2, P) \in \Gamma$ pomeni, da analiza sklepa, da mora biti $R_1$ podmnožica $R_2$ na točki $P$. Definirana je z zaprtjem naslednjih pravil:
 		      \item \textbf{Osnova:} Če $(R_1, R_2, P) \in \beta$, potem $(R_1, R_2, P) \in \Gamma$.
 		      \item \textbf{Tranzitivnost:} Če $(R_1, R_2, P) \in \Gamma$ in $(R_2, R_3, P) \in \Gamma$, potem $(R_1, R_3, P) \in \Gamma$.
-		      \item \textbf{Propagacija (ze z dodatnimi pravili):} Če $(R_1, R_2, P) \in \Gamma$, $(P, Q) \in C_E$, $(R_1, Q) \in \nabla_R$, in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. (Propagira se samo, če sta obe regiji živi na naslednji točki $Q$).
+		      \item \textbf{Propagacija (že z dodatnimi pravili):} Če $(R_1, R_2, P) \in \Gamma$, $(P, Q) \in C_E$, $(R_1, Q) \in \nabla_R$, in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. (Propagira se samo, če sta obe regiji živi na naslednji točki $Q$).
 	      \end{itemize}
 	\item \textbf{Relacija zahteve (Requires Relation)} ($\zeta \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$):
 	      \begin{itemize}
