@@ -9,6 +9,7 @@
 \title{Formalizacija originalne formulacije Polonius-a}
 \author{Filip Trplan}
 \date{April 2025}
+\renewcommand{\refname}{Viri}
 \lstset{
     escapeinside={(*}{*)},
     numbers=left,
@@ -20,7 +21,8 @@
 \maketitle
 
 To je moj poskus matematične formalizacije originalne formulacije Polonius preverjalnika izposoj (\textit{borrow checker}).
-Objava je dostopna na \cite{AliasbasedFormulationBorrow}.
+Objava je dostopna na \cite{AliasbasedFormulationBorrow}. Trenutno pa je razlicica te formulacije ze del nightly izdaje
+Rustovega prevajalnika, dostopna na \cite{RustCompilerRustc_borrowck}.
 
 \section{Osnovne množice in elementi}
 
@@ -31,7 +33,7 @@ Množico vseh posoj (\textit{angl. loans}) označimo z $\mathcal{L}$. Pravimo, d
 	\item Je referenca deljena (\textit{shared}), torej je oblike \verb|&x| in
 	      \begin{itemize}
 		      \item ustvarimo novo spremenljivo (\textit{mutable}) referenco
-		            (* tukaj ne vem točno kako bi formaliziral, moram še pogledati malo borrow checker rules *) \textbf{ali}
+		            (tukaj ne vem točno kako bi formaliziral, moram še pogledati malo borrow checker rules) \textbf{ali}
 		      \item pišemo v mesto, ki je bilo sposojeno
 	      \end{itemize}
 	\item Je referenca spremenljiva in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
@@ -173,36 +175,59 @@ je ze opisano v poglavju o definicije mnozice $\mathcal{L}$.
 V tem poglavju bomo opisali relacije, ki jih izpeljemo iz zacetnih. Te relacije tvorijo najbolj pomembni del analize
 Polonius-a.
 
-\begin{itemize}
-	\item \textbf{Relacija vsebovanosti (Subset Relation)} ($\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$):
-	      \begin{itemize}
-		      \item $(R_1, R_2, P) \in \Gamma$ pomeni, da analiza sklepa, da mora biti $R_1$ podmnožica $R_2$ na točki $P$. Definirana je z zaprtjem naslednjih pravil:
-		      \item \textbf{Osnova:} Če $(R_1, R_2, P) \in \beta$, potem $(R_1, R_2, P) \in \Gamma$.
-		      \item \textbf{Tranzitivnost:} Če $(R_1, R_2, P) \in \Gamma$ in $(R_2, R_3, P) \in \Gamma$, potem $(R_1, R_3, P) \in \Gamma$.
-		      \item \textbf{Propagacija (že z dodatnimi pravili):} Če $(R_1, R_2, P) \in \Gamma$, $(P, Q) \in C_E$, $(R_1, Q) \in \nabla_R$, in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. (Propagira se samo, če sta obe regiji živi na naslednji točki $Q$).
-	      \end{itemize}
-	\item \textbf{Relacija zahteve (Requires Relation)} ($\zeta \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$):
-	      \begin{itemize}
-		      \item $(R, L, P) \in \zeta$ pomeni, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Definirana je z zaprtjem naslednjih pravil:
-		      \item \textbf{Osnova:} Če $(R, L, P) \in \psi$, potem $(R, L, P) \in \zeta$.
-		      \item \textbf{Vsebovanost:} Če $(R_1, L, P) \in \zeta$ in $(R_1, R_2, P) \in \Gamma$, potem $(R_2, L, P) \in \zeta$. (Če $R_1 \subseteq R_2$, potem $R_2$ zahteva vse, kar zahteva $R_1$).
-		      \item \textbf{Propagacija:} Če $(R, L, P) \in \zeta$, $(L, P) \notin \kappa$, $(P, Q) \in C_E$, in $(R, Q) \in \nabla_R$, potem $(R, L, Q) \in \zeta$. (Propagira se samo, če posoja $L$ ni prekinjena na $P$ in je regija živa na naslednji točki $Q$).
-	      \end{itemize}
-	\item \textbf{Relacija živosti posoje (Loan Live At Relation)} ($\nabla_{L} \subseteq \mathcal{L} \times \mathcal{P}$):
-	      \begin{itemize}
-		      \item $(L, P) \in \nabla_{L}$ pomeni, da je posoja $L$ živa (live) na točki $P$.
-		      \item \textbf{Definicija:} $(L, P) \in \nabla_{L}$ če $\exists R \in \mathcal{R}$ tako da $(R, P) \in \nabla_{R}$ in $(R, L, P) \in \zeta$. (Posoja je živa, če jo zahteva neka živa regija).
-	      \end{itemize}
-\end{itemize}
-\section*{4. Pogoji za napako}
-\begin{itemize}
-	\item \textbf{Relacija napake (Error Relation)} ($\epsilon \subseteq \mathcal{P}$):
-	      \begin{itemize}
-		      \item $P \in \epsilon$ pomeni, da se napaka preverjevalnika izposoj (borrow check error) pojavi na točki $P$.
-		      \item \textbf{Definicija:} $P \in \epsilon$ če $\exists L \in \mathcal{L}$ tako da $(P, L) \in \iota$ in $(L, P) \in \nabla_{L}$. (Napaka se pojavi, če dejanje na točki $P$ razveljavi posojo $L$, ki je živa na točki $P$).
-	      \end{itemize}
-\end{itemize}
-\section{Viri}
+\subsection{Relacija vsebovanosti}
+
+Razsirimo zacetno relacijo vsebovanosti z relacijo vsebovanosti (\textit{subset}), ki jo oznacimo s
+$\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Definirana je z zaprtjem naslednjih pravil:
+
+\begin{enumerate}
+	\item \textbf{Zacetna relacija: }Če $(R_1, R_2, P) \in \beta$, potem $(R_1, R_2, P) \in \Gamma$. Torej vse trojice iz zacetne relacije se pojavijo tudi v razsirjeni.
+	\item \textbf{Tranzitivnost:} Če $(R_1, R_2, P) \in \Gamma$ in $(R_2, R_3, P) \in \Gamma$, potem $(R_1, R_3, P) \in \Gamma$. Relacija vsebovanosti na isti tocki v programu je tranzitivna.
+	\item \textbf{Propagacija:} Če $(R_1, R_2, P) \in \Gamma$, $(P, Q) \in C_E$, $(R_1, Q) \in \nabla_R$, in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. To pomeni, da se propagira cez graf poteka, ce sta obe regiji zivi na naslednji tocki v grafu.
+\end{enumerate}
+
+\subsection{Relacija zahteve}
+
+Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na tocki $P$. Oznacimo jo s
+$\zeta \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$ in definirana je z zaprtjem naslednjih pravil:
+\begin{enumerate}
+	\item \textbf{Zacetna relacija:} Če $(R, L, P) \in \psi$, potem $(R, L, P) \in \zeta$. To nam pove, da ce se trojica
+	      nahaja v relaciji posoje regij, se nahaja tudi v $\zeta$.
+	\item \textbf{Vsebovanost:} Ce $(R_{1}, L, P) \in \zeta$ in $(R_{1}, R_{2}, P) \in \Gamma$, potem velja
+	      $(R_{2}, L, P) \in \zeta$. To nam pove, da ce neka regija $R_{1}$, ki je podmnozica vecje regije $R_{2}$ na tocki $P$
+	      zahteva posojo $L$, potem tudi $R_{2}$ zahteva isto posojo.
+	\item \textbf{Propagacija:} Ce veljajo vse \begin{enumerate}
+		      \item $(R,L,P) \in \zeta$: $R$ zahteva $L$ na $P$
+		      \item $(L, P) \notin \kappa$: $L$ ni prekinjena na $P$
+		      \item $(P, Q) \in C_{E}$: $Q$ sledi $P$ v grafu poteka
+		      \item $(R,Q) \in \nabla_{R}$: regija $R$ je ziva na tocki $Q$
+	      \end{enumerate}
+	      potem propagiramo relacijo v $(R,L,Q) \in \zeta$.
+\end{enumerate}
+
+\subsection{Relacija zivosti posoje}
+
+Relacija zivosti posoje(\textit{loan live at}) pomeni, da je posoja $L$ ziva na tocki $P$. Oznacimo jo s
+$\nabla_{L} \subseteq \mathcal{L} \times \mathcal{P}$ in definiramo takrat, ko
+
+\[ \exists R \in \mathcal{R}: (R,P) \in \nabla_{R} \land (R,L,P) \in \zeta \]
+
+To na kratko pomeni, da je posoja ziva, ce jo na isti tocki zahteva nekia ziva regija.
+
+
+\section{Javljanje napake}
+
+S pomocjo prejsnjih relacij lahko na koncu definiramo kje v programu se zgodi napaka (vsaj v smislu preverjalnika posoj).
+Ze spet si pomagamo z relacijo, ki jo poimenujemo \textbf{relacija napake} (\textit{error}) in jo oznacimo s
+$\epsilon \subset \mathcal{P}$. To nam bo povedalo, da se napaka pojavi na tocki $P$ v programu.
+
+Definiramo jo, ko:
+
+\[ \exists L \in \mathcal{L}: (P, L) \in \iota \land (L,P) \in \nabla_{L} \]
+
+Torej napaka se pojavi natanko tedaj, ko neko dejanje na tocki $P$ razveljavi pogoje posoje $L$, ki je hkrati tudi
+ziva na tocki $P$.
+
 \bibliography{thesis}
 \bibliographystyle{unsrt}
 \end{document}
