@@ -7,17 +7,25 @@
 \usepackage[utf8]{inputenc} % For Slovenian characters
 \usepackage[colorlinks=true, linkcolor=blue, urlcolor=red]{hyperref} % Add this to your preamble
 \title{Formalizacija originalne formulacije Polonius-a}
+\author{Filip Trplan}
+\date{April 2025}
 \lstset{
     escapeinside={(*}{*)},
     numbers=left,
     basicstyle=\ttfamily
 }
+
 \begin{document}
-\section{Formalizacija originalne formulacije Polonius-a}
+
+\maketitle
+
 To je moj poskus matematične formalizacije originalne formulacije Polonius preverjalnika izposoj (\textit{borrow checker}).
 Objava je dostopna na \cite{AliasbasedFormulationBorrow}.
-\subsection{Osnovne množice in elementi}
-\subsubsection{Množica posoj $\mathcal{L}$}
+
+\section{Osnovne množice in elementi}
+
+\subsection{Množica posoj $\mathcal{L}$}
+
 Množico vseh posoj (\textit{angl. loans}) označimo z $\mathcal{L}$. Pravimo, da \textbf{razveljavimo pogoje posoje}, če:
 \begin{itemize}
 	\item Je referenca deljena (\textit{shared}), torej je oblike \verb|&x| in
@@ -54,7 +62,7 @@ Rvalue pa je definiran z enumeratorjem \verb|Rvalue| \cite{RvalueRustc_middleMir
 varianta \verb|Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)|, ki ustvari referenco tipa \verb|BorrowKind|
 na mesto \verb|Place|.
 
-\subsubsection{Množica regij $\mathcal{R}$}
+\subsection{Množica regij $\mathcal{R}$}
 V trenutni implementaciji preverjalnika izposoj, ki se imenuje NLL \cite{2094nllRustRFC} se posoje spremljajo s pomočjo
 t.i. \textit{lifetimes}. V tej formulaciji pa jih je avtor poimenoval regije (\textit{regions}).
 
@@ -71,7 +79,7 @@ let p: &'a i32 = if random() {
     \end{lstlisting}
 \end{figure}
 
-\subsubsection{Množica stavkov in točk}
+\subsection{Množica stavkov in točk}
 
 Množico vseh stavkov v MIR označimo s $\mathcal{S}$. Točke v grafu poteka (\textit{CFG - control flow graph})
 označimo s $\mathcal{P}$. Lahko so dveh tipov:
@@ -80,7 +88,7 @@ označimo s $\mathcal{P}$. Lahko so dveh tipov:
 	\item \textbf{med stavkom:} to označuje trenutek med izvajanjem stavka. Označimo s $M(stmt)$
 \end{itemize}
 
-\subsubsection{Graf poteka}
+\subsection{Graf poteka}
 
 Graf poteka (\textit{angl. CFG - control flow graph}) je izračunan v prejšnjih fazah analize kode.
 Zgrajen je iz osnovnih blokov, te pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
@@ -101,13 +109,13 @@ Privzeto se ustvarijo naslednje povezave (to bi moral potrditi v kodi rustc, v c
 \textit{Opomba:} To je samo matematicna formulacija predstavitve grafa poteka, v prevajalniku
 je njegova predstavitev precej bolj kompleksna.
 
-\subsection{Začetne relacije (\textit{Input Relations})}
+\section{Začetne relacije (\textit{Input Relations})}
 
 Relacijo oznacimo kot \textbf{zacetno} (\textit{input}), ko jo dobimo tako, da jo izpeljemo
 iz analize poteka podatkov, ki je bila opravljena v prejsnjih fazah prevajalnika. Te relacije
 bodio predstavljale naso zacetno tocko iz katere bomo izpeljali druge relacije.
 
-\subsubsection{Zacetna relacija vsebovanosti}
+\subsection{Zacetna relacija vsebovanosti}
 
 Zacetno relacijo vsebovanosti (\textit{base subset}) bomo oznacili s
 $\beta \subset \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Torej to je relacija, ki povezuje dve regiji
@@ -116,14 +124,14 @@ ob neki tocki v programu.
 Bolj natancno, ce velja $(R_{1}, R_{2}, P) \in \beta$ pomeni, da je $R_{1}$ podmnozica regije $R_{2}$ na tocki $P$ v programu.
 To dejstvo mora veljati na sredini stavka ($M(stmt)$), ki inducira zahtevo.
 
-\subsubsection{Zacetna relacija posoje regij}
+\subsection{Zacetna relacija posoje regij}
 
 Zacetno relacijo posoje regij (\textit{borrow region}) oznacimo s $\psi \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$.
 
 Ce velja $(R,L,P) \in \psi$ pomeni, da izraz za posojo (\textit{borrow expression}) na tocki $P$ ustvari posojo $L$ in postane del
 regije $R$. Prav tako kot relacija vsebovanosti se ta zahteva vzpostavi na sredini stavka.
 
-\subsubsection{Relacija zive regije}
+\subsection{Relacija zive regije}
 
 Zacetno relacijo zive regije (\textit{region live at}) oznacimo z $\nabla_{R} \subseteq \mathcal{R} \times \mathcal{P}$.
 $(R, P) \in \nabla_{R}$ pomeni, da je regija $R$ ziva na tocki $P$. Torej spremenljivka katere tip vkljucuje $R$ (recimo \verb|&'a|)
@@ -132,7 +140,7 @@ bo morda kasneje v programu uporabljena.
 To doloci analiza zivosti, ki poteka isto kot v NLL RFC. Bolj specificno, s pomocjo raznih omejitev izracuna mnozico tock
 kjer mora biti regija (v RFC-ju poimenovana \textit{lifetime}) ziva \cite{2094nllRustRFC}.
 
-\subsubsection{Relacija prekinitve posoje}
+\subsection{Relacija prekinitve posoje}
 
 Zacetno relacijo prekinitve posoje (\textit{loan killed at}) oznacimo s $\kappa \subseteq \mathcal{L} \times \mathcal{P}$.
 $(L,P) \in \kappa$ pomeni, da je posoja $L$ prekinjena (\textit{killed}) na tocki $P$. To se obicajno zgodi
@@ -154,13 +162,17 @@ kjer je pojem \textit{prefix} definiran tako:
 	The prefixes of \verb|*a.b| would be \verb|*a.b|, \verb|a.b|, and \verb|a|.
 \end{displayquote}
 
-\subsubsection{Relacija razveljavitve posoje}
+\subsection{Relacija razveljavitve posoje}
 
 Zacetno relacijo razveljavitve posoje (\textit{invalidates loan}) oznacimo s $\iota \subset \mathcal{P} \times \mathcal{L}$.
 To pomeni, da dejanje na tocki $P$ (recimo mutacija sposojenega mesta oz. \textit{place}) razveljavi pogoje posoje $L$, kar
 je ze opisano v poglavju o definicije mnozice $\mathcal{L}$.
 
-\subsection*{3. Izpeljane relacije (Derived Relations) (Izračunane z analizo)}
+\section{Izpeljane relacije}
+
+V tem poglavju bomo opisali relacije, ki jih izpeljemo iz zacetnih. Te relacije tvorijo najbolj pomembni del analize
+Polonius-a.
+
 \begin{itemize}
 	\item \textbf{Relacija vsebovanosti (Subset Relation)} ($\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$):
 	      \begin{itemize}
@@ -182,7 +194,7 @@ je ze opisano v poglavju o definicije mnozice $\mathcal{L}$.
 		      \item \textbf{Definicija:} $(L, P) \in \nabla_{L}$ če $\exists R \in \mathcal{R}$ tako da $(R, P) \in \nabla_{R}$ in $(R, L, P) \in \zeta$. (Posoja je živa, če jo zahteva neka živa regija).
 	      \end{itemize}
 \end{itemize}
-\subsection*{4. Pogoji za napako}
+\section*{4. Pogoji za napako}
 \begin{itemize}
 	\item \textbf{Relacija napake (Error Relation)} ($\epsilon \subseteq \mathcal{P}$):
 	      \begin{itemize}
