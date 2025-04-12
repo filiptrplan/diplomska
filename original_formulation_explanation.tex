@@ -102,11 +102,13 @@ Privzeto se ustvarijo naslednje povezave (to bi moral potrditi v kodi rustc, v c
 je njegova predstavitev precej bolj kompleksna.
 
 \subsection{Začetne relacije (\textit{Input Relations})}
+
 Relacijo oznacimo kot \textbf{zacetno} (\textit{input}), ko jo dobimo tako, da jo izpeljemo
 iz analize poteka podatkov, ki je bila opravljena v prejsnjih fazah prevajalnika. Te relacije
 bodio predstavljale naso zacetno tocko iz katere bomo izpeljali druge relacije.
 
 \subsubsection{Zacetna relacija vsebovanosti}
+
 Zacetno relacijo vsebovanosti (\textit{base subset}) bomo oznacili s
 $\beta \subset \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Torej to je relacija, ki povezuje dve regiji
 ob neki tocki v programu.
@@ -115,12 +117,14 @@ Bolj natancno, ce velja $(R_{1}, R_{2}, P) \in \beta$ pomeni, da je $R_{1}$ podm
 To dejstvo mora veljati na sredini stavka ($M(stmt)$), ki inducira zahtevo.
 
 \subsubsection{Zacetna relacija posoje regij}
+
 Zacetno relacijo posoje regij (\textit{borrow region}) oznacimo s $\psi \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$.
 
 Ce velja $(R,L,P) \in \psi$ pomeni, da izraz za posojo (\textit{borrow expression}) na tocki $P$ ustvari posojo $L$ in postane del
 regije $R$. Prav tako kot relacija vsebovanosti se ta zahteva vzpostavi na sredini stavka.
 
 \subsubsection{Relacija zive regije}
+
 Zacetno relacijo zive regije (\textit{region live at}) oznacimo z $\nabla_{R} \subseteq \mathcal{R} \times \mathcal{P}$.
 $(R, P) \in \nabla_{R}$ pomeni, da je regija $R$ ziva na tocki $P$. Torej spremenljivka katere tip vkljucuje $R$ (recimo \verb|&'a|)
 bo morda kasneje v programu uporabljena.
@@ -130,16 +134,32 @@ kjer mora biti regija (v RFC-ju poimenovana \textit{lifetime}) ziva \cite{2094nl
 
 \subsubsection{Relacija prekinitve posoje}
 
-\begin{itemize}
-	\item \textbf{Relacija prekinitve posoje (Killed Loan)} ($\kappa \subseteq \mathcal{L} \times \mathcal{P}$):
-	      \begin{itemize}
-		      \item $(L, P) \in \kappa$ pomeni, da je posoja $L$ "prekinjena" (killed) na točki $P$. To se običajno zgodi na sredini točke ($P = M(stmt)$) prireditvenega stavka $stmt$, ki prepiše pot (path), prej povezano s posojo $L$.
-	      \end{itemize}
-	\item \textbf{Relacija razveljavitve posoje (Invalidates Loan)} ($\iota \subseteq \mathcal{P} \times \mathcal{L}$):
-	      \begin{itemize}
-		      \item $(P, L) \in \iota$ pomeni, da dejanje, ki se zgodi na točki $P$ (npr. mutacija), razveljavi pogoje posoje $L$.
-	      \end{itemize}
-\end{itemize}
+Zacetno relacijo prekinitve posoje (\textit{loan killed at}) oznacimo s $\kappa \subseteq \mathcal{L} \times \mathcal{P}$.
+$(L,P) \in \kappa$ pomeni, da je posoja $L$ prekinjena (\textit{killed}) na tocki $P$. To se obicajno zgodi
+na sredini prireditvenega stavka, ki prepise pot (\textit{path}) prej povezano s posojo $L$. V NLL RFC-ju
+je ta izraz definiran tako \cite{2094nllRustRFC}:
+
+\begin{displayquote}
+	For a statement at point P in the graph, we define the “transfer function” – that is, which loans it brings into or out of scope – as follows:
+	\begin{itemize}
+		\item \dots
+		\item if this is an assignment \verb|lv = <rvalue>|, then any loan for some path P of which \verb|lv| is a prefix is killed.
+	\end{itemize}
+\end{displayquote}
+
+kjer je pojem \textit{prefix} definiran tako:
+
+\begin{displayquote}
+	\textbf{Prefixes}. We say that the prefixes of an lvalue are all the lvalues you get by stripping away fields and derefs.
+	The prefixes of \verb|*a.b| would be \verb|*a.b|, \verb|a.b|, and \verb|a|.
+\end{displayquote}
+
+\subsubsection{Relacija razveljavitve posoje}
+
+Zacetno relacijo razveljavitve posoje (\textit{invalidates loan}) oznacimo s $\iota \subset \mathcal{P} \times \mathcal{L}$.
+To pomeni, da dejanje na tocki $P$ (recimo mutacija sposojenega mesta oz. \textit{place}) razveljavi pogoje posoje $L$, kar
+je ze opisano v poglavju o definicije mnozice $\mathcal{L}$.
+
 \subsection*{3. Izpeljane relacije (Derived Relations) (Izračunane z analizo)}
 \begin{itemize}
 	\item \textbf{Relacija vsebovanosti (Subset Relation)} ($\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$):
