@@ -3,8 +3,9 @@
 \usepackage{amssymb}
 \usepackage{listings}
 \usepackage{amsfonts} % For \mathcal
-\usepackage{csquotes}
 \usepackage[utf8]{inputenc} % For Slovenian characters
+\usepackage{csquotes}
+\usepackage{float}
 \usepackage[colorlinks=true, linkcolor=blue, urlcolor=red]{hyperref} % Add this to your preamble
 \title{Formalizacija originalne formulacije Polonius-a}
 \author{Filip Trplan}
@@ -70,13 +71,13 @@ t.i. \textit{lifetimes}. V tej formulaciji pa jih je avtor poimenoval regije (\t
 
 Množica regij je torej označena s $\mathcal{R} \subset 2^{\mathcal{L}}$.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\begin{lstlisting}
 let x = vec![1, 2];
 let p: &'a i32 = if random() {
-    &x[0] (* $L_{0} \in \text{'a}$ (*@\llap{prva posoja}@*) *)
+    &x[0] (* $L_{0} \in \text{'a}$ prva posoja *)
 } else {
-    &x[1] (* $L_{1} \in \text{'a}$ (*@\llap{druga posoja}@*) *)
+    &x[1] (* $L_{1} \in \text{'a}$ druga posoja *)
 };
     \end{lstlisting}
 \end{figure}
