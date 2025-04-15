@@ -27,7 +27,7 @@ Objava je dostopna na \cite{AliasbasedFormulationBorrow}. Trenutno pa je razlici
 Rustovega prevajalnika, dostopna na \cite{RustCompilerRustc_borrowck}.
 
 Vsezkozi clanka bom uporabljal naslednji primer anotiran z abstraktnimi regijami (te nimajo ciste bijektivne korespondence z
-dejanskimi Rustovimi lifetime-i).
+dejanskimi Rustovimi lifetime-i). Vsi primeri so izvzeti iz originalnega clanka.
 
 \begin{lstlisting}
 fn main() {
@@ -83,22 +83,30 @@ Rvalue pa je definiran z enumeratorjem \verb|Rvalue| \cite{RvalueRustc_middleMir
 varianta \verb|Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)|, ki ustvari referenco tipa \verb|BorrowKind|
 na mesto \verb|Place|.
 
+V nasem primeru bi posoje zgledale tako:
+
+\begin{lstlisting}
+fn main() {
+  let mut x: i32 = 22;
+  let mut v: Vec<&'0 i32> = vec![];
+  let r: &'1 mut Vec<&'2 i32> = &'3 mut v; (* posoja $L_{0}$ *)
+  let p: &'5 i32 = &'4 x; (* posoja $L_{1} $*)
+  r.push(p);
+  x += 1;
+  take::<Vec<&'6 i32>>(v);
+}
+
+fn take<T>(p: T) { .. }
+\end{lstlisting}
+
 \subsection{Množica regij $\mathcal{R}$}
+
 V trenutni implementaciji preverjalnika izposoj, ki se imenuje NLL \cite{2094nllRustRFC} se posoje spremljajo s pomočjo
 t.i. \textit{lifetimes}. V tej formulaciji pa jih je avtor poimenoval regije (\textit{regions}).
 
 Množica regij je torej označena s $\mathcal{R} \subset 2^{\mathcal{L}}$.
 
-\begin{figure}[H]
-	\begin{lstlisting}
-let x = vec![1, 2];
-let p: &'a i32 = if random() {
-    &x[0] (* $L_{0} \in \text{'a}$ prva posoja *)
-} else {
-    &x[1] (* $L_{1} \in \text{'a}$ druga posoja *)
-};
-    \end{lstlisting}
-\end{figure}
+Na primeru so ze oznacene z \verb|'stevilka|, katere posoje pa so del teh regij pa bomo kasneje dolocili z relacijo.
 
 \subsection{Množica stavkov in točk}
 
@@ -130,7 +138,7 @@ Privzeto se ustvarijo naslednje povezave (to bi moral potrditi v kodi rustc, v c
 \textit{Opomba:} To je samo matematicna formulacija predstavitve grafa poteka, v prevajalniku
 je njegova predstavitev precej bolj kompleksna.
 
-\section{Začetne relacije (\textit{Input Relations})}
+\section{Začetne relacije}
 
 Relacijo oznacimo kot \textbf{zacetno} (\textit{input}), ko jo dobimo tako, da jo izpeljemo
 iz analize poteka podatkov, ki je bila opravljena v prejsnjih fazah prevajalnika. Te relacije
@@ -145,12 +153,51 @@ ob neki tocki v programu.
 Bolj natancno, ce velja $(R_{1}, R_{2}, P) \in \beta$ pomeni, da je $R_{1}$ podmnozica regije $R_{2}$ na tocki $P$ v programu.
 To dejstvo mora veljati na sredini stavka ($M(stmt)$), ki inducira zahtevo.
 
+\begin{lstlisting}
+fn main() {
+  let mut x: i32 = 22;
+  let mut v: Vec<&'0 i32> = vec![];
+
+  let r: &'1 mut Vec<&'2 i32> = &'3 mut v; 
+  // tukaj zahtevamo naslednje: &'3 mut Vec<&'0 i32> <: &'1 mut Vec<&'2 i32> 
+  (* $('3, '1, P) \in \beta, ('0, '2, P) \in \beta, ('2, '0, P) \in \beta$ *)
+
+  let p: &'5 i32 = &'4 x; 
+  // zahtevamo: &'4 i32 <: &'5 i32
+  (* $('4, '5, P) \in \beta$ *)
+
+  r.push(p);
+  // zahtevamo: &'5 i32 <: &'2 i32
+  (* $('5, '2, P) \in \beta$ *)
+
+  x += 1;
+
+  take::<Vec<&'6 i32>>(v);
+  // requires: Vec<&'0 i32> <: Vec<&'6 i32>
+  (* $('0, '6, P) \in \beta$ *)
+}
+\end{lstlisting}
+
 \subsection{Zacetna relacija posoje regij}
 
 Zacetno relacijo posoje regij (\textit{borrow region}) oznacimo s $\psi \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$.
 
 Ce velja $(R,L,P) \in \psi$ pomeni, da izraz za posojo (\textit{borrow expression}) na tocki $P$ ustvari posojo $L$ in postane del
 regije $R$. Prav tako kot relacija vsebovanosti se ta zahteva vzpostavi na sredini stavka.
+
+\begin{lstlisting}
+fn main() {
+  let mut x: i32 = 22;
+  let mut v: Vec<&'0 i32> = vec![];
+  let r: &'1 mut Vec<&'2 i32> = &'3 mut v; 
+  (* $('3, L_{0}, P) \in \psi $ *)
+  let p: &'5 i32 = &'4 x; 
+  (* $('4, L_{1}, P) \in \psi $ *)
+  r.push(p);
+  x += 1;
+  take::<Vec<&'6 i32>>(v);
+}
+\end{lstlisting}
 
 \subsection{Relacija zive regije}
 
@@ -182,6 +229,17 @@ kjer je pojem \textit{prefix} definiran tako:
 	\textbf{Prefixes}. We say that the prefixes of an lvalue are all the lvalues you get by stripping away fields and derefs.
 	The prefixes of \verb|*a.b| would be \verb|*a.b|, \verb|a.b|, and \verb|a|.
 \end{displayquote}
+
+V nasem primeru nimamo nobenega primera prekinitve posoje, je pa relacija kljucna v naslednjem primeru:
+
+\begin{lstlisting}
+let p = 22;
+let q = 44;
+let x: &mut i32 = &mut p; // `x` kaze na `p`
+let y = &mut *x; // Loan L0, `y` kaze tudi na `p`
+// ...
+x = &mut q; // `x` kaze na `q`; prekine L0
+\end{lstlisting}
 
 \subsection{Relacija razveljavitve posoje}
 
