@@ -1,20 +1,21 @@
 \documentclass{article}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{listings}
+\usepackage{listings, listings-rust}
 \usepackage{amsfonts} % For \mathcal
 \usepackage[utf8]{inputenc} % For Slovenian characters
 \usepackage{csquotes}
 \usepackage{float}
-\usepackage[colorlinks=true, linkcolor=blue, urlcolor=red]{hyperref} % Add this to your preamble
 \title{Formalizacija originalne formulacije Polonius-a}
 \author{Filip Trplan}
 \date{April 2025}
 \renewcommand{\refname}{Viri}
 \lstset{
+    language=Rust,
     escapeinside={(*}{*)},
     numbers=left,
-    basicstyle=\ttfamily
+    basicstyle=\ttfamily,
+    style=colouredRust
 }
 
 \begin{document}
@@ -24,6 +25,23 @@
 To je moj poskus matematične formalizacije originalne formulacije Polonius preverjalnika izposoj (\textit{borrow checker}).
 Objava je dostopna na \cite{AliasbasedFormulationBorrow}. Trenutno pa je razlicica te formulacije ze del nightly izdaje
 Rustovega prevajalnika, dostopna na \cite{RustCompilerRustc_borrowck}.
+
+Vsezkozi clanka bom uporabljal naslednji primer anotiran z abstraktnimi regijami (te nimajo ciste bijektivne korespondence z
+dejanskimi Rustovimi lifetime-i).
+
+\begin{lstlisting}
+fn main() {
+  let mut x: i32 = 22;
+  let mut v: Vec<&'0 i32> = vec![];
+  let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+  let p: &'5 i32 = &'4 x;
+  r.push(p);
+  x += 1;
+  take::<Vec<&'6 i32>>(v);
+}
+
+fn take<T>(p: T) { .. }
+\end{lstlisting}
 
 \section{Osnovne množice in elementi}
 
