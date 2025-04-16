@@ -389,24 +389,19 @@ fn main() {
   let mut v: Vec<&'0 i32> = vec![];
 
   let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-  (* $('3, L_{0}) \in \zeta $ *)
-  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
+  (* relacije, ki so ustvarjene tukaj niso relevantne za napako *)
 
   let p: &'5 i32 = &'4 x;
-  (* $('3, L_{0}) \in \zeta $ *)
   (* $('4, L_{1}) \in \zeta $ *)
-  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
-  (* $('4, '5) \in \beta$ *)
+  (* $('4, '5) \in \beta \implies ('5, L_{1}) \in \zeta$ *)
 
   r.push(p);
-  (* $('3, L_{0}) \in \zeta $ *)
-  (* $('4, L_{1}) \in \zeta $ *)
-  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
-  (* $('4, '5) \in \beta$ *)
-  (* $('5, '2) \in \beta$ *)
+  (* $('5, '2) \in \beta \implies ('2, L_{1} \in \zeta)$ *)
   
   x += 1;
-  (* tukaj se razveljavi posoja $L_{0}$: $(L_{0}) \in \iota$ *)
+  (* tukaj se razveljavi posoja $L_{1}$: $(L_{1}) \in \iota$ *)
+  (* da se nam javi napaka mora biti ta posoja ziva: $(L_{1}) \in \nabla_{L}$ *)
+  (* torej jo mora zahtevati neka ziva regija, na trenutni tocki v programu je ziva regija $'2$, ker jo lahko uporabimo v funkciji $take$, ki sprejme nas vektor $v$ z elementi, ki imajo regijo $'2$ *)
 
   take::<Vec<&'6 i32>>(v);
 }
