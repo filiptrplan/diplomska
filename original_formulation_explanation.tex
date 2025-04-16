@@ -18,7 +18,7 @@
     style=colouredRust,
     inputencoding=utf8,
     extendedchars=true,
-    literate={č}{{\'c}}1 {ž}{{\'z}}1 {š}{{\'s}}1
+    literate={č}{{\v{c}}}1 {ž}{{\v{z}}}1 {š}{{\v{s}}}1
 }
 
 \begin{document}
@@ -69,7 +69,7 @@ opisujejo pravila razveljavljanja posoje (\textit{loan killed}). Iz NLL RFC-ja \
 	which loans it brings into or out of scope – as follows:
 	\begin{itemize}
 		\item ...
-		\item if this is an assignment lv = <rvalue>, then any loan for some path P of which lv is a prefix is killed.
+		\item if this is an assignment \verb|lv = <rvalue>|, then any loan for some path P of which \verb|lv| is a prefix is killed.
 	\end{itemize}
 \end{displayquote}
 
@@ -105,9 +105,8 @@ fn take<T>(p: T) { .. }
 \subsection{Množica regij $\mathcal{R}$}
 
 V trenutni implementaciji preverjalnika izposoj, ki se imenuje NLL \cite{2094nllRustRFC} se posoje spremljajo s pomočjo
-t.i. \textit{lifetimes}. V tej formulaciji pa jih je avtor poimenoval regije (\textit{regions}).
-
-Množica regij je torej označena s $\mathcal{R} \subset 2^{\mathcal{L}}$.
+t.i. \textit{lifetimes}. V tej formulaciji pa jih je avtor poimenoval regije (\textit{regions}). Množica regij je
+označena z $\mathcal{R} \subset 2^{\mathcal{L}}$.
 
 Na primeru so že označene z \verb|'stevilka|, katere posoje pa so del teh regij pa bomo kasneje določili z relacijo.
 
@@ -239,7 +238,7 @@ V našem primeru nimamo nobenega primera prekinitve posoje, je pa relacija klju�
 let p = 22;
 let q = 44;
 let x: &mut i32 = &mut p; // `x` kaže na `p`
-let y = &mut *x; // Loan L0, `y` kaže tudi na `p`
+let y = &mut *x; // Posoja L0, `y` kaže tudi na `p`
 // ...
 x = &mut q; // `x` kaže na `q`; prekine L0
 \end{lstlisting}
@@ -269,9 +268,9 @@ fn main() {
 V tem poglavju bomo opisali relacije, ki jih izpeljemo iz začetnih. Te relacije tvorijo najbolj pomembni del analize
 Polonius-a.
 
-V primerih ne bomo označevali točk v grafu poteka z relacijah, ker bo koda anotirana na tistem mestu, kjer
+V primerih ne bomo označevali točk v grafu poteka pri relacijah, ker bo koda anotirana na tistem mestu, kjer
 se posamezna relacija pojavi. V ozadju se to še vedno izvaja na nivoju MIR, vendar za naše poenostavljene
-primere ni to ključna informacija.
+primere ni to ključna informacija. (torej bomo pisali recimo $(R_{1}, R_{2}) \in \beta$ namesto $(R_{1}, R_{2}, P) \in \beta$).
 
 \subsection{Relacija vsebovanosti}
 
@@ -283,9 +282,15 @@ $\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Definirana
 	      iz začetne relacije se pojavijo tudi v razširjeni.
 	\item \textbf{Tranzitivnost:} Če $(R_1, R_2, P) \in \Gamma$ in $(R_2, R_3, P) \in \Gamma$, potem $(R_1, R_3, P) \in \Gamma$.
 	      Relacija vsebovanosti na isti točki v programu je tranzitivna.
-	\item \textbf{Propagacija:} Če $(R_1, R_2, P) \in \Gamma$, $(P, Q) \in C_E$, $(R_1, Q) \in \nabla_R$,
-	      in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. To pomeni, da se propagira čez graf poteka, če sta obe
-	      regiji živi na naslednji točki v grafu.
+	\item \textbf{Propagacija:} Če veljajo
+	      \begin{enumerate}
+		      \item $(R_1, R_2, P) \in \Gamma$
+		      \item $(P, Q) \in C_E$: točki si sledita v grafu poteka
+		      \item $(R_1, Q) \in \nabla_R$: regija 1 je živa na naslednji točki
+		      \item $(R_2, Q) \in \nabla_R$: regija 2 je živa
+	      \end{enumerate}
+	      potem sledi $(R_1, R_2, Q) \in \Gamma$. To pomeni, da se propagira čez graf poteka, če sta obe
+	      regiji živi na naslednji točki v grafu. Pogoj za živost nam pride prav kasneje.
 \end{enumerate}
 
 Za krajši zapis izpustimo točko v grafu P, pozicija anotacije v kodi nam poda njeno relativno lokacijo.
@@ -359,7 +364,7 @@ x += 1;
 // tukaj bi brez pravila o živosti regij še vedno zahtevali (* $(L_{0}, '0) \in \zeta$ *)
 // zaradi pravila o propagaciji 
 
-print(*p);
+print( *p );
 \end{lstlisting}
 
 \subsection{Relacija živosti posoje}
