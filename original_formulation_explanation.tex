@@ -23,11 +23,11 @@
 \maketitle
 
 To je moj poskus matematične formalizacije originalne formulacije Polonius preverjalnika izposoj (\textit{borrow checker}).
-Objava je dostopna na \cite{AliasbasedFormulationBorrow}. Trenutno pa je razlicica te formulacije ze del nightly izdaje
+Objava je dostopna na \cite{AliasbasedFormulationBorrow}. Trenutno pa je različica te formulacije že del nightly izdaje
 Rustovega prevajalnika, dostopna na \cite{RustCompilerRustc_borrowck}.
 
-Vsezkozi clanka bom uporabljal naslednji primer anotiran z abstraktnimi regijami (te nimajo ciste bijektivne korespondence z
-dejanskimi Rustovimi lifetime-i). Vsi primeri so izvzeti iz originalnega clanka.
+Vseskozi članka bom uporabljal naslednji primer anotiran z abstraktnimi regijami (te nimajo čiste bijektivne korespondence z
+dejanskimi Rustovimi lifetime-i). Vsi primeri so izvzeti iz originalnega članka.
 
 \begin{lstlisting}
 fn main() {
@@ -70,8 +70,8 @@ opisujejo pravila razveljavljanja posoje (\textit{loan killed}). Iz NLL RFC-ja \
 	\end{itemize}
 \end{displayquote}
 
-V clanku avtor pravi tudi posojam \textit{borrow expressions}, ki jih Rustov prirocnik za prevajalnik \cite{MIRMidlevelIR}
-opredeli kot poseben primer \textit{Rvalue}. Sicer niso nikjer eksplicitno definirani, vendar v prirocniku
+V članku avtor pravi tudi posojam \textit{borrow expressions}, ki jih Rustov priročnik za prevajalnik \cite{MIRMidlevelIR}
+opredeli kot poseben primer \textit{Rvalue}. Sicer niso nikjer eksplicitno definirani, vendar v priročniku
 so omenjeni tako:
 
 \begin{displayquote}
@@ -79,11 +79,11 @@ so omenjeni tako:
 	mutable borrow expression, which looks like \verb|&mut <Place>|
 \end{displayquote}
 
-Rvalue pa je definiran z enumeratorjem \verb|Rvalue| \cite{RvalueRustc_middleMira}. Nas pa zanima specificno
+Rvalue pa je definiran z enumeratorjem \verb|Rvalue| \cite{RvalueRustc_middleMira}. Nas pa zanima specifično
 varianta \verb|Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)|, ki ustvari referenco tipa \verb|BorrowKind|
 na mesto \verb|Place|.
 
-V nasem primeru bi posoje zgledale tako:
+V našem primeru bi posoje zgledale tako:
 
 \begin{lstlisting}
 fn main() {
@@ -106,7 +106,7 @@ t.i. \textit{lifetimes}. V tej formulaciji pa jih je avtor poimenoval regije (\t
 
 Množica regij je torej označena s $\mathcal{R} \subset 2^{\mathcal{L}}$.
 
-Na primeru so ze oznacene z \verb|'stevilka|, katere posoje pa so del teh regij pa bomo kasneje dolocili z relacijo.
+Na primeru so že označene z \verb|'stevilka|, katere posoje pa so del teh regij pa bomo kasneje določili z relacijo.
 
 \subsection{Množica stavkov in točk}
 
@@ -125,32 +125,32 @@ ki nam bodo kasneje prišle prav. Te so izračunane tekom analize poteka podatko
 (\textit{dataflow analysis})\cite{MIRDataflowRust}. Graf poteka označimo s $C = (C_{V}, C_{E})$.
 
 % TODO: Malo se preberi ali je res to pravilno. Kako dejansko dobimo input za CFG in
-% kaksne informacije mu pripadajo?
+% kakšne informacije mu pripadajo?
 
-Privzeto se ustvarijo naslednje povezave (to bi moral potrditi v kodi rustc, v clanku tako pise):
+Privzeto se ustvarijo naslednje povezave (to bi moral potrditi v kodi rustc, v članku tako piše):
 \begin{itemize}
-	\item Za vsak stavek se ustvari povezava med njegovim zacetkom in sredino:
+	\item Za vsak stavek se ustvari povezava med njegovim začetkom in sredino:
 	      $\forall stmt \in \mathcal{S}: (S(stmt), M(stmt)) \in C_{E}$
-	\item Ce $M(stmt)$ predstavlja \textit{terminator} potem dodamo povezavo iz njega v $S(stmt')$
-	      zacetnih stavkov osnovnih blokov, ki mu sledijo.
+	\item Če $M(stmt)$ predstavlja \textit{terminator} potem dodamo povezavo iz njega v $S(stmt')$
+	      začetnih stavkov osnovnih blokov, ki mu sledijo.
 \end{itemize}
 
-\textit{Opomba:} To je samo matematicna formulacija predstavitve grafa poteka, v prevajalniku
+\textit{Opomba:} To je samo matematična formulacija predstavitve grafa poteka, v prevajalniku
 je njegova predstavitev precej bolj kompleksna.
 
 \section{Začetne relacije}
 
-Relacijo oznacimo kot \textbf{zacetno} (\textit{input}), ko jo dobimo tako, da jo izpeljemo
-iz analize poteka podatkov, ki je bila opravljena v prejsnjih fazah prevajalnika. Te relacije
-bodio predstavljale naso zacetno tocko iz katere bomo izpeljali druge relacije.
+Relacijo označimo kot \textbf{začetno} (\textit{input}), ko jo dobimo tako, da jo izpeljemo
+iz analize poteka podatkov, ki je bila opravljena v prejšnjih fazah prevajalnika. Te relacije
+bodo predstavljale našo začetno točko iz katere bomo izpeljali druge relacije.
 
-\subsection{Zacetna relacija vsebovanosti}
+\subsection{Začetna relacija vsebovanosti}
 
-Zacetno relacijo vsebovanosti (\textit{base subset}) bomo oznacili s
+Začetno relacijo vsebovanosti (\textit{base subset}) bomo označili s
 $\beta \subset \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Torej to je relacija, ki povezuje dve regiji
-ob neki tocki v programu.
+ob neki točki v programu.
 
-Bolj natancno, ce velja $(R_{1}, R_{2}, P) \in \beta$ pomeni, da je $R_{1}$ podmnozica regije $R_{2}$ na tocki $P$ v programu.
+Bolj natančno, če velja $(R_{1}, R_{2}, P) \in \beta$ pomeni, da je $R_{1}$ podmnožica regije $R_{2}$ na točki $P$ v programu.
 To dejstvo mora veljati na sredini stavka ($M(stmt)$), ki inducira zahtevo.
 
 \begin{lstlisting}
@@ -178,11 +178,11 @@ fn main() {
 }
 \end{lstlisting}
 
-\subsection{Zacetna relacija posoje regij}
+\subsection{Začetna relacija posoje regij}
 
-Zacetno relacijo posoje regij (\textit{borrow region}) oznacimo s $\psi \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$.
+Začetno relacijo posoje regij (\textit{borrow region}) označimo s $\psi \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$.
 
-Ce velja $(R,L,P) \in \psi$ pomeni, da izraz za posojo (\textit{borrow expression}) na tocki $P$ ustvari posojo $L$ in postane del
+Če velja $(R,L,P) \in \psi$ pomeni, da izraz za posojo (\textit{borrow expression}) na točki $P$ ustvari posojo $L$ in postane del
 regije $R$. Prav tako kot relacija vsebovanosti se ta zahteva vzpostavi na sredini stavka.
 
 \begin{lstlisting}
@@ -199,20 +199,20 @@ fn main() {
 }
 \end{lstlisting}
 
-\subsection{Relacija zive regije}
+\subsection{Relacija žive regije}
 
-Zacetno relacijo zive regije (\textit{region live at}) oznacimo z $\nabla_{R} \subseteq \mathcal{R} \times \mathcal{P}$.
-$(R, P) \in \nabla_{R}$ pomeni, da je regija $R$ ziva na tocki $P$. Torej spremenljivka katere tip vkljucuje $R$ (recimo \verb|&'a|)
+Začetno relacijo žive regije (\textit{region live at}) označimo z $\nabla_{R} \subseteq \mathcal{R} \times \mathcal{P}$.
+$(R, P) \in \nabla_{R}$ pomeni, da je regija $R$ živa na točki $P$. Torej spremenljivka katere tip vključuje $R$ (recimo \verb|&'a|)
 bo morda kasneje v programu uporabljena.
 
-To doloci analiza zivosti, ki poteka isto kot v NLL RFC. Bolj specificno, s pomocjo raznih omejitev izracuna mnozico tock
-kjer mora biti regija (v RFC-ju poimenovana \textit{lifetime}) ziva \cite{2094nllRustRFC}.
+To določi analiza živosti, ki poteka isto kot v NLL RFC. Bolj specifično, s pomočjo raznih omejitev izračuna množico točk
+kjer mora biti regija (v RFC-ju poimenovana \textit{lifetime}) živa \cite{2094nllRustRFC}.
 
 \subsection{Relacija prekinitve posoje}
 
-Zacetno relacijo prekinitve posoje (\textit{loan killed at}) oznacimo s $\kappa \subseteq \mathcal{L} \times \mathcal{P}$.
-$(L,P) \in \kappa$ pomeni, da je posoja $L$ prekinjena (\textit{killed}) na tocki $P$. To se obicajno zgodi
-na sredini prireditvenega stavka, ki prepise pot (\textit{path}) prej povezano s posojo $L$. V NLL RFC-ju
+Začetno relacijo prekinitve posoje (\textit{loan killed at}) označimo s $\kappa \subseteq \mathcal{L} \times \mathcal{P}$.
+$(L,P) \in \kappa$ pomeni, da je posoja $L$ prekinjena (\textit{killed}) na točki $P$. To se običajno zgodi
+na sredini prireditvenega stavka, ki prepiše pot (\textit{path}) prej povezano s posojo $L$. V NLL RFC-ju
 je ta izraz definiran tako \cite{2094nllRustRFC}:
 
 \begin{displayquote}
@@ -230,22 +230,22 @@ kjer je pojem \textit{prefix} definiran tako:
 	The prefixes of \verb|*a.b| would be \verb|*a.b|, \verb|a.b|, and \verb|a|.
 \end{displayquote}
 
-V nasem primeru nimamo nobenega primera prekinitve posoje, je pa relacija kljucna v naslednjem primeru:
+V našem primeru nimamo nobenega primera prekinitve posoje, je pa relacija ključna v naslednjem primeru:
 
 \begin{lstlisting}
 let p = 22;
 let q = 44;
-let x: &mut i32 = &mut p; // `x` kaze na `p`
-let y = &mut *x; // Loan L0, `y` kaze tudi na `p`
+let x: &mut i32 = &mut p; // `x` kaže na `p`
+let y = &mut *x; // Loan L0, `y` kaže tudi na `p`
 // ...
-x = &mut q; // `x` kaze na `q`; prekine L0
+x = &mut q; // `x` kaže na `q`; prekine L0
 \end{lstlisting}
 
 \subsection{Relacija razveljavitve posoje}
 
-Zacetno relacijo razveljavitve posoje (\textit{invalidates loan}) oznacimo s $\iota \subset \mathcal{P} \times \mathcal{L}$.
-To pomeni, da dejanje na tocki $P$ (recimo mutacija sposojenega mesta oz. \textit{place}) razveljavi pogoje posoje $L$, kar
-je ze opisano v poglavju o definicije mnozice $\mathcal{L}$.
+Začetno relacijo razveljavitve posoje (\textit{invalidates loan}) označimo s $\iota \subset \mathcal{P} \times \mathcal{L}$.
+To pomeni, da dejanje na točki $P$ (recimo mutacija sposojenega mesta oz. \textit{place}) razveljavi pogoje posoje $L$, kar
+je že opisano v poglavju o definicije množice $\mathcal{L}$.
 
 \begin{lstlisting}
 fn main() {
@@ -263,29 +263,29 @@ fn main() {
 
 \section{Izpeljane relacije}
 
-V tem poglavju bomo opisali relacije, ki jih izpeljemo iz zacetnih. Te relacije tvorijo najbolj pomembni del analize
+V tem poglavju bomo opisali relacije, ki jih izpeljemo iz začetnih. Te relacije tvorijo najbolj pomembni del analize
 Polonius-a.
 
-V primerih ne bomo oznacevali tock v grafu poteka z relacijah, ker bo koda anotirana na tistem mestu, kjer
-se posamezna relacija pojavi. V ozadju se to se vedno izvaja na nivoju MIR, vendar za nase poenostavljene
-primere ni to kljucna informacija.
+V primerih ne bomo označevali točk v grafu poteka z relacijah, ker bo koda anotirana na tistem mestu, kjer
+se posamezna relacija pojavi. V ozadju se to še vedno izvaja na nivoju MIR, vendar za naše poenostavljene
+primere ni to ključna informacija.
 
 \subsection{Relacija vsebovanosti}
 
-Razsirimo zacetno relacijo vsebovanosti z relacijo vsebovanosti (\textit{subset}), ki jo oznacimo s
+Razširimo začetno relacijo vsebovanosti z relacijo vsebovanosti (\textit{subset}), ki jo označimo s
 $\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Definirana je z zaprtjem naslednjih pravil:
 
 \begin{enumerate}
-	\item \textbf{Zacetna relacija: }Če $(R_1, R_2, P) \in \beta$, potem $(R_1, R_2, P) \in \Gamma$. Torej vse trojice
-	      iz zacetne relacije se pojavijo tudi v razsirjeni.
+	\item \textbf{Začetna relacija: }Če $(R_1, R_2, P) \in \beta$, potem $(R_1, R_2, P) \in \Gamma$. Torej vse trojice
+	      iz začetne relacije se pojavijo tudi v razširjeni.
 	\item \textbf{Tranzitivnost:} Če $(R_1, R_2, P) \in \Gamma$ in $(R_2, R_3, P) \in \Gamma$, potem $(R_1, R_3, P) \in \Gamma$.
-	      Relacija vsebovanosti na isti tocki v programu je tranzitivna.
+	      Relacija vsebovanosti na isti točki v programu je tranzitivna.
 	\item \textbf{Propagacija:} Če $(R_1, R_2, P) \in \Gamma$, $(P, Q) \in C_E$, $(R_1, Q) \in \nabla_R$,
-	      in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. To pomeni, da se propagira cez graf poteka, ce sta obe
-	      regiji zivi na naslednji tocki v grafu.
+	      in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. To pomeni, da se propagira čez graf poteka, če sta obe
+	      regiji živi na naslednji točki v grafu.
 \end{enumerate}
 
-Za krajsi zapis izpustimo tocko v grafu P, pozicija anotacije v kodi nam poda njeno relativno lokacijo.
+Za krajši zapis izpustimo točko v grafu P, pozicija anotacije v kodi nam poda njeno relativno lokacijo.
 
 \begin{lstlisting}
 fn main() {
@@ -318,25 +318,25 @@ fn take<T>(p: T) { .. }
 
 \subsection{Relacija zahteve}
 
-Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na tocki $P$. Oznacimo jo s
+Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Oznacimo jo s
 $\zeta \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$ in definirana je z zaprtjem naslednjih pravil:
 \begin{enumerate}
-	\item \textbf{Zacetna relacija:} Če $(R, L, P) \in \psi$, potem $(R, L, P) \in \zeta$. To nam pove, da ce se trojica
+	\item \textbf{Začetna relacija:} Če $(R, L, P) \in \psi$, potem $(R, L, P) \in \zeta$. To nam pove, da če se trojica
 	      nahaja v relaciji posoje regij, se nahaja tudi v $\zeta$.
-	\item \textbf{Vsebovanost:} Ce $(R_{1}, L, P) \in \zeta$ in $(R_{1}, R_{2}, P) \in \Gamma$, potem velja
-	      $(R_{2}, L, P) \in \zeta$. To nam pove, da ce neka regija $R_{1}$, ki je podmnozica vecje regije $R_{2}$ na tocki $P$
+	\item \textbf{Vsebovanost:} Če $(R_{1}, L, P) \in \zeta$ in $(R_{1}, R_{2}, P) \in \Gamma$, potem velja
+	      $(R_{2}, L, P) \in \zeta$. To nam pove, da če neka regija $R_{1}$, ki je podmnožica večje regije $R_{2}$ na točki $P$
 	      zahteva posojo $L$, potem tudi $R_{2}$ zahteva isto posojo.
-	\item \textbf{Propagacija:} Ce veljajo vse \begin{enumerate}
+	\item \textbf{Propagacija:} Če veljajo vse \begin{enumerate}
 		      \item $(R,L,P) \in \zeta$: $R$ zahteva $L$ na $P$
 		      \item $(L, P) \notin \kappa$: $L$ ni prekinjena na $P$
 		      \item $(P, Q) \in C_{E}$: $Q$ sledi $P$ v grafu poteka
-		      \item $(R,Q) \in \nabla_{R}$: regija $R$ je ziva na tocki $Q$
+		      \item $(R,Q) \in \nabla_{R}$: regija $R$ je živa na točki $Q$
 	      \end{enumerate}
 	      potem propagiramo relacijo v $(R,L,Q) \in \zeta$.
 \end{enumerate}
 
-Ce pozorno pogledamo pri relaciji vsebovanosti $\beta$ in relaciji zahteve $\zeta$ mora biti regija pri pravilu
-za propagacijo ziva na naslednji tocki $Q$. To nam pomaga pri naslednjem primeru.
+Če pozorno pogledamo pri relaciji vsebovanosti $\beta$ in relaciji zahteve $\zeta$ mora biti regija pri pravilu
+za propagacijo živa na naslednji točki $Q$. To nam pomaga pri naslednjem primeru.
 
 \begin{lstlisting}
 let x = 22;
@@ -349,39 +349,39 @@ let mut p: &'0 i32 = &'1 x; (* posoja $L_{0}$ *)
 p = &'3 y; (* posoja $L_{1}$ *)
 (* $('3,'0) \in \beta$ *)
 (* $('3, L_{1}) \in \zeta$ *)
-//'1 ni vec ziva, ker smo jo prepisali z '3 
+//'1 ni več živa, ker smo jo prepisali z '3 
 
 x += 1;
 // razveljavi se posoja (* $L_{0}$ $(L_{0}) \in \iota$ *)
-// tukaj bi brez pravila o zivosti regij se vedno zahtevali (* $(L_{0}, '0) \in \zeta$ *)
+// tukaj bi brez pravila o živosti regij še vedno zahtevali (* $(L_{0}, '0) \in \zeta$ *)
 // zaradi pravila o propagaciji 
 
 print(*p);
 \end{lstlisting}
 
-\subsection{Relacija zivosti posoje}
+\subsection{Relacija živosti posoje}
 
-Relacija zivosti posoje(\textit{loan live at}) pomeni, da je posoja $L$ ziva na tocki $P$. Oznacimo jo s
+Relacija živosti posoje(\textit{loan live at}) pomeni, da je posoja $L$ živa na točki $P$. Oznacimo jo s
 $\nabla_{L} \subseteq \mathcal{L} \times \mathcal{P}$ in definiramo takrat, ko
 
 \[ \exists R \in \mathcal{R}: (R,P) \in \nabla_{R} \land (R,L,P) \in \zeta \]
 
-To na kratko pomeni, da je posoja ziva, ce jo na isti tocki zahteva nekia ziva regija.
+To na kratko pomeni, da je posoja živa, če jo na isti točki zahteva neka živa regija.
 
 \section{Javljanje napake}
 
-S pomocjo prejsnjih relacij lahko na koncu definiramo kje v programu se zgodi napaka (vsaj v smislu preverjalnika posoj).
-Ze spet si pomagamo z relacijo, ki jo poimenujemo \textbf{relacija napake} (\textit{error}) in jo oznacimo s
-$\epsilon \subset \mathcal{P}$. To nam bo povedalo, da se napaka pojavi na tocki $P$ v programu.
+S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu se zgodi napaka (vsaj v smislu preverjalnika posoj).
+Že spet si pomagamo z relacijo, ki jo poimenujemo \textbf{relacija napake} (\textit{error}) in jo označimo s
+$\epsilon \subset \mathcal{P}$. To nam bo povedalo, da se napaka pojavi na točki $P$ v programu.
 
 Definiramo jo, ko:
 
 \[ \exists L \in \mathcal{L}: (P, L) \in \iota \land (L,P) \in \nabla_{L} \]
 
-Torej napaka se pojavi natanko tedaj, ko neko dejanje na tocki $P$ razveljavi pogoje posoje $L$, ki je hkrati tudi
-ziva na tocki $P$.
+Torej napaka se pojavi natanko tedaj, ko neko dejanje na točki $P$ razveljavi pogoje posoje $L$, ki je hkrati tudi
+živa na točki $P$.
 
-Poglejmo se kako se dokoncno napaka javi na nasem primeru:
+Poglejmo še kako se dokončno napaka javi na našem primeru:
 
 \begin{lstlisting}
 fn main() {
@@ -400,9 +400,9 @@ fn main() {
   
   x += 1;
   // tukaj se razveljavi posoja (* $L_{1}$: $(L_{1}) \in \iota$ *)
-  // da se nam javi napaka mora biti ta posoja ziva: (* $(L_{1}) \in \nabla_{L}$ *)
-  // torej jo mora zahtevati neka ziva regija, na trenutni tocki v programu je 
-  // ziva regija '2, ker jo lahko uporabimo v funkciji `take`, ki sprejme nas 
+  // da se nam javi napaka mora biti ta posoja živa: (* $(L_{1}) \in \nabla_{L}$ *)
+  // torej jo mora zahtevati neka živa regija, na trenutni točki v programu je 
+  // živa regija '2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš 
   // vektor `v` z elementi, ki imajo regijo '2
 
   take::<Vec<&'6 i32>>(v);
@@ -415,3 +415,4 @@ fn take<T>(p: T) { .. }
 \bibliography{thesis}
 \bibliographystyle{unsrt}
 \end{document}
+
