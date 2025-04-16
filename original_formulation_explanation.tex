@@ -247,10 +247,28 @@ Zacetno relacijo razveljavitve posoje (\textit{invalidates loan}) oznacimo s $\i
 To pomeni, da dejanje na tocki $P$ (recimo mutacija sposojenega mesta oz. \textit{place}) razveljavi pogoje posoje $L$, kar
 je ze opisano v poglavju o definicije mnozice $\mathcal{L}$.
 
+\begin{lstlisting}
+fn main() {
+  let mut x: i32 = 22;
+  let mut v: Vec<&'0 i32> = vec![];
+  let r: &'1 mut Vec<&'2 i32> = &'3 mut v; 
+  (* $('3, L_{0}, P) \in \psi $ *)
+  let p: &'5 i32 = &'4 x; 
+  (* $('4, L_{1}, P) \in \psi $ *)
+  r.push(p);
+  x += 1; (* tukaj razveljavimo $L_{1}$ z mutacijo deljenega referenta *)
+  take::<Vec<&'6 i32>>(v);
+}
+\end{lstlisting}
+
 \section{Izpeljane relacije}
 
 V tem poglavju bomo opisali relacije, ki jih izpeljemo iz zacetnih. Te relacije tvorijo najbolj pomembni del analize
 Polonius-a.
+
+V primerih ne bomo oznacevali tock v grafu poteka z relacijah, ker bo koda anotirana na tistem mestu, kjer
+se posamezna relacija pojavi. V ozadju se to se vedno izvaja na nivoju MIR, vendar za nase poenostavljene
+primere ni to kljucna informacija.
 
 \subsection{Relacija vsebovanosti}
 
@@ -258,10 +276,45 @@ Razsirimo zacetno relacijo vsebovanosti z relacijo vsebovanosti (\textit{subset}
 $\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Definirana je z zaprtjem naslednjih pravil:
 
 \begin{enumerate}
-	\item \textbf{Zacetna relacija: }Če $(R_1, R_2, P) \in \beta$, potem $(R_1, R_2, P) \in \Gamma$. Torej vse trojice iz zacetne relacije se pojavijo tudi v razsirjeni.
-	\item \textbf{Tranzitivnost:} Če $(R_1, R_2, P) \in \Gamma$ in $(R_2, R_3, P) \in \Gamma$, potem $(R_1, R_3, P) \in \Gamma$. Relacija vsebovanosti na isti tocki v programu je tranzitivna.
-	\item \textbf{Propagacija:} Če $(R_1, R_2, P) \in \Gamma$, $(P, Q) \in C_E$, $(R_1, Q) \in \nabla_R$, in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. To pomeni, da se propagira cez graf poteka, ce sta obe regiji zivi na naslednji tocki v grafu.
+	\item \textbf{Zacetna relacija: }Če $(R_1, R_2, P) \in \beta$, potem $(R_1, R_2, P) \in \Gamma$. Torej vse trojice
+	      iz zacetne relacije se pojavijo tudi v razsirjeni.
+	\item \textbf{Tranzitivnost:} Če $(R_1, R_2, P) \in \Gamma$ in $(R_2, R_3, P) \in \Gamma$, potem $(R_1, R_3, P) \in \Gamma$.
+	      Relacija vsebovanosti na isti tocki v programu je tranzitivna.
+	\item \textbf{Propagacija:} Če $(R_1, R_2, P) \in \Gamma$, $(P, Q) \in C_E$, $(R_1, Q) \in \nabla_R$,
+	      in $(R_2, Q) \in \nabla_R$, potem $(R_1, R_2, Q) \in \Gamma$. To pomeni, da se propagira cez graf poteka, ce sta obe
+	      regiji zivi na naslednji tocki v grafu.
 \end{enumerate}
+
+Za krajsi zapis izpustimo tocko v grafu P, pozicija anotacije v kodi nam poda njeno relativno lokacijo.
+
+\begin{lstlisting}
+fn main() {
+  let mut x: i32 = 22;
+  let mut v: Vec<&'0 i32> = vec![];
+
+  let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
+
+  let p: &'5 i32 = &'4 x;
+  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
+  (* $('4, '5) \in \beta$ *)
+
+  r.push(p);
+  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
+  (* $('4, '5) \in \beta$ *)
+  (* $('5, '2) \in \beta$ *)
+  
+  x += 1;
+
+  take::<Vec<&'6 i32>>(v);
+  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
+  (* $('4, '5) \in \beta$ *)
+  (* $('5, '2) \in \beta$ *)
+  (* $('0, '6) \in \beta$ *)
+}
+
+fn take<T>(p: T) { .. }
+\end{lstlisting}
 
 \subsection{Relacija zahteve}
 
@@ -282,6 +335,30 @@ $\zeta \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$ in definiran
 	      potem propagiramo relacijo v $(R,L,Q) \in \zeta$.
 \end{enumerate}
 
+Ce pozorno pogledamo pri relaciji vsebovanosti $\beta$ in relaciji zahteve $\zeta$ mora biti regija pri pravilu
+za propagacijo ziva na naslednji tocki $Q$. To nam pomaga pri naslednjem primeru.
+
+\begin{lstlisting}
+let x = 22;
+let y = 44;
+
+let mut p: &'0 i32 = &'1 x; (* posoja $L_{0}$ *)
+(* $('1,'0) \in \beta$ *)
+(* $('1, L_{0}) \in \zeta$ *)
+
+p = &'3 y; (* posoja $L_{1}$ *)
+(* $('3,'0) \in \beta$ *)
+(* $('3, L_{1}) \in \zeta$ *)
+(* '1 ni vec ziva, ker smo jo prepisali z '3 *)
+
+x += 1;
+(* razveljavi se posoja $L_{0}$ $(L_{0}) \in \iota$ *)
+(* tukaj bi brez pravila o zivosti regij se vedno zahtevali $(L_{0}, '0) \in \zeta$
+zaradi pravila o propagaciji *)
+
+print(*p);
+\end{lstlisting}
+
 \subsection{Relacija zivosti posoje}
 
 Relacija zivosti posoje(\textit{loan live at}) pomeni, da je posoja $L$ ziva na tocki $P$. Oznacimo jo s
@@ -290,7 +367,6 @@ $\nabla_{L} \subseteq \mathcal{L} \times \mathcal{P}$ in definiramo takrat, ko
 \[ \exists R \in \mathcal{R}: (R,P) \in \nabla_{R} \land (R,L,P) \in \zeta \]
 
 To na kratko pomeni, da je posoja ziva, ce jo na isti tocki zahteva nekia ziva regija.
-
 
 \section{Javljanje napake}
 
@@ -304,6 +380,40 @@ Definiramo jo, ko:
 
 Torej napaka se pojavi natanko tedaj, ko neko dejanje na tocki $P$ razveljavi pogoje posoje $L$, ki je hkrati tudi
 ziva na tocki $P$.
+
+Poglejmo se kako se dokoncno napaka javi na nasem primeru:
+
+\begin{lstlisting}
+fn main() {
+  let mut x: i32 = 22;
+  let mut v: Vec<&'0 i32> = vec![];
+
+  let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+  (* $('3, L_{0}) \in \zeta $ *)
+  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
+
+  let p: &'5 i32 = &'4 x;
+  (* $('3, L_{0}) \in \zeta $ *)
+  (* $('4, L_{1}) \in \zeta $ *)
+  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
+  (* $('4, '5) \in \beta$ *)
+
+  r.push(p);
+  (* $('3, L_{0}) \in \zeta $ *)
+  (* $('4, L_{1}) \in \zeta $ *)
+  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
+  (* $('4, '5) \in \beta$ *)
+  (* $('5, '2) \in \beta$ *)
+  
+  x += 1;
+  (* tukaj se razveljavi posoja $L_{0}$: $(L_{0}) \in \iota$ *)
+
+  take::<Vec<&'6 i32>>(v);
+}
+
+fn take<T>(p: T) { .. }
+\end{lstlisting}
+
 
 \bibliography{thesis}
 \bibliographystyle{unsrt}
