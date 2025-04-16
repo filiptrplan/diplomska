@@ -173,7 +173,7 @@ fn main() {
   x += 1;
 
   take::<Vec<&'6 i32>>(v);
-  // requires: Vec<&'0 i32> <: Vec<&'6 i32>
+  // zahtevamo Vec<&'0 i32> <: Vec<&'6 i32>
   (* $('0, '6, P) \in \beta$ *)
 }
 \end{lstlisting}
@@ -256,7 +256,7 @@ fn main() {
   let p: &'5 i32 = &'4 x; 
   (* $('4, L_{1}, P) \in \psi $ *)
   r.push(p);
-  x += 1; (* tukaj razveljavimo $L_{1}$ z mutacijo deljenega referenta *)
+  x += 1; // tukaj razveljavimo (* $L_{1}$ *) z mutacijo deljenega referenta
   take::<Vec<&'6 i32>>(v);
 }
 \end{lstlisting}
@@ -349,12 +349,12 @@ let mut p: &'0 i32 = &'1 x; (* posoja $L_{0}$ *)
 p = &'3 y; (* posoja $L_{1}$ *)
 (* $('3,'0) \in \beta$ *)
 (* $('3, L_{1}) \in \zeta$ *)
-(* '1 ni vec ziva, ker smo jo prepisali z '3 *)
+//'1 ni vec ziva, ker smo jo prepisali z '3 
 
 x += 1;
-(* razveljavi se posoja $L_{0}$ $(L_{0}) \in \iota$ *)
-(* tukaj bi brez pravila o zivosti regij se vedno zahtevali $(L_{0}, '0) \in \zeta$
-zaradi pravila o propagaciji *)
+// razveljavi se posoja (* $L_{0}$ $(L_{0}) \in \iota$ *)
+// tukaj bi brez pravila o zivosti regij se vedno zahtevali (* $(L_{0}, '0) \in \zeta$ *)
+// zaradi pravila o propagaciji 
 
 print(*p);
 \end{lstlisting}
@@ -389,7 +389,7 @@ fn main() {
   let mut v: Vec<&'0 i32> = vec![];
 
   let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-  (* relacije, ki so ustvarjene tukaj niso relevantne za napako *)
+  // relacije, ki so ustvarjene tukaj niso relevantne za napako 
 
   let p: &'5 i32 = &'4 x;
   (* $('4, L_{1}) \in \zeta $ *)
@@ -399,9 +399,11 @@ fn main() {
   (* $('5, '2) \in \beta \implies ('2, L_{1} \in \zeta)$ *)
   
   x += 1;
-  (* tukaj se razveljavi posoja $L_{1}$: $(L_{1}) \in \iota$ *)
-  (* da se nam javi napaka mora biti ta posoja ziva: $(L_{1}) \in \nabla_{L}$ *)
-  (* torej jo mora zahtevati neka ziva regija, na trenutni tocki v programu je ziva regija $'2$, ker jo lahko uporabimo v funkciji $take$, ki sprejme nas vektor $v$ z elementi, ki imajo regijo $'2$ *)
+  // tukaj se razveljavi posoja (* $L_{1}$: $(L_{1}) \in \iota$ *)
+  // da se nam javi napaka mora biti ta posoja ziva: (* $(L_{1}) \in \nabla_{L}$ *)
+  // torej jo mora zahtevati neka ziva regija, na trenutni tocki v programu je 
+  // ziva regija '2, ker jo lahko uporabimo v funkciji `take`, ki sprejme nas 
+  // vektor `v` z elementi, ki imajo regijo '2
 
   take::<Vec<&'6 i32>>(v);
 }
