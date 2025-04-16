@@ -15,7 +15,10 @@
     escapeinside={(*}{*)},
     numbers=left,
     basicstyle=\ttfamily,
-    style=colouredRust
+    style=colouredRust,
+    inputencoding=utf8,
+    extendedchars=true,
+    literate={č}{{\'c}}1 {ž}{{\'z}}1 {š}{{\'s}}1
 }
 
 \begin{document}
@@ -371,7 +374,7 @@ To na kratko pomeni, da je posoja živa, če jo na isti točki zahteva neka živ
 \section{Javljanje napake}
 
 S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu se zgodi napaka (vsaj v smislu preverjalnika posoj).
-Že spet si pomagamo z relacijo, ki jo poimenujemo \textbf{relacija napake} (\textit{error}) in jo označimo s
+že spet si pomagamo z relacijo, ki jo poimenujemo \textbf{relacija napake} (\textit{error}) in jo označimo s
 $\epsilon \subset \mathcal{P}$. To nam bo povedalo, da se napaka pojavi na točki $P$ v programu.
 
 Definiramo jo, ko:
@@ -411,8 +414,7 @@ fn main() {
 fn take<T>(p: T) { .. }
 \end{lstlisting}
 
-
-\bibliography{thesis}
 \bibliographystyle{unsrt}
+\bibliography{thesis}
 \end{document}
 
