@@ -6,10 +6,15 @@
 \usepackage[utf8]{inputenc} % For Slovenian characters
 \usepackage{csquotes}
 \usepackage{float}
+\usepackage[backend=biber]{biblatex}
+
+\addbibresource{thesis.bib}
+
 \title{Formalizacija originalne formulacije Polonius-a}
 \author{Filip Trplan}
 \date{April 2025}
 \renewcommand{\refname}{Viri}
+
 \lstset{
     language=Rust,
     escapeinside={(*}{*)},
@@ -45,6 +50,9 @@ fn main() {
 
 fn take<T>(p: T) { .. }
 \end{lstlisting}
+
+\section{Definicije pojmov}
+
 
 \section{Osnovne množice in elementi}
 
@@ -419,7 +427,7 @@ fn main() {
 fn take<T>(p: T) { .. }
 \end{lstlisting}
 
-\bibliographystyle{unsrt}
-\bibliography{thesis}
+\printbibliography
+
 \end{document}
 
