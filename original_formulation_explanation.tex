@@ -30,7 +30,7 @@
 
 \maketitle
 
-To je moj poskus matematične formalizacije originalne formulacije Polonius preverjalnika izposoj (\textit{borrow checker}).
+To je moj poskus matematične formalizacije originalne formulacije Polonius preverjevalnika izposoj (\textit{borrow checker}).
 Objava je dostopna na \cite{AliasbasedFormulationBorrow}. Trenutno pa je različica te formulacije že del nightly izdaje
 Rustovega prevajalnika, dostopna na \cite{RustCompilerRustc_borrowck}.
 
@@ -51,9 +51,32 @@ fn main() {
 fn take<T>(p: T) { .. }
 \end{lstlisting}
 
+TODO: Mogoce omeni delo na \cite{crichtonGroundedConceptualModel2023} kjer so tudi na hitro opisali polonius formalno.
+
 \section{Definicije pojmov}
 
+\begin{description}
+	\item[MIR] MIR je kratica za \textit{Mid-level intermediate representation} in je bistveno poenostavljena oblika Rust-a, ki
+	      se uporablja za dele prevajalnika, ki zahtevajo informaciji o kontroli pretoka (toka?) \cite{MIRMidlevelIR}.
+	      \subitem[Mesto (\textit{place})] je izraz, ki nam opredeli (identify?) lokacijo v pomnilniku \cite{MIRMidlevelIR}.
+	      \citeauthor{weissOxideEssenceRust} primerjajo pojem mesta s pojmom \textit{lvalue} iz programskega jezika C.
+	\item[Referenca] v Rust-u je podobna kazalcu v ostalih programskih jezikih, vendar prevajalnik zagotavlja, da kaze
+	      na veljavno vrednost podanega tipa za celo dobo aktivnosti(? pisalo je for the life of the reference) reference \cite{klabnikRustProgrammingLanguage2023}.
+	      Locimo jih na dva tipa \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust}:
+	      \subitem[Deljena referenca (\textit{shared / immutable reference})] V programu lahko ustvarimo vec deljenih referenc
+	      na isto mesto, vendar tega mesta potem ne moremo mutirati.
+	      \subitem[Spremenljiva referenca (\textit{ unique / mutable reference})] Za omogocanje mutacije pa lahko ustvarimo
+	      spremenljivo referenco, ki je ena sama in nam omogoca spreminjanje vrednosti zapisana na posameznem mestu.
+	      V literaturi jim pravijo vecinoma \textit{unique}
+	      vendar sem izbral prevod spremenljiva saj beseda \textit{edinstvena} ne zveni ustrezno.
+	      \subitem Ta tip omejevanja ustvarjanja referenc se imenuje \textit{aliasing XOR mutability}. Ta model poveze podatke
+	      z dovoljenjimi operacijami, ki jih lahko izvajamo nad temi podatki s pomocjo tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
+	\item[Izposoja (\textit{borrow})]
+	\item[Posoja (\textit{loan})]
+	\item[NLL]
+\end{description}
 
+asdadasda
 \section{Osnovne množice in elementi}
 
 \subsection{Množica posoj $\mathcal{L}$}
