@@ -73,23 +73,44 @@ TODO: Daljsi uvod v ownership pa borrowing? Mogoce to potem, ker bi bilo fajn ma
 	      vendar sem izbral prevod spremenljiva saj beseda \textit{edinstvena} ne zveni ustrezno.
 	      \subitem Ta tip omejevanja ustvarjanja referenc se imenuje \textit{aliasing XOR mutability}. Ta model poveze podatke
 	      z dovoljenjimi operacijami, ki jih lahko izvajamo nad temi podatki s pomocjo tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
-	\item[Izposoja (\textit{borrow})]
-	\item[Posoja (\textit{loan})]
-	\item[NLL]
+	\item[Posoja (\textit{loan})] je tesno povezana s sorodnim pojmom \textbf{izraz izposoje} (\textit{borrow expression}). Izraz izposoje
+	      je jezikovni konstrukt, ki nam omogoča do ustvarimo referenco (npr. \verb|&mut x|). Rustov priročnik za prevajlnik \cite{MIRMidlevelIR} pojma \textit{borrow expression} ne
+	      definira vendar ga uporabi tako:
+	      \begin{displayquote}
+		      An Rvalue is an expression that creates a value: in this case, the rvalue is a
+		      mutable borrow expression, which looks like \verb|&mut <Place>|
+	      \end{displayquote}
+
+	      Rvalue pa je definiran z enumeratorjem \verb|Rvalue| \cite{RvalueRustc_middleMir}. Nas pa zanima specifično
+	      varianta \verb|Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)|, ki ustvari referenco tipa \verb|BorrowKind|
+	      na mesto \verb|Place|.
+
+	      Pojem \textit{borrow expression} pogosto uporabljajo \author{weissOxideEssenceRust} v svojem clanku o formalizaciji
+	      podmnozice Rust-a. Njihov nacin uporabe se sklada z naso definicijo.
+
+	      \textbf{Posoja} (\textit{loan}) pa je interni konstrukt prevajalnika, ki hrani stanje o referenci, ki jo je ustvaril
+	      izraz izposoje in njenem izvoru \cite{weissOxideEssenceRust}. V trenutni implementaciji preverjevalnika izposoj je
+	      izposoja predstavljena kot urejena trojica \cite{2094nllRustRFC} \verb=('a, shared|uniq|mut, lvalue)=, kjer je:
+	      \begin{itemize}
+		      \item \verb|'a| zivljenjska doba za katero je vrednost izposojena. To se nanasa na zivljenjske dobe kot
+		            del Rustovega sistema tipov, ne pa kot mnozico izposoj, kot jih bomo definirali kasneje.
+		      \item \verb=shared|uniq|mut= tip izposoje
+		      \item \verb|lvalue| vrednost, ki je bila izposojena
+	      \end{itemize}
+	\item[NLL] je trenutna implementacija preverjevalnika izposoj v Rust-ovem prevajalniku.
 \end{description}
 
-asdadasda
 \section{Osnovne množice in elementi}
 
 \subsection{Množica posoj $\mathcal{L}$}
 
-Množico vseh posoj (\textit{angl. loans}) označimo z $\mathcal{L}$. Pravimo, da \textbf{razveljavimo pogoje posoje}, če:
+Množico vseh posoj (\textit{angl. loans}) označimo z $\mathcal{L}$. Pravimo, da \textbf{razveljavimo pogoje posoje}, če velja
+ena izmed naslednjih tock:
 \begin{itemize}
 	\item Je referenca deljena (\textit{shared}), torej je oblike \verb|&x| in
 	      \begin{itemize}
-		      \item ustvarimo novo spremenljivo (\textit{mutable}) referenco
-		            (tukaj ne vem točno kako bi formaliziral, moram še pogledati malo borrow checker rules) \textbf{ali}
-		      \item pišemo v mesto, ki je bilo sposojeno
+		      \item ustvarimo novo spremenljivo referenco
+		      \item pišemo v mesto, ki je bilo izposojeno
 	      \end{itemize}
 	\item Je referenca spremenljiva in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
 \end{itemize}
@@ -106,20 +127,7 @@ opisujejo pravila razveljavljanja posoje (\textit{loan killed}). Iz NLL RFC-ja \
 	\end{itemize}
 \end{displayquote}
 
-V članku avtor pravi tudi posojam \textit{borrow expressions}, ki jih Rustov priročnik za prevajalnik \cite{MIRMidlevelIR}
-opredeli kot poseben primer \textit{Rvalue}. Sicer niso nikjer eksplicitno definirani, vendar v priročniku
-so omenjeni tako:
-
-\begin{displayquote}
-	An Rvalue is an expression that creates a value: in this case, the rvalue is a
-	mutable borrow expression, which looks like \verb|&mut <Place>|
-\end{displayquote}
-
-Rvalue pa je definiran z enumeratorjem \verb|Rvalue| \cite{RvalueRustc_middleMira}. Nas pa zanima specifično
-varianta \verb|Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)|, ki ustvari referenco tipa \verb|BorrowKind|
-na mesto \verb|Place|.
-
-V našem primeru bi posoje zgledale tako:
+V članku avtor pravi posojam tudi izrazi izposoje (\textit{borrow expressions}). V našem primeru bi posoje zgledale tako:
 
 \begin{lstlisting}
 fn main() {
