@@ -73,7 +73,8 @@ TODO: Daljsi uvod v ownership pa borrowing? Mogoce to potem, ker bi bilo fajn ma
 	      vendar sem izbral prevod spremenljiva saj beseda \textit{edinstvena} ne zveni ustrezno.
 	      \subitem Ta tip omejevanja ustvarjanja referenc se imenuje \textit{aliasing XOR mutability}. Ta model poveze podatke
 	      z dovoljenjimi operacijami, ki jih lahko izvajamo nad temi podatki s pomocjo tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
-	\item[Zivljenska doba (\textit{lifetime})
+	\item[Zivljenska doba (\textit{lifetime})] Vsaka referenca ima zivljenjsko dobo, ki nam opise doseg v programu v katerem je ta
+	      referenca se vedno veljavna (torej kaze na veljavno mesto) \cite{klabnikRustProgrammingLanguage2023}.
 	\item[Posoja (\textit{loan})] je tesno povezana s sorodnim pojmom \textbf{izraz izposoje} (\textit{borrow expression}). Izraz izposoje
 	      je jezikovni konstrukt, ki nam omogoča do ustvarimo referenco (npr. \verb|&mut x|). Rustov priročnik za prevajlnik \cite{MIRMidlevelIR} pojma \textit{borrow expression} ne
 	      definira vendar ga uporabi tako:
@@ -135,8 +136,8 @@ V članku avtor pravi posojam tudi izrazi izposoje (\textit{borrow expressions})
 fn main() {
   let mut x: i32 = 22;
   let mut v: Vec<&'0 i32> = vec![];
-  let r: &'1 mut Vec<&'2 i32> = &'3 mut v; (* posoja $L_{0}$ *)
-  let p: &'5 i32 = &'4 x; (* posoja $L_{1} $*)
+  let r: &'1 mut Vec<&'2 i32> = &'3 mut v; (* \fbox{posoja $L_{0}$} *)
+  let p: &'5 i32 = &'4 x; (* \fbox{posoja $L_{1}$} *)
   r.push(p);
   x += 1;
   take::<Vec<&'6 i32>>(v);
@@ -148,15 +149,15 @@ fn take<T>(p: T) { .. }
 \subsection{Množica regij $\mathcal{R}$}
 
 V trenutni implementaciji preverjalnika izposoj, ki se imenuje NLL \cite{2094nllRustRFC} se posoje spremljajo s pomočjo
-t.i. zivljenjskih dob (\textit{lifetimes}). V tej formulaciji pa jih je avtor poimenoval regije (\textit{regions}). Množica regij je
-označena z $\mathcal{R} \subset 2^{\mathcal{L}}$.
+t.i. zivljenjskih dob (\textit{lifetimes}). V tej formulaciji pa je zivljenjske dobe avtor poimenoval regije (\textit{regions}).
+Množica regij je označena z $\mathcal{R} \subset 2^{\mathcal{L}}$.
 
-Na primeru so že označene z \verb|'stevilka|, katere posoje pa so del teh regij pa bomo kasneje določili z relacijo.
+Na primeru so že označene z \verb|'1|, \verb|'2|, \verb|'3|, itd. Katere posoje pa so del teh regij pa bomo kasneje določili z relacijo.
 
 \subsection{Graf poteka}
 
 Graf poteka (\textit{angl. CFG - control flow graph}) je izračunan v prejšnjih fazah analize kode.
-Zgrajen je iz osnovnih blokov, te pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
+Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
 ki nam bodo kasneje prišle prav. Te so izračunane tekom analize poteka podatkov
 (\textit{dataflow analysis})\cite{MIRDataflowRust}. Graf poteka označimo s $C = (C_{V}, C_{E})$.
 
@@ -168,7 +169,7 @@ Privzeto se ustvarijo naslednje povezave (to bi moral potrditi v kodi rustc, v �
 \begin{itemize}
 	\item Za vsak stavek se ustvari povezava med njegovim začetkom in sredino:
 	      $\forall stmt \in \mathcal{S}: (S(stmt), M(stmt)) \in C_{E}$
-	\item Če $M(stmt)$ predstavlja \textit{terminator} potem dodamo povezavo iz njega v $S(stmt')$
+	\item Če $M(stmt)$ predstavlja \textit{terminator} (stavek na koncu bloka) potem dodamo povezavo iz njega v $S(stmt')$
 	      začetnih stavkov osnovnih blokov, ki mu sledijo.
 \end{itemize}
 

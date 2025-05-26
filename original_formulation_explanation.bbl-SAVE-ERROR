@@ -1,0 +1,352 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global/global}
+    \entry{2094nllRustRFC}{online}{}{}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labeltitlesource}{title}
+      \field{title}{2094-Nll - {{The Rust RFC Book}}}
+      \field{urlday}{13}
+      \field{urlmonth}{1}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb /home/filip/Zotero/storage/9WVTM9KY/2094-nll.html
+      \endverb
+      \verb{urlraw}
+      \verb https://rust-lang.github.io/rfcs/2094-nll.html
+      \endverb
+      \verb{url}
+      \verb https://rust-lang.github.io/rfcs/2094-nll.html
+      \endverb
+      \keyw{✅,High}
+    \endentry
+    \entry{AliasbasedFormulationBorrow}{online}{}{}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labeltitlesource}{title}
+      \field{title}{An Alias-Based Formulation of the Borrow Checker · Baby Steps}
+      \field{urlday}{2}
+      \field{urlmonth}{1}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb /home/filip/Zotero/storage/5CJPTNKX/an-alias-based-formulation-of-the-borrow-checker.html
+      \endverb
+      \verb{urlraw}
+      \verb https://smallcultfollowing.com/babysteps/blog/2018/04/27/an-alias-based-formulation-of-the-borrow-checker/
+      \endverb
+      \verb{url}
+      \verb https://smallcultfollowing.com/babysteps/blog/2018/04/27/an-alias-based-formulation-of-the-borrow-checker/
+      \endverb
+    \endentry
+    \entry{crichtonGroundedConceptualModel2023}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=bb9bddbd76595875c0782e5d8fe2059e}{%
+           family={Crichton},
+           familyi={C\bibinitperiod},
+           given={Will},
+           giveni={W\bibinitperiod}}}%
+        {{hash=99c040cef8907c8462b9fb53ba5801a0}{%
+           family={Gray},
+           familyi={G\bibinitperiod},
+           given={Gavin},
+           giveni={G\bibinitperiod}}}%
+        {{hash=f7416298c547d841aa97cdf04c4564f7}{%
+           family={Krishnamurthi},
+           familyi={K\bibinitperiod},
+           given={Shriram},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{c5caa2d92d9b0244e7263cce656d42d6}
+      \strng{fullhash}{c5caa2d92d9b0244e7263cce656d42d6}
+      \strng{fullhashraw}{c5caa2d92d9b0244e7263cce656d42d6}
+      \strng{bibnamehash}{c5caa2d92d9b0244e7263cce656d42d6}
+      \strng{authorbibnamehash}{c5caa2d92d9b0244e7263cce656d42d6}
+      \strng{authornamehash}{c5caa2d92d9b0244e7263cce656d42d6}
+      \strng{authorfullhash}{c5caa2d92d9b0244e7263cce656d42d6}
+      \strng{authorfullhashraw}{c5caa2d92d9b0244e7263cce656d42d6}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{WILL CRICHTON, Brown University, USA GAVIN GRAY, ETH Zürich, Switzerland SHRIRAM KRISHNAMURTHI, Brown University, USA Programmers learning Rust struggle to understand ownership types, Rust’s core mechanism for ensuring memory safety without garbage collection. This paper describes our attempt to systematically design a pedagogy for ownership types. First, we studied Rust developers’ misconceptions of ownership to create the Ownership Inventory, a new instrument for measuring a person’s knowledge of ownership. We found that Rust learners could not connect Rust’s static and dynamic semantics, such as determining why an ill-typed program would (or would not) exhibit unde�ned behavior. Second, we created a conceptual model of Rust’s semantics that explains borrow checking in terms of �ow-sensitive permissions on paths into memory. Third, we implemented a Rust compiler plugin that visualizes programs under the model. Fourth, we integrated the permissions model and visualizations into a broader pedagogy of ownership by writing a new ownership chapter for The Rust Programming Language, a popular Rust textbook. Fifth, we evaluated an initial deployment of our pedagogy against the original version, using reader responses to the Ownership Inventory as a point of comparison. Thus far, the new pedagogy has improved learner scores on the Ownership Inventory by an average of 9\% (\# = 342, 3 = 0.56). CCS Concepts: • Theory of computation ! Type structures; • Human-centered computing ! Visualization systems and tools; • Social and professional topics ! Computing education.}
+      \field{day}{16}
+      \field{issn}{2475-1421}
+      \field{issue}{OOPSLA2}
+      \field{journaltitle}{Proceedings of the ACM on Programming Languages}
+      \field{langid}{english}
+      \field{month}{10}
+      \field{shortjournal}{Proc. ACM Program. Lang.}
+      \field{title}{A {{Grounded Conceptual Model}} for {{Ownership Types}} in {{Rust}}}
+      \field{urlday}{20}
+      \field{urlmonth}{12}
+      \field{urlyear}{2024}
+      \field{volume}{7}
+      \field{year}{2023}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{1224\bibrangedash 1252}
+      \range{pages}{29}
+      \verb{doi}
+      \verb 10.1145/3622841
+      \endverb
+      \verb{file}
+      \verb /home/filip/Zotero/storage/3J6BQDCN/Crichton et al. - 2023 - A Grounded Conceptual Model for Ownership Types in Rust.pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://dl.acm.org/doi/10.1145/3622841
+      \endverb
+      \verb{url}
+      \verb https://dl.acm.org/doi/10.1145/3622841
+      \endverb
+      \keyw{✅,Low}
+    \endentry
+    \entry{klabnikRustProgrammingLanguage2023}{book}{}{}
+      \name{author}{2}{}{%
+        {{hash=a41f7649d631481ec7b8c9984f13ca74}{%
+           family={Klabnik},
+           familyi={K\bibinitperiod},
+           given={Steve},
+           giveni={S\bibinitperiod}}}%
+        {{hash=dddb7b905682bcd4ef905d1f964c7ae8}{%
+           family={Nichols},
+           familyi={N\bibinitperiod},
+           given={Carol},
+           giveni={C\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {San Francisco}%
+      }
+      \list{publisher}{1}{%
+        {No Starch Press}%
+      }
+      \strng{namehash}{e2d6cc0cf49d363084c5ab92add7b56f}
+      \strng{fullhash}{e2d6cc0cf49d363084c5ab92add7b56f}
+      \strng{fullhashraw}{e2d6cc0cf49d363084c5ab92add7b56f}
+      \strng{bibnamehash}{e2d6cc0cf49d363084c5ab92add7b56f}
+      \strng{authorbibnamehash}{e2d6cc0cf49d363084c5ab92add7b56f}
+      \strng{authornamehash}{e2d6cc0cf49d363084c5ab92add7b56f}
+      \strng{authorfullhash}{e2d6cc0cf49d363084c5ab92add7b56f}
+      \strng{authorfullhashraw}{e2d6cc0cf49d363084c5ab92add7b56f}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{"The Rust Programming Language, 2nd Edition is the official guide to Rust 2021: an open source systems programming language that will help you write faster, more reliable software. Rust provides control of low-level details along with high-level ergonomics, allowing you to improve productivity and eliminate the hassle traditionally associated with low-level languages. Klabnik and Nichols, alumni of the Rust Core Team, share their knowledge to help you get the most out of Rust's features so that you can create robust and scalable programs. You'll begin with basics like creating functions, choosing data types, and binding variables, then move on to more advanced concepts. In addition to the countless code examples, you'll find three chapters dedicated to building complete projects: a number-guessing game, a Rust implementation of a command line tool, and a multithreaded server."--Publisher marketing}
+      \field{annotation}{OCLC: on1363816350}
+      \field{edition}{2nd edition}
+      \field{isbn}{978-1-7185-0310-6}
+      \field{pagetotal}{527}
+      \field{title}{The {{Rust}} Programming Language}
+      \field{year}{2023}
+      \field{dateera}{ce}
+      \keyw{Handbooks and manuals,Instructional and educational works,Rust (Computer program language)}
+    \endentry
+    \entry{MIRDataflowRust}{online}{}{}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labeltitlesource}{title}
+      \field{title}{{{MIR}} Dataflow - {{Rust Compiler Development Guide}}}
+      \field{urlday}{9}
+      \field{urlmonth}{4}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb /home/filip/Zotero/storage/KSY937UZ/dataflow.html
+      \endverb
+      \verb{urlraw}
+      \verb https://rustc-dev-guide.rust-lang.org/mir/dataflow.html
+      \endverb
+      \verb{url}
+      \verb https://rustc-dev-guide.rust-lang.org/mir/dataflow.html
+      \endverb
+    \endentry
+    \entry{RustCompilerRustc_borrowck}{online}{}{}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labeltitlesource}{title}
+      \field{title}{Rust/Compiler/Rustc\_borrowck/Src/Polonius at Master · Rust-Lang/Rust}
+      \field{urlday}{12}
+      \field{urlmonth}{4}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb /home/filip/Zotero/storage/44PRU4AB/polonius.html
+      \endverb
+      \verb{urlraw}
+      \verb https://github.com/rust-lang/rust/tree/master/compiler/rustc_borrowck/src/polonius
+      \endverb
+      \verb{url}
+      \verb https://github.com/rust-lang/rust/tree/master/compiler/rustc_borrowck/src/polonius
+      \endverb
+    \endentry
+    \entry{RvalueRustc_middleMir}{online}{}{}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labeltitlesource}{title}
+      \field{title}{Rvalue in Rustc\_middle::Mir - {{Rust}}}
+      \field{urlday}{12}
+      \field{urlmonth}{4}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb /home/filip/Zotero/storage/2GF6KZZK/enum.Rvalue.html
+      \endverb
+      \verb{urlraw}
+      \verb https://doc.rust-lang.org/nightly/nightly-rustc/rustc_middle/mir/enum.Rvalue.html
+      \endverb
+      \verb{url}
+      \verb https://doc.rust-lang.org/nightly/nightly-rustc/rustc_middle/mir/enum.Rvalue.html
+      \endverb
+    \endentry
+    \entry{MIRMidlevelIR}{online}{}{}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{labeltitlesource}{title}
+      \field{title}{The {{MIR}} ({{Mid-level IR}}) - {{Rust Compiler Development Guide}}}
+      \field{urlday}{12}
+      \field{urlmonth}{4}
+      \field{urlyear}{2025}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb /home/filip/Zotero/storage/LBWD7Y3U/index.html
+      \endverb
+      \verb{urlraw}
+      \verb https://rustc-dev-guide.rust-lang.org/mir/index.html
+      \endverb
+      \verb{url}
+      \verb https://rustc-dev-guide.rust-lang.org/mir/index.html
+      \endverb
+    \endentry
+    \entry{weissOxideEssenceRust}{article}{}{}
+      \name{author}{4}{}{%
+        {{hash=4cd9aa7f8ee9359a817704735202116c}{%
+           family={Weiss},
+           familyi={W\bibinitperiod},
+           given={Aaron},
+           giveni={A\bibinitperiod}}}%
+        {{hash=55eac47c78b0ce3489ab92ad74dead0b}{%
+           family={Patterson},
+           familyi={P\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod}}}%
+        {{hash=b9ab334450ee042b091f8f30fe01d877}{%
+           family={Matsakis},
+           familyi={M\bibinitperiod},
+           given={Nicholas\bibnamedelima D},
+           giveni={N\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+        {{hash=94a245e2a7f48b654d74d292a96172d0}{%
+           family={Ahmed},
+           familyi={A\bibinitperiod},
+           given={Amal},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{93d82729007774331d4d08546fa4cff7}
+      \strng{fullhash}{cc5c70be4f098c065229554b23499579}
+      \strng{fullhashraw}{cc5c70be4f098c065229554b23499579}
+      \strng{bibnamehash}{93d82729007774331d4d08546fa4cff7}
+      \strng{authorbibnamehash}{93d82729007774331d4d08546fa4cff7}
+      \strng{authornamehash}{93d82729007774331d4d08546fa4cff7}
+      \strng{authorfullhash}{cc5c70be4f098c065229554b23499579}
+      \strng{authorfullhashraw}{cc5c70be4f098c065229554b23499579}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{langid}{english}
+      \field{title}{Oxide: {{The Essence}} of {{Rust}}}
+      \verb{file}
+      \verb /home/filip/Zotero/storage/RUZHJSKB/Weiss et al. - Oxide The Essence of Rust.pdf
+      \endverb
+      \keyw{⏳}
+    \endentry
+    \entry{yanovskiGhostCellSeparatingPermissions2021}{article}{}{}
+      \name{author}{4}{}{%
+        {{hash=f1b5c2c53462cfabc747a3694b9103a0}{%
+           family={Yanovski},
+           familyi={Y\bibinitperiod},
+           given={Joshua},
+           giveni={J\bibinitperiod}}}%
+        {{hash=f12c5c501eafc706c2e804adcb9415ef}{%
+           family={Dang},
+           familyi={D\bibinitperiod},
+           given={Hoang-Hai},
+           giveni={H\bibinithyphendelim H\bibinitperiod}}}%
+        {{hash=b941e8725b8fd9992bdee2980fefad07}{%
+           family={Jung},
+           familyi={J\bibinitperiod},
+           given={Ralf},
+           giveni={R\bibinitperiod}}}%
+        {{hash=3c61a075f82133ed00b1cf07a5b5c194}{%
+           family={Dreyer},
+           familyi={D\bibinitperiod},
+           given={Derek},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{8d3fff591f8c2d684fbfa0f5010ba557}
+      \strng{fullhash}{10c842ad64a98ea28bd44f1237e7a309}
+      \strng{fullhashraw}{10c842ad64a98ea28bd44f1237e7a309}
+      \strng{bibnamehash}{8d3fff591f8c2d684fbfa0f5010ba557}
+      \strng{authorbibnamehash}{8d3fff591f8c2d684fbfa0f5010ba557}
+      \strng{authornamehash}{8d3fff591f8c2d684fbfa0f5010ba557}
+      \strng{authorfullhash}{10c842ad64a98ea28bd44f1237e7a309}
+      \strng{authorfullhashraw}{10c842ad64a98ea28bd44f1237e7a309}
+      \field{sortinit}{Y}
+      \field{sortinithash}{fd67ad5a9ef0f7456bdd9aab10fe1495}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{JOSHUA YANOVSKI, MPI-SWS, Germany HOANG-HAI DANG, MPI-SWS, Germany RALF JUNG, MPI-SWS, Germany DEREK DREYER, MPI-SWS, Germany The Rust language offers a promising approach to safe systems programming based on the principle of aliasing XOR mutability: a value may be either aliased or mutable, but not both at the same time. However, to implement pointer-based data structures with internal sharing, such as graphs or doubly-linked lists, we need to be able to mutate aliased state. To support such data structures, Rust provides a number of APIs that offer so-called interior mutability: the ability to mutate data via method calls on a shared reference. Unfortunately, the existing APIs sacrifice flexibility, concurrent access, and/or performance, in exchange for safety. In this paper, we propose a new Rust API called GhostCell which avoids such sacrifices by separating permissions from data: it enables the user to safely synchronize access to a collection of data via a single permission. GhostCell repurposes an old trick from typed functional programming: branded types (as exemplified by Haskell’s ST monad), which combine phantom types and rank-2 polymorphism to simulate a lightweight form of state-dependent types. We have formally proven the soundness of GhostCell by adapting and extending RustBelt, a semantic soundness proof for a representative subset of Rust, mechanized in Coq. CCS Concepts: • Theory of computation → Type structures; Separation logic.}
+      \field{day}{22}
+      \field{issn}{2475-1421}
+      \field{issue}{ICFP}
+      \field{journaltitle}{Proceedings of the ACM on Programming Languages}
+      \field{langid}{english}
+      \field{month}{8}
+      \field{shortjournal}{Proc. ACM Program. Lang.}
+      \field{shorttitle}{{{GhostCell}}}
+      \field{title}{{{GhostCell}}: Separating Permissions from Data in {{Rust}}}
+      \field{urlday}{15}
+      \field{urlmonth}{5}
+      \field{urlyear}{2025}
+      \field{volume}{5}
+      \field{year}{2021}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{1\bibrangedash 30}
+      \range{pages}{30}
+      \verb{doi}
+      \verb 10.1145/3473597
+      \endverb
+      \verb{file}
+      \verb /home/filip/Zotero/storage/JTVPVVLZ/Yanovski et al. - 2021 - GhostCell separating permissions from data in Rust.pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://dl.acm.org/doi/10.1145/3473597
+      \endverb
+      \verb{url}
+      \verb https://dl.acm.org/doi/10.1145/3473597
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
