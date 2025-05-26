@@ -61,10 +61,10 @@ fn take<T>(p: T) { .. }
 	\item[MIR] MIR je kratica za \textit{Mid-level intermediate representation} in je bistveno poenostavljena oblika Rust-a, ki
 	      se uporablja za dele prevajalnika, ki zahtevajo informaciji o kontroli pretoka (toka?) \cite{MIRMidlevelIR}.
 	      \subitem[Mesto (\textit{place})] je izraz, ki nam opredeli (identify?) lokacijo v pomnilniku \cite{MIRMidlevelIR}.
-	      \citeauthor{weissOxideEssenceRust} primerjajo pojem mesta s pojmom \textit{lvalue} iz programskega jezika C.
+	      \citeauthor{weissOxideEssenceRust2019} primerjajo pojem mesta s pojmom \textit{lvalue} iz programskega jezika C.
 	\item[Referenca] v Rust-u je podobna kazalcu v ostalih programskih jezikih, vendar prevajalnik zagotavlja, da kaze
 	      na veljavno vrednost podanega tipa za celo dobo aktivnosti(? pisalo je for the life of the reference) reference \cite{klabnikRustProgrammingLanguage2023}.
-	      Locimo jih na dva tipa \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust}:
+	      Locimo jih na dva tipa \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust2019}:
 	      \subitem[Deljena referenca (\textit{shared / immutable reference})] V programu lahko ustvarimo vec deljenih referenc
 	      na isto mesto, vendar tega mesta potem ne moremo mutirati.
 	      \subitem[Spremenljiva referenca (\textit{ unique / mutable reference})] Za omogocanje mutacije pa lahko ustvarimo
@@ -87,11 +87,11 @@ fn take<T>(p: T) { .. }
 	      varianta \verb|Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)|, ki ustvari referenco tipa \verb|BorrowKind|
 	      na mesto \verb|Place|.
 
-	      Pojem \textit{borrow expression} pogosto uporabljajo \author{weissOxideEssenceRust} v svojem clanku o formalizaciji
+	      Pojem \textit{borrow expression} pogosto uporabljajo \citeauthor{weissOxideEssenceRust2019} v svojem clanku o formalizaciji
 	      podmnozice Rust-a. Njihov nacin uporabe se sklada z naso definicijo.
 
 	      \textbf{Posoja} (\textit{loan}) pa je interni konstrukt prevajalnika, ki hrani stanje o referenci, ki jo je ustvaril
-	      izraz izposoje in njenem izvoru \cite{weissOxideEssenceRust}. V trenutni implementaciji preverjevalnika izposoj je
+	      izraz izposoje in njenem izvoru \cite{weissOxideEssenceRust2019}. V trenutni implementaciji preverjevalnika izposoj je
 	      izposoja predstavljena kot urejena trojica \cite{2094nllRustRFC} \verb=('a, shared|uniq|mut, lvalue)=, kjer je:
 	      \begin{itemize}
 		      \item \verb|'a| zivljenjska doba za katero je vrednost izposojena. To se nanasa na zivljenjske dobe kot
