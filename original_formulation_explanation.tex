@@ -72,6 +72,13 @@ fn take<T>(p: T) { .. }
 	      V literaturi jim večinoma pravijo \textit{unique references}, vendar smo izbrali prevod \textit{"spremenljiva"}, saj \textit{"edinstvena"} ne zveni ustrezno.
 	      \subitem Tovrsten tip omejevanja ustvarjanja referenc se imenuje \textit{aliasing XOR mutability}. Ta model s pomočjo tipov
 	      poveže podatke z dovoljenjimi operacijami, ki jih lahko izvajamo na teh podatkih \cite{yanovskiGhostCellSeparatingPermissions2021}.
+	      \subitem \textbf{Deljena referenca (\textit{shared / immutable reference})}: V programu lahko ustvarimo več deljenih referenc
+	      kažejo na isto mesto, vendar tega mesta potem ne smemo mutirati.
+	      \subitem \textbf{Spremenljiva referenca (\textit{ unique / mutable reference})}: Da lahko mutiramo mesto na katerega kaže
+	      referenca, pa ustvarimo spremenljivo referenco, ki je ena sama in nam omogoča spreminjanje vrednosti zapisane na posameznem mestu.
+	      V literaturi jim večinoma pravijo \textit{unique}, vendar sem izbral prevod \textit{"spremenljiva"}, saj \textit{"edinstvena"} ne zveni ustrezno.
+	      \subitem Tovrsten tip omejevanja ustvarjanja referenc se imenuje \textit{aliasing XOR mutability}. Ta model poveže podatke
+	      z dovoljenjimi operacijami, ki jih lahko izvajamo nad temi podatki, s pomočjo tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
 	\item[Življenska doba (\textit{lifetime})] Vsaka referenca ima življenjsko dobo, ki nam opiše doseg v programu znotraj katerega je
 	      referenca še vedno veljavna (torej kaže na veljavno mesto) \cite{klabnikRustProgrammingLanguage2023}.
 	\item[Posoja (\textit{loan})] je tesno povezana s sorodnim pojmom \textbf{izraz izposoje} (\textit{borrow expression}). Izraz izposoje
