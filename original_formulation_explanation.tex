@@ -60,24 +60,23 @@ fn take<T>(p: T) { .. }
 \begin{description}
 	\item[MIR] MIR je kratica za \textit{Mid-level intermediate representation} in je bistveno poenostavljena oblika Rust-a, ki
 	      se uporablja za dele prevajalnika, ki zahtevajo informaciji o kontroli pretoka (toka?) \cite{MIRMidlevelIR}.
-	      \subitem[Mesto (\textit{place})] je izraz, ki nam opredeli (identify?) lokacijo v pomnilniku \cite{MIRMidlevelIR}.
+	      \subitem \textbf{Mesto (\textit{place})} je izraz, ki nam opredeli (identify?) lokacijo v pomnilniku \cite{MIRMidlevelIR}.
 	      \citeauthor{weissOxideEssenceRust2019} primerjajo pojem mesta s pojmom \textit{lvalue} iz programskega jezika C.
-	\item[Referenca] v Rust-u je podobna kazalcu v ostalih programskih jezikih, vendar prevajalnik zagotavlja, da kaze
+	\item[Referenca] v Rust-u je podobna kazalcu v ostalih programskih jezikih, vendar prevajalnik zagotavlja, da kaže
 	      na veljavno vrednost podanega tipa za celo dobo aktivnosti(? pisalo je for the life of the reference) reference \cite{klabnikRustProgrammingLanguage2023}.
-	      Locimo jih na dva tipa \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust2019}:
-	      \subitem[Deljena referenca (\textit{shared / immutable reference})] V programu lahko ustvarimo vec deljenih referenc
-	      na isto mesto, vendar tega mesta potem ne moremo mutirati.
-	      \subitem[Spremenljiva referenca (\textit{ unique / mutable reference})] Za omogocanje mutacije pa lahko ustvarimo
-	      spremenljivo referenco, ki je ena sama in nam omogoca spreminjanje vrednosti zapisana na posameznem mestu.
-	      V literaturi jim pravijo vecinoma \textit{unique}
-	      vendar sem izbral prevod spremenljiva saj beseda \textit{edinstvena} ne zveni ustrezno.
-	      \subitem Ta tip omejevanja ustvarjanja referenc se imenuje \textit{aliasing XOR mutability}. Ta model poveze podatke
-	      z dovoljenjimi operacijami, ki jih lahko izvajamo nad temi podatki s pomocjo tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
-	\item[Zivljenska doba (\textit{lifetime})] Vsaka referenca ima zivljenjsko dobo, ki nam opise doseg v programu v katerem je ta
-	      referenca se vedno veljavna (torej kaze na veljavno mesto) \cite{klabnikRustProgrammingLanguage2023}.
+	      Reference ločimo na dva tipa \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust2019}:
+	      \subitem \textbf{Deljena referenca (\textit{shared / immutable reference})}: V programu lahko ustvarimo več deljenih referenc
+	      kažejo na isto mesto, vendar tega mesta potem ne smemo mutirati.
+	      \subitem \textbf{Spremenljiva referenca (\textit{ unique / mutable reference})}: Da lahko mutiramo mesto na katerega kaže
+	      referenca, pa ustvarimo spremenljivo referenco, ki je ena sama in nam omogoča spreminjanje vrednosti zapisane na posameznem mestu.
+	      V literaturi jim večinoma pravijo \textit{unique}, vendar sem izbral prevod \textit{"spremenljiva"}, saj \textit{"edinstvena"} ne zveni ustrezno.
+	      \subitem Tovrsten tip omejevanja ustvarjanja referenc se imenuje \textit{aliasing XOR mutability}. Ta model poveže podatke
+	      z dovoljenjimi operacijami, ki jih lahko izvajamo nad temi podatki, s pomočjo tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
+	\item[Življenska doba (\textit{lifetime})] Vsaka referenca ima življenjsko dobo, ki nam opiše doseg v programu znotraj katerega je
+	      referenca še vedno veljavna (torej kaže na veljavno mesto) \cite{klabnikRustProgrammingLanguage2023}.
 	\item[Posoja (\textit{loan})] je tesno povezana s sorodnim pojmom \textbf{izraz izposoje} (\textit{borrow expression}). Izraz izposoje
-	      je jezikovni konstrukt, ki nam omogoča do ustvarimo referenco (npr. \verb|&mut x|). Rustov priročnik za prevajlnik \cite{MIRMidlevelIR} pojma \textit{borrow expression} ne
-	      definira vendar ga uporabi tako:
+	      je jezikovni konstrukt, ki nam omogoča, da ustvarimo referenco (npr. \verb|&mut x|). Rustov priročnik za prevajlnik \cite{MIRMidlevelIR}
+	      pojma \textit{borrow expression} ne definira, ampak ga uporabi tako:
 	      \begin{displayquote}
 		      An Rvalue is an expression that creates a value: in this case, the rvalue is a
 		      mutable borrow expression, which looks like \verb|&mut <Place>|
@@ -87,17 +86,17 @@ fn take<T>(p: T) { .. }
 	      varianta \verb|Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)|, ki ustvari referenco tipa \verb|BorrowKind|
 	      na mesto \verb|Place|.
 
-	      Pojem \textit{borrow expression} pogosto uporabljajo \citeauthor{weissOxideEssenceRust2019} v svojem clanku o formalizaciji
-	      podmnozice Rust-a. Njihov nacin uporabe se sklada z naso definicijo.
+	      Pojem \textit{borrow expression} pogosto uporabljajo \citeauthor{weissOxideEssenceRust2019} v svojem članku o formalizaciji
+	      podmnožice Rust-a. Njihov način uporabe se sklada z našo definicijo.
 
-	      \textbf{Posoja} (\textit{loan}) pa je interni konstrukt prevajalnika, ki hrani stanje o referenci, ki jo je ustvaril
-	      izraz izposoje in njenem izvoru \cite{weissOxideEssenceRust2019}. V trenutni implementaciji preverjevalnika izposoj je
+	      \textbf{Posoja} (\textit{loan}) pa je interni konstrukt prevajalnika, ki hrani stanje o referenci, katero je ustvaril
+	      izraz izposoje, in njenem izvoru \cite{weissOxideEssenceRust2019}. V trenutni implementaciji preverjevalnika izposoj je
 	      izposoja predstavljena kot urejena trojica \cite{2094nllRustRFC} \verb=('a, shared|uniq|mut, lvalue)=, kjer je:
 	      \begin{itemize}
-		      \item \verb|'a| zivljenjska doba za katero je vrednost izposojena. To se nanasa na zivljenjske dobe kot
-		            del Rustovega sistema tipov, ne pa kot mnozico izposoj, kot jih bomo definirali kasneje.
-		      \item \verb=shared|uniq|mut= tip izposoje
-		      \item \verb|lvalue| vrednost, ki je bila izposojena
+		      \item \verb|'a|: življenjska doba za katero je vrednost izposojena. To se nanaša na življenjske dobe kot
+		            del Rustovega sistema tipov, ne pa kot množico izposoj, kot jih bomo definirali kasneje.
+		      \item \verb=shared|uniq|mut=: tip izposoje
+		      \item \verb|lvalue|: vrednost, ki je bila izposojena
 	      \end{itemize}
 	\item[NLL] je trenutna implementacija preverjevalnika izposoj v Rust-ovem prevajalniku.
 \end{description}
@@ -107,19 +106,19 @@ fn take<T>(p: T) { .. }
 \subsection{Množica posoj $\mathcal{L}$}
 
 Množico vseh posoj (\textit{angl. loans}) označimo z $\mathcal{L}$. \textbf{Pogoji posoje} so lastnosti, ki morajo
-drzati v doloceni tocki programa, da smatramo posojo kot veljavno oz. aktivno.
-Pravimo, da \textbf{razveljavimo pogoje posoje}, če velja ena izmed naslednjih tock:
+držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno.
+Pravimo, da \textbf{razveljavimo pogoje posoje}, če velja ena izmed naslednjih točk:
 \begin{itemize}
-	\item Je referenca deljena (\textit{shared}), torej je oblike \verb|&x| in
+	\item Referenca je deljena (\textit{shared}), torej je oblike \verb|&x| in
 	      \begin{itemize}
 		      \item ustvarimo novo spremenljivo referenco
 		      \item pišemo v mesto, ki je bilo izposojeno
 	      \end{itemize}
-	\item Je referenca spremenljiva in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
+	\item Referenca je spremenljiva in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
 \end{itemize}
 
-Ta pravila načeloma sledijo NLL, ki je trenutno implementiran v glavni veji Rustovega prevajalnika. Bolj formalno jih
-opisujejo pravila razveljavljanja posoje (\textit{loan killed}). Iz NLL RFC-ja \cite{2094nllRustRFC}:
+Ta pravila načeloma sledijo NLLm, bolj formalno jih opisujejo pravila razveljavljanja posoje (\textit{loan killed}).
+Iz NLL RFC-ja \cite{2094nllRustRFC}:
 
 \begin{displayquote}
 	For a statement at point P in the graph, we define the “transfer function” – that is,
@@ -128,6 +127,13 @@ opisujejo pravila razveljavljanja posoje (\textit{loan killed}). Iz NLL RFC-ja \
 		\item ...
 		\item if this is an assignment \verb|lv = <rvalue>|, then any loan for some path P of which \verb|lv| is a prefix is killed.
 	\end{itemize}
+\end{displayquote}
+
+kjer je pojem \textit{prefix} definiran tako:
+
+\begin{displayquote}
+	\textbf{Prefixes}. We say that the prefixes of an lvalue are all the lvalues you get by stripping away fields and derefs.
+	The prefixes of \verb|*a.b| would be \verb|*a.b|, \verb|a.b|, and \verb|a|.
 \end{displayquote}
 
 V članku avtor pravi posojam tudi izrazi izposoje (\textit{borrow expressions}). V našem primeru bi posoje zgledale tako:
@@ -148,18 +154,19 @@ fn take<T>(p: T) { .. }
 
 \subsection{Množica regij $\mathcal{R}$}
 
-V trenutni implementaciji preverjalnika izposoj, ki se imenuje NLL \cite{2094nllRustRFC} se posoje spremljajo s pomočjo
-t.i. zivljenjskih dob (\textit{lifetimes}). V tej formulaciji pa je zivljenjske dobe avtor poimenoval regije (\textit{regions}).
+V trenutni implementaciji preverjevalnika izposoj NLL se posoje spremljajo s pomočjo življenjskih dob.
+V tej formulaciji pa je avtor življenjske dobe poimenoval regije (\textit{regions}).
 Množica regij je označena z $\mathcal{R} \subset 2^{\mathcal{L}}$.
 
 Na primeru so že označene z \verb|'1|, \verb|'2|, \verb|'3|, itd. Katere posoje pa so del teh regij pa bomo kasneje določili z relacijo.
 
-\subsection{Graf poteka}
+\subsection{Graf poteka}izposoje
 
 Graf poteka (\textit{angl. CFG - control flow graph}) je izračunan v prejšnjih fazah analize kode.
 Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
 ki nam bodo kasneje prišle prav. Te so izračunane tekom analize poteka podatkov
-(\textit{dataflow analysis})\cite{MIRDataflowRust}. Graf poteka označimo s $C = (C_{V}, C_{E})$.
+(\textit{dataflow analysis})\cite{MIRDataflowRust}. Graf poteka označimo s $C = (C_{V}, C_{E})$, kjer
+je $C_{V}$ množica vozlišč in $C_{E}$ množica povezav.
 
 % TODO: Malo se preberi ali je res to pravilno. Kako dejansko dobimo input za CFG in
 % kakšne informacije mu pripadajo?
@@ -185,31 +192,33 @@ označimo s $\mathcal{P}$. Lahko so dveh tipov:
 	\item \textbf{med stavkom:} to označuje trenutek med izvajanjem stavka. Označimo s $M(stmt)$
 \end{itemize}
 
-Avtor spletne objave ne opredeli pojmov \textit{na zacetku stavka} in \textit{med stavkom} natancno,
-vendar lahko najdemo bolj natancno pojasnitev v \verb|legacy| implementaciji Polonius preverjevalnika v izvorni
-kodi Rust-ovega prevajalnika. Komentar nad strukturo, ki opisuje mnozico stavkov pravi naslednje \cite{RustCompilerRustc_borrowcka}:
+Avtor spletne objave ne opredeli pojmov \textit{na začetku stavka} in \textit{med stavkom} natančno,
+vendar lahko najdemo pojasnitev v \verb|legacy| implementaciji Polonius preverjevalnika izposoj.
+Komentar nad strukturo, ki opisuje množico stavkovm, pravi naslednje \cite{RustCompilerRustc_borrowcka}:
 
 \begin{displayquote}
-	Ta struktura prevede MIR lokacijo, ki identifira stavek znotraj osnovnega bloka v "obogateno lokacijo",
-	ki nam omogoci vecjo granularnost. Bolj podrobno, razlocimo med zacetkom in sredino stavka. Sredina stavka
-	je tocka \textit{tik preden} ima stavek ucinek, torej za prirejanje \verb|A = B| bi bila sredina stavka
-	tocka, kjer se bo \verb|B| ravno zapisal v \verb|A|. \dots
+	Ta struktura prevede MIR lokacijo, ki identificira stavek znotraj osnovnega bloka, v "obogateno lokacijo",
+	kar nam omogoči večjo granularnost. Bolj podrobno, ločimo med začetkom in sredino stavka. Sredina stavka
+	je točka \textit{tik preden} ima stavek učinek. Torej za prirejanje \verb|A = B| bi bila sredina stavka
+	točka trenutek ravno preden bi se \verb|B| zapisal v \verb|A| \dots
 \end{displayquote}
 
 \section{Začetne relacije}
 
 Relacijo označimo kot \textbf{začetno} (\textit{input}), ko jo dobimo tako, da jo izpeljemo
 iz analize poteka podatkov, ki je bila opravljena v prejšnjih fazah prevajalnika. Te relacije
-bodo predstavljale našo začetno točko iz katere bomo izpeljali druge relacije.
+bodo predstavljale našo izhodiščno točko iz katere bomo izpeljali druge relacije.
 
 \subsection{Začetna relacija vsebovanosti}
 
-Začetno relacijo vsebovanosti (\textit{base subset}) bomo označili s
+Začetno relacijo vsebovanosti (\textit{base subset}) bomo označili z
 $\beta \subset \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Torej to je relacija, ki povezuje dve regiji
 ob neki točki v programu.
 
 Bolj natančno, če velja $(R_{1}, R_{2}, P) \in \beta$ pomeni, da je $R_{1}$ podmnožica regije $R_{2}$ na točki $P$ v programu.
 To dejstvo mora veljati na sredini stavka ($M(stmt)$), ki inducira zahtevo.
+
+\textit{Opomba:} Oznaka \verb|<:| nam predstavlja vsebovanost med tipi (\textit{subtyping relation}).
 
 \begin{lstlisting}
 fn main() {
@@ -240,7 +249,7 @@ fn main() {
 
 Začetno relacijo posoje regij (\textit{borrow region}) označimo s $\psi \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$.
 
-Če velja $(R,L,P) \in \psi$ pomeni, da izraz za posojo (\textit{borrow expression}) na točki $P$ ustvari posojo $L$ in postane del
+Če velja $(R,L,P) \in \psi$ pomeni, da izraz izposoje na točki $P$ ustvari posojo $L$ in postane del
 regije $R$. Prav tako kot relacija vsebovanosti se ta zahteva vzpostavi na sredini stavka.
 
 \begin{lstlisting}
@@ -257,36 +266,20 @@ fn main() {
 }
 \end{lstlisting}
 
-\subsection{Relacija žive regije}
+\subsection{Relacija aktivnosti regije}
 
-Začetno relacijo žive regije (\textit{region live at}) označimo z $\nabla_{R} \subseteq \mathcal{R} \times \mathcal{P}$.
-$(R, P) \in \nabla_{R}$ pomeni, da je regija $R$ živa na točki $P$. Torej spremenljivka katere tip vključuje $R$ (recimo \verb|&'a|)
+Začetno relacijo aktivnosti regije (\textit{region live at}) označimo z $\nabla_{R} \subseteq \mathcal{R} \times \mathcal{P}$.
+$(R, P) \in \nabla_{R}$ pomeni, da je regija $R$ aktivna na točki $P$. Torej spremenljivka, katere tip vključuje $R$ (recimo \verb|&'a|),
 bo morda kasneje v programu uporabljena.
 
-To določi analiza živosti, ki poteka isto kot v NLL RFC. Bolj specifično, s pomočjo raznih omejitev izračuna množico točk
-kjer mora biti regija (v RFC-ju poimenovana \textit{lifetime}) živa \cite{2094nllRustRFC}.
+To določi analiza aktivnosti, ki poteka isto kot v NLL RFC. Bolj specifično, s pomočjo raznih omejitev izračuna množico točk
+kjer mora biti regija (v RFC-ju poimenovana \textit{lifetime}) aktivna \cite{2094nllRustRFC}.
 
 \subsection{Relacija prekinitve posoje}
 
 Začetno relacijo prekinitve posoje (\textit{loan killed at}) označimo s $\kappa \subseteq \mathcal{L} \times \mathcal{P}$.
-$(L,P) \in \kappa$ pomeni, da je posoja $L$ prekinjena (\textit{killed}) na točki $P$. To se običajno zgodi
-na sredini prireditvenega stavka, ki prepiše pot (\textit{path}) prej povezano s posojo $L$. V NLL RFC-ju
-je ta izraz definiran tako \cite{2094nllRustRFC}:
-
-\begin{displayquote}
-	For a statement at point P in the graph, we define the “transfer function” – that is, which loans it brings into or out of scope – as follows:
-	\begin{itemize}
-		\item \dots
-		\item if this is an assignment \verb|lv = <rvalue>|, then any loan for some path P of which \verb|lv| is a prefix is killed.
-	\end{itemize}
-\end{displayquote}
-
-kjer je pojem \textit{prefix} definiran tako:
-
-\begin{displayquote}
-	\textbf{Prefixes}. We say that the prefixes of an lvalue are all the lvalues you get by stripping away fields and derefs.
-	The prefixes of \verb|*a.b| would be \verb|*a.b|, \verb|a.b|, and \verb|a|.
-\end{displayquote}
+$(L,P) \in \kappa$ pomeni, da je posoja $L$ prekinjena (\textit{killed}) na točki $P$. Pojem prekinitve oziroma razveljavitve
+pogojev smo definirali že zgoraj. To se običajno zgodi na sredini prireditvenega stavka, ki prepiše pot (\textit{path}) prej povezano s posojo $L$.
 
 V našem primeru nimamo nobenega primera prekinitve posoje, je pa relacija ključna v naslednjem primeru:
 
@@ -297,12 +290,18 @@ let x: &mut i32 = &mut p; // `x` kaže na `p`
 let y = &mut *x; // Posoja L0, `y` kaže tudi na `p`
 // ...
 x = &mut q; // `x` kaže na `q`; prekine L0
+// Lahko uporabimo *x tukaj
 \end{lstlisting}
+
+V tem primeru je \verb|x| referenca na \verb|p|, ki je prekopirana v \verb|y|. Dostop do \verb|*x| bi bil tukaj neveljaven,
+ker si ga je \verb|y| izposodil. Ko pa \verb|x| priredimo novo vrednost, pa razveljavimo posojo \verb|L0| in s tem si že spet
+omogočimo dostop do \verb|x|. Brez prekinitve bi Polonius mislil, da je mesto \verb|*x| še vedno izposojeno, čeprav
+zdaj \verb|y| kaže na \verb|p| in \verb|x| na \verb|q|.
 
 \subsection{Relacija razveljavitve posoje}
 
-Začetno relacijo razveljavitve posoje (\textit{invalidates loan}) označimo s $\iota \subset \mathcal{P} \times \mathcal{L}$.
-To pomeni, da dejanje na točki $P$ (recimo mutacija sposojenega mesta oz. \textit{place}) razveljavi pogoje posoje $L$, kar
+Začetno relacijo razveljavitve posoje (\textit{invalidates loan}) označimo z $\iota \subset \mathcal{P} \times \mathcal{L}$.
+To pomeni, da dejanje na točki $P$ (recimo mutacija izposojenega mesta) razveljavi pogoje posoje $L$, kar
 je že opisano v poglavju o definicije množice $\mathcal{L}$.
 
 \begin{lstlisting}

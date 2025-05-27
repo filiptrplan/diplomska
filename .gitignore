@@ -10,4 +10,5 @@
 *.bcf
 *.run.xml
 examples/mir_dump
+*-SAVE-ERROR
 
