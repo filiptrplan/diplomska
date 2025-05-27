@@ -313,7 +313,7 @@ fn main() {
   let p: &'5 i32 = &'4 x; 
   (* $('4, L_{1}, P) \in \psi $ *)
   r.push(p);
-  x += 1; // tukaj razveljavimo (* $L_{1}$ *) z mutacijo deljenega referenta
+  x += 1; // tukaj razveljavimo (* $L_{1}$ *) z mutacijo deljenega referenta (ustvarili smo deljeno referenco v p)
   take::<Vec<&'6 i32>>(v);
 }
 \end{lstlisting}
@@ -325,11 +325,11 @@ Polonius-a.
 
 V primerih ne bomo označevali točk v grafu poteka pri relacijah, ker bo koda anotirana na tistem mestu, kjer
 se posamezna relacija pojavi. V ozadju se to še vedno izvaja na nivoju MIR, vendar za naše poenostavljene
-primere ni to ključna informacija. (torej bomo pisali recimo $(R_{1}, R_{2}) \in \beta$ namesto $(R_{1}, R_{2}, P) \in \beta$).
+primere to ni ključna informacija. (torej pisali bomo $(R_{1}, R_{2}) \in \beta$ namesto $(R_{1}, R_{2}, P) \in \beta$).
 
 \subsection{Relacija vsebovanosti}
 
-Razširimo začetno relacijo vsebovanosti z relacijo vsebovanosti (\textit{subset}), ki jo označimo s
+Razširimo začetno relacijo vsebovanosti z (raširjeno) relacijo vsebovanosti (\textit{subset}), ki jo označimo z
 $\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Definirana je z zaprtjem naslednjih pravil:
 
 \begin{enumerate}
@@ -337,18 +337,18 @@ $\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Definirana
 	      iz začetne relacije se pojavijo tudi v razširjeni.
 	\item \textbf{Tranzitivnost:} Če $(R_1, R_2, P) \in \Gamma$ in $(R_2, R_3, P) \in \Gamma$, potem $(R_1, R_3, P) \in \Gamma$.
 	      Relacija vsebovanosti na isti točki v programu je tranzitivna.
-	\item \textbf{Propagacija:} Če veljajo
+	\item \textbf{Propagacija:} Če veljajo vse izmed naštetega:
 	      \begin{enumerate}
 		      \item $(R_1, R_2, P) \in \Gamma$
 		      \item $(P, Q) \in C_E$: točki si sledita v grafu poteka
-		      \item $(R_1, Q) \in \nabla_R$: regija 1 je živa na naslednji točki
-		      \item $(R_2, Q) \in \nabla_R$: regija 2 je živa
+		      \item $(R_1, Q) \in \nabla_R$: regija 1 je aktivna na naslednji točki
+		      \item $(R_2, Q) \in \nabla_R$: regija 2 je aktivna
 	      \end{enumerate}
-	      potem sledi $(R_1, R_2, Q) \in \Gamma$. To pomeni, da se propagira čez graf poteka, če sta obe
-	      regiji živi na naslednji točki v grafu. Pogoj za živost nam pride prav kasneje.
+	      potem sledi $(R_1, R_2, Q) \in \Gamma$. To pomeni, da se relacija propagira čez graf poteka, če sta obe
+	      regiji aktivni na naslednji točki v grafu. Pogoj za aktivnost nam pride prav kasneje.
 \end{enumerate}
 
-Za krajši zapis izpustimo točko v grafu P, pozicija anotacije v kodi nam poda njeno relativno lokacijo.
+Na primeru ustvarimo naslednje relacije:
 
 \begin{lstlisting}
 fn main() {
@@ -381,25 +381,25 @@ fn take<T>(p: T) { .. }
 
 \subsection{Relacija zahteve}
 
-Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Oznacimo jo s
+Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Označimo jo s
 $\zeta \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$ in definirana je z zaprtjem naslednjih pravil:
 \begin{enumerate}
 	\item \textbf{Začetna relacija:} Če $(R, L, P) \in \psi$, potem $(R, L, P) \in \zeta$. To nam pove, da če se trojica
 	      nahaja v relaciji posoje regij, se nahaja tudi v $\zeta$.
-	\item \textbf{Vsebovanost:} Če $(R_{1}, L, P) \in \zeta$ in $(R_{1}, R_{2}, P) \in \Gamma$, potem velja
-	      $(R_{2}, L, P) \in \zeta$. To nam pove, da če neka regija $R_{1}$, ki je podmnožica večje regije $R_{2}$ na točki $P$
+	\item \textbf{Vsebovanost:} Če velja $(R_{1}, L, P) \in \zeta$ in $(R_{1}, R_{2}, P) \in \Gamma$, potem sledi
+	      $(R_{2}, L, P) \in \zeta$. To nam pove, da če neka regija $R_{1}$, ki je podmnožica večje regije $R_{2}$, na točki $P$
 	      zahteva posojo $L$, potem tudi $R_{2}$ zahteva isto posojo.
 	\item \textbf{Propagacija:} Če veljajo vse \begin{enumerate}
 		      \item $(R,L,P) \in \zeta$: $R$ zahteva $L$ na $P$
 		      \item $(L, P) \notin \kappa$: $L$ ni prekinjena na $P$
 		      \item $(P, Q) \in C_{E}$: $Q$ sledi $P$ v grafu poteka
-		      \item $(R,Q) \in \nabla_{R}$: regija $R$ je živa na točki $Q$
+		      \item $(R,Q) \in \nabla_{R}$: regija $R$ je aktivna na točki $Q$
 	      \end{enumerate}
 	      potem propagiramo relacijo v $(R,L,Q) \in \zeta$.
 \end{enumerate}
 
-Če pozorno pogledamo pri relaciji vsebovanosti $\beta$ in relaciji zahteve $\zeta$ mora biti regija pri pravilu
-za propagacijo živa na naslednji točki $Q$. To nam pomaga pri naslednjem primeru.
+Opazimo, da pri relaciji vsebovanosti $\beta$ in pri relaciji zahteve $\zeta$ mora biti regija pri pravilu
+za propagacijo aktivna na naslednji točki $Q$. Z naslednjim primerom ponazorimo zakaj je to ključna omejitev.
 
 \begin{lstlisting}
 let x = 22;
@@ -412,37 +412,38 @@ let mut p: &'0 i32 = &'1 x; (* posoja $L_{0}$ *)
 p = &'3 y; (* posoja $L_{1}$ *)
 (* $('3,'0) \in \beta$ *)
 (* $('3, L_{1}) \in \zeta$ *)
-//'1 ni več živa, ker smo jo prepisali z '3 
+//'1 ni več aktivna, ker smo jo prepisali z '3 
 
 x += 1;
 // razveljavi se posoja (* $L_{0}$ $(L_{0}) \in \iota$ *)
-// tukaj bi brez pravila o živosti regij še vedno zahtevali (* $(L_{0}, '0) \in \zeta$ *)
-// zaradi pravila o propagaciji 
+// tukaj bi brez pravila o aktivnosti regij še vedno zahtevali 
+// (* $(L_{0}, '0) \in \zeta$ *) zaradi pravila o propagaciji 
 
 print( *p );
+// ta izraz posledično ne bi bil veljaven
 \end{lstlisting}
 
-\subsection{Relacija živosti posoje}
+\subsection{Relacija aktivnosti posoje}
 
-Relacija živosti posoje(\textit{loan live at}) pomeni, da je posoja $L$ živa na točki $P$. Oznacimo jo s
-$\nabla_{L} \subseteq \mathcal{L} \times \mathcal{P}$ in definiramo takrat, ko
+Relacija aktivnosti posoje (\textit{loan live at}) pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s
+$\nabla_{L} \subseteq \mathcal{L} \times \mathcal{P}$ in jo definiramo takrat, ko
 
 \[ \exists R \in \mathcal{R}: (R,P) \in \nabla_{R} \land (R,L,P) \in \zeta \]
 
-To na kratko pomeni, da je posoja živa, če jo na isti točki zahteva neka živa regija.
+To na kratko pomeni, da je posoja aktivna, če jo na isti točki zahteva neka aktivna regija.
 
 \section{Javljanje napake}
 
-S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu se zgodi napaka (vsaj v smislu preverjalnika posoj).
-že spet si pomagamo z relacijo, ki jo poimenujemo \textbf{relacija napake} (\textit{error}) in jo označimo s
-$\epsilon \subset \mathcal{P}$. To nam bo povedalo, da se napaka pojavi na točki $P$ v programu.
+S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu javimo napako (v obsegu preverjalnika posoj).
+Že spet si pomagamo z relacijo, ki jo tokrat poimenujemo \textbf{relacija napake} (\textit{error}) in jo označimo z
+$\epsilon \subset \mathcal{P}$. Ta relacija nam pove, da javimo napako na točki $P$ v programu.
 
-Definiramo jo, ko:
+Definiramo jo, ko velja:
 
 \[ \exists L \in \mathcal{L}: (P, L) \in \iota \land (L,P) \in \nabla_{L} \]
 
-Torej napaka se pojavi natanko tedaj, ko neko dejanje na točki $P$ razveljavi pogoje posoje $L$, ki je hkrati tudi
-živa na točki $P$.
+Torej napaka se javi natanko tedaj, ko neko dejanje na točki $P$ razveljavi pogoje posoje $L$, ki je hkrati tudi
+aktivna na točki $P$.
 
 Poglejmo še kako se dokončno napaka javi na našem primeru:
 
@@ -462,11 +463,13 @@ fn main() {
   (* $('5, '2) \in \beta \implies ('2, L_{1} \in \zeta)$ *)
   
   x += 1;
-  // tukaj se razveljavi posoja (* $L_{1}$: $(L_{1}) \in \iota$ *)
-  // da se nam javi napaka mora biti ta posoja živa: (* $(L_{1}) \in \nabla_{L}$ *)
-  // torej jo mora zahtevati neka živa regija, na trenutni točki v programu je 
-  // živa regija '2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš 
-  // vektor `v` z elementi, ki imajo regijo '2
+  // Tukaj se razveljavi posoja (* $L_{1}$: $(L_{1}) \in \iota$ *).
+  // Da se nam javi napaka mora biti ta posoja aktivna (* $(L_{1}) \in \nabla_{L}$ *).
+  // Torej jo mora zahtevati neka aktivna regija, na trenutni točki pa je 
+  // aktivna regija '2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš 
+  // vektor `v`. Elementi vektorja pa imajo regijo `'2`, ki pa je del posoje (* L_{1} *).
+  // Torej, ker smo razveljavili posojo (* L_{1} *), medtem ko je bila aktivna regija,
+  // ki jo ta posoja zahteva, javimo napako.
 
   take::<Vec<&'6 i32>>(v);
 }
