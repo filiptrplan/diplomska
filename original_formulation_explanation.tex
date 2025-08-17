@@ -33,9 +33,10 @@
 \section{Uvod}
 
 Varnost na področju pisanja programske opreme je bila vedno relevantna tema. Napadalci lahko
-izkoristijo veliko različnih attack surfaces, vendar ena izmed najbolj pogostih so napake
-pri upravljanju s pomnilnikom (cite). Te napake so prav tako pogost razlog za razne hrošče (cite)
-in so se jih zato razvijalci različnih jezikov lotili na raznolike načine.
+izkoristijo veliko različnih attack surfaces, vendar Microsoft je pokazal, da so ena izmed najbolj pogostih
+napake pri upravljanju s pomnilnikom \cite{Microsoft70Percent}. Pri projektu Chromium, ki je za enem
+izmed najbolj popularnih brskalnikov, so opazili, da okoli 70 procentov hroščev povzročiju tovrstne napake \cite{MemorySafety}.
+Zato so se jih razvijalci različnih jezikov lotili na več načinov.
 
 Eden najbolj uporabljenih jezikov je C, kjer je programerju povsem prepuščeno koliko pomnilnika zasede,
 kaj dela s kazalci in kdaj piše ter bere iz pomnilniških lokacij. Tovrsten pristop lahko vodi do izredno
