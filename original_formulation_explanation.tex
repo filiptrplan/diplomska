@@ -30,9 +30,50 @@
 
 \maketitle
 
-V tem članku bomo matematično formalizirali originalno formulacijo Polonius preverjevalnika izposoj (\textit{borrow checker}).
-Prvotna spletna objava je dostopna na viru \cite{AliasbasedFormulationBorrow}. Trenutno je različica Polonius-a že del \verb|nightly| izdaje
-Rustovega prevajalnika, dostopna na viru \cite{RustCompilerRustc_borrowck}.
+\section{Uvod}
+
+Varnost na področju pisanja programske opreme je bila vedno relevantna tema. Napadalci lahko
+izkoristijo veliko različnih attack surfaces, vendar ena izmed najbolj pogostih so napake
+pri upravljanju s pomnilnikom (cite). Te napake so prav tako pogost razlog za razne hrošče (cite)
+in so se jih zato razvijalci različnih jezikov lotili na raznolike načine.
+
+Eden najbolj uporabljenih jezikov je C, kjer je programerju povsem prepuščeno koliko pomnilnika zasede,
+kaj dela s kazalci in kdaj piše ter bere iz pomnilniških lokacij. Tovrsten pristop lahko vodi do izredno
+hitre kode in časov prevajanja ampak je tud vir številnih napak (cite).
+
+Alternativni pristop je pa garbage collection, kjer se programski jezik namesto programerja
+ukvarja z alokacijami in sproščanjem pomnilnika ter s tem razbremeni programerja, da se lahko
+osredotoči na obnašanje samega programa. Kompromis, ki ga naredimo pa je, da se med izvajanjem
+programa moramo ustaviti in počistiti pomnilnik. To lahko vodi do razno raznih hiccupov (CITE? mogoce kej kok lahko GC steka).
+
+Programski jezik Rust se tega problema loti na drugačen način. Varnost dostopanja do pomnilniških
+lokacij se preverja med časom prevajanja s pomočjo preverjevalnika izposoj (\textit{borrow checker}), ki je
+del Rustovega prevajalnika, ki se ukvarja s tokom podatkov in pomnilniškimi lokacijami. Tak pristop
+nam teoretično, da najbolje obeh svetov: garancijo o varnih programih, ki nam jih da GC in hitrost izvajanja
+programov jezikov z ročnim upravljanjem pomnilnika (cite). Znana slabost Rusta je pa zato počasno prevajanje (cite),
+ki sicer ni samo odvisno od preverjevalnika izposoj, vendar zagotovo pripomore.
+
+Preverjevalnik izposoj se je tekom razvoja Rusta bistveno spremenil od svoje prvotne implementacije.
+Na začetku je bila dokaj primitivna in ni sprejela veliko pravilnih programov zaradi svoje konzervativnosti
+pri zagotavljanju varnosti (cite NLL). Zato se je čez par let pojavila naslednja različica preverjevalnika,
+imenovana NLL (\textit{non-lexical lifetimes}), ki je rešila veliko pogostih problem s prvotno različico.
+Vendar vseeno še vedno ne sprejema vseh veljavnih programov. Da rešijo probleme NLL-ja so Rustovi razvijalci
+predlagali najnovejšo verzijo preverjevalnika, Polonius, ki drugače zastavi problem izposoj in tako
+sprejme še večji delež pravilnih programov.
+
+NLL je bil prvotno natančno opisan v RFC-ju z zelo točnim jezikom, kar je potem vodilo njegov razvoj (cite), Polonius
+pa je prvotno nastal kot predlog na spletnem blogu in se počasi razvijal s pomočjo dodatnih objav (cite). Do danes
+ne obstaja centraliziranega formalnega zapisa o točnem delovanju Poloniusa, le nekaj spletnih objav, nedokončana knjiga(cite)
+ter trenutna implementacija v Rustovem prevajalniku (cite).
+
+Cilj te naloge je potemtakem matematično formalizirati najnovejšo različico preverjevalnika izposoj in razčistiti
+podrobnosti, ki so se izgubile v bolj nenatančnem jeziku spletnih blogov in video posnetkov. Prvo bomo raziskali
+pretekle poskuse formalizacije Rusta in sorodne načine upravljanja s pomnilnikom. Nato sledi kratek pregled
+intuicije za Rustovimi pravili posojanja ter nato končali z formalizacijo Poloniusa.
+
+\section{Pregled literature}
+
+\section{Formalizacija}
 
 Tekom članka bomo uporabljali naslednji primer izvorne kode anotiran z abstraktnimi regijami (te nimajo čiste bijektivne korespondence z
 dejanskimi Rustovimi življenjskimi dobami). Vsi primeri so izvzeti iz originalne spletne objave.
@@ -55,7 +96,7 @@ fn take<T>(p: T) { .. }
 
 % TODO: Daljsi uvod v ownership pa borrowing? Mogoce to potem, ker bi bilo fajn malo daljsi uvod - to je za final verzijo.
 
-\section{Definicije pojmov}
+\subsection{Definicije pojmov}
 
 \begin{description}
 	\item[MIR] MIR je kratica za \textit{Mid-level intermediate representation} in je bistveno poenostavljena oblika Rust-a.
@@ -108,9 +149,9 @@ fn take<T>(p: T) { .. }
 	\item[NLL] je trenutna implementacija preverjevalnika izposoj v Rust-ovem prevajalniku.
 \end{description}
 
-\section{Osnovne množice in elementi}
+\subsection{Osnovne množice in elementi}
 
-\subsection{Množica posoj $\mathcal{L}$}
+\subsubsection{Množica posoj $\mathcal{L}$}
 
 Množico vseh posoj (\textit{angl. loans}) označimo z $\mathcal{L}$. \textbf{Pogoji posoje} so lastnosti, ki morajo
 držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno.
@@ -160,7 +201,7 @@ fn main() {
 fn take<T>(p: T) { .. }
 \end{lstlisting}
 
-\subsection{Množica regij $\mathcal{R}$}
+\subsubsection{Množica regij $\mathcal{R}$}
 
 V trenutni implementaciji preverjevalnika izposoj NLL se posoje spremljajo s pomočjo življenjskih dob.
 V tej formulaciji pa je avtor življenjske dobe poimenoval regije (\textit{regions}).
@@ -168,7 +209,7 @@ Množica regij je označena z $\mathcal{R} \subset 2^{\mathcal{L}}$.
 
 Na primeru so že označene z \verb|'1|, \verb|'2|, \verb|'3|, itd. Pripadnost posoj regijam bomo kasneje določili z relacijo.
 
-\subsection{Graf poteka}izposoje
+\subsubsection{Graf poteka}izposoje
 
 Graf poteka (\textit{angl. CFG - control flow graph}) je izračunan v prejšnjih fazah analize kode.
 Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
@@ -191,7 +232,7 @@ Privzeto se ustvarijo naslednje povezave (to bi moral potrditi v kodi rustc, v �
 \textit{Opomba:} To je samo matematična formulacija predstavitve grafa poteka, v prevajalniku
 je njegova predstavitev precej bolj kompleksna.
 
-\subsection{Množica stavkov in točk}
+\subsubsection{Množica stavkov in točk}
 
 Množico vseh stavkov v MIR označimo s $\mathcal{S}$. Točke v grafu poteka (\textit{CFG - control flow graph})
 označimo s $\mathcal{P}$. Lahko so dveh tipov:
@@ -212,13 +253,13 @@ Komentar nad strukturo, ki opisuje množico stavkov, pravi naslednje \cite{RustC
 	točka trenutek ravno preden bi se \verb|B| zapisal v \verb|A| \dots
 \end{displayquote}
 
-\section{Začetne relacije}
+\subsection{Začetne relacije}
 
 Relacijo označimo kot \textbf{začetno} (\textit{input}), ko jo dobimo tako, da jo izpeljemo
 iz direktno analize poteka podatkov. Te relacije bodo predstavljale našo izhodiščno točko iz katere bomo izpeljali druge relacije.
 
 
-\subsection{Začetna relacija vsebovanosti}
+\subsubsection{Začetna relacija vsebovanosti}
 
 Začetno relacijo vsebovanosti (\textit{base subset}) bomo označili z
 $\beta \subset \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Torej to je relacija, ki povezuje dve regiji
@@ -254,7 +295,7 @@ fn main() {
 }
 \end{lstlisting}
 
-\subsection{Začetna relacija posoje regij}
+\subsubsection{Začetna relacija posoje regij}
 
 Začetno relacijo posoje regij (\textit{borrow region}) označimo s $\psi \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$.
 
@@ -275,7 +316,7 @@ fn main() {
 }
 \end{lstlisting}
 
-\subsection{Relacija aktivnosti regije}
+\subsubsection{Relacija aktivnosti regije}
 
 Začetno relacijo aktivnosti regije (\textit{region live at}) označimo z $\nabla_{R} \subseteq \mathcal{R} \times \mathcal{P}$.
 $(R, P) \in \nabla_{R}$ pomeni, da je regija $R$ aktivna na točki $P$. Torej spremenljivka, katere tip vključuje $R$ (recimo \verb|&'a|),
@@ -284,7 +325,7 @@ bo morda kasneje v programu uporabljena.
 To določi analiza aktivnosti, ki poteka isto kot v NLL RFC. Bolj specifično, s pomočjo raznih omejitev izračuna množico točk
 kjer mora biti regija (v RFC-ju poimenovana \textit{lifetime}) aktivna \cite{2094nllRustRFC}.
 
-\subsection{Relacija prekinitve posoje}
+\subsubsection{Relacija prekinitve posoje}
 
 Začetno relacijo prekinitve posoje (\textit{loan killed at}) označimo s $\kappa \subseteq \mathcal{L} \times \mathcal{P}$.
 $(L,P) \in \kappa$ pomeni, da je posoja $L$ prekinjena (\textit{killed}) na točki $P$. Pojem prekinitve oziroma razveljavitve
@@ -307,7 +348,7 @@ ker si ga je \verb|y| izposodil. Ko pa \verb|x| priredimo novo vrednost, pa razv
 omogočimo dostop do \verb|x|. Brez prekinitve bi Polonius mislil, da je mesto \verb|*x| še vedno izposojeno, čeprav
 zdaj \verb|y| kaže na \verb|p| in \verb|x| na \verb|q|.
 
-\subsection{Relacija razveljavitve posoje}
+\subsubsection{Relacija razveljavitve posoje}
 
 Začetno relacijo razveljavitve posoje (\textit{invalidates loan}) označimo z $\iota \subset \mathcal{P} \times \mathcal{L}$.
 To pomeni, da dejanje na točki $P$ (recimo mutacija izposojenega mesta) razveljavi pogoje posoje $L$, kar
@@ -327,7 +368,7 @@ fn main() {
 }
 \end{lstlisting}
 
-\section{Izpeljane relacije}
+\subsection{Izpeljane relacije}
 
 V tem poglavju bomo opisali relacije, ki jih izpeljemo iz začetnih. Te relacije tvorijo najbolj pomembni del analize
 Polonius-a.
@@ -336,7 +377,7 @@ V primerih ne bomo označevali točk v grafu poteka pri relacijah, ker bo koda a
 se posamezna relacija pojavi. V ozadju se to še vedno izvaja na nivoju MIR, vendar za naše poenostavljene
 primere to ni ključna informacija. (torej pisali bomo $(R_{1}, R_{2}) \in \beta$ namesto $(R_{1}, R_{2}, P) \in \beta$).
 
-\subsection{Relacija vsebovanosti}
+\subsubsection{Relacija vsebovanosti}
 
 Razširimo začetno relacijo vsebovanosti z (raširjeno) relacijo vsebovanosti (\textit{subset}), ki jo označimo z
 $\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Definirana je z zaprtjem naslednjih pravil:
@@ -388,7 +429,7 @@ fn main() {
 fn take<T>(p: T) { .. }
 \end{lstlisting}
 
-\subsection{Relacija zahteve}
+\subsubsection{Relacija zahteve}
 
 Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Označimo jo s
 $\zeta \subseteq \mathcal{R} \times \mathcal{L} \times \mathcal{P}$ in definirana je z zaprtjem naslednjih pravil:
@@ -432,7 +473,7 @@ print( *p );
 // ta izraz posledično ne bi bil veljaven
 \end{lstlisting}
 
-\subsection{Relacija aktivnosti posoje}
+\subsubsection{Relacija aktivnosti posoje}
 
 Relacija aktivnosti posoje (\textit{loan live at}) pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s
 $\nabla_{L} \subseteq \mathcal{L} \times \mathcal{P}$ in jo definiramo takrat, ko
@@ -441,7 +482,7 @@ $\nabla_{L} \subseteq \mathcal{L} \times \mathcal{P}$ in jo definiramo takrat, k
 
 To na kratko pomeni, da je posoja aktivna, če jo na isti točki zahteva neka aktivna regija.
 
-\section{Javljanje napake}
+\subsection{Javljanje napake}
 
 S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu javimo napako (v obsegu preverjalnika posoj).
 Že spet si pomagamo z relacijo, ki jo tokrat poimenujemo \textbf{relacija napake} (\textit{error}) in jo označimo z

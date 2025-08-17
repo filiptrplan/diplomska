@@ -115,6 +115,24 @@
   file = {/home/filip/Zotero/storage/AM8UVJZL/Jung et al. - 2018 - RustBelt securing the foundations of the Rust programming language.pdf}
 }
 
+@article{kevinandriansantosoRustsMemorySafety2023,
+  title = {Rust's {{Memory Safety Model}}: {{An Evaluation}} of {{Its Effectiveness}} in {{Preventing Common Vulnerabilities}}},
+  shorttitle = {Rust's {{Memory Safety Model}}},
+  author = {Kevin Andrian Santoso, Oey and Kwee, Catherine and Chua, William and Nabiilah, Ghinaa Zain and {Rojali}},
+  date = {2023},
+  journaltitle = {Procedia Computer Science},
+  shortjournal = {Procedia Computer Science},
+  volume = {227},
+  pages = {119--127},
+  issn = {18770509},
+  doi = {10.1016/j.procs.2023.10.509},
+  url = {https://linkinghub.elsevier.com/retrieve/pii/S1877050923016757},
+  urldate = {2025-08-15},
+  abstract = {Ensuring safe program operation is crucial for systems programming, and memory safety is a significant aspect of this. This paper assesses the memory safety strategies used in Rust and C++ programming languages. Rust is a modern language that has become popular due to its focus on safety, performance, and concurrency, whereas C++ is known for its efficiency and low-level programming capabilities. The analysis compares and contrasts the memory safety features of both languages, including Rust’s ownership and borrowing model and C++’s manual memory management techniques. Additionally, the study examines the development tools available for both languages and compares ease of use and productivity. The analysis shows that Rust has several memory safety advantages over C++. Rust’s ownership and borrowing model enables safe memory management without requiring manual intervention. By enforcing strict rules for memory usage, the compiler in Rust prevents typical memory-related errors like null and dangling pointers. However, in contrast to Rust, C++ provides more low-level hardware control but needs manual memory management, exposing it to memory errors such as buffer overflows and memory leaks. Moreover, Rust’s memory safety features simplify the development of secure and dependable code, especially for applications with crucial security requirements. In contrast, C++ demands significant memory management expertise to avoid memory-related errors. In conclusion, Rust offers several memory safety benefits over C++, making it a superior choice for applications with critical safety needs. However, the selection of language ultimately depends on the specific project requirements and the development team’s experience and preferences.},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/6SVHWB2V/Kevin Andrian Santoso et al. - 2023 - Rust's Memory Safety Model An Evaluation of Its Effectiveness in Preventing Common Vulnerabilities.pdf}
+}
+
 @book{klabnikRustProgrammingLanguage2023,
   title = {The {{Rust}} Programming Language},
   author = {Klabnik, Steve and Nichols, Carol},
@@ -127,6 +145,13 @@
   pagetotal = {527},
   keywords = {Handbooks and manuals,Instructional and educational works,Rust (Computer program language)},
   annotation = {OCLC: on1363816350}
+}
+
+@online{MemorySafety,
+  title = {Memory Safety},
+  url = {https://www.chromium.org/Home/chromium-security/memory-safety/},
+  urldate = {2025-08-15},
+  file = {/home/filip/Zotero/storage/QLVEQE6W/memory-safety.html}
 }
 
 @online{MIRDataflowRust,
@@ -202,7 +227,7 @@
   file = {/home/filip/Zotero/storage/38ES3KBQ/location.html}
 }
 
-@online{RvalueRustc_middleMir,
+@online{RvalueRustc_middleMira,
   title = {Rvalue in Rustc\_middle::Mir - {{Rust}}},
   url = {https://doc.rust-lang.org/nightly/nightly-rustc/rustc_middle/mir/enum.Rvalue.html},
   urldate = {2025-04-12},
