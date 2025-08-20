@@ -13,6 +13,24 @@
   file = {/home/filip/Zotero/storage/5CJPTNKX/an-alias-based-formulation-of-the-borrow-checker.html}
 }
 
+@article{bakerListProcessingReal1978,
+  title = {List Processing in Real Time on a Serial Computer},
+  author = {Baker, Henry G.},
+  date = {1978-04},
+  journaltitle = {Communications of the ACM},
+  shortjournal = {Commun. ACM},
+  volume = {21},
+  number = {4},
+  pages = {280--294},
+  issn = {0001-0782, 1557-7317},
+  doi = {10.1145/359460.359470},
+  url = {https://dl.acm.org/doi/10.1145/359460.359470},
+  urldate = {2025-08-20},
+  abstract = {A real-time list processing system is one in which the time required by the elementary list operations (e.g. CONS, CAR, CDR, RPLACA, RPLACD, EQ, and ATOM in LISP) is bounded by a (small) constant. Classical implementations of list processing systems lack this property because allocating a list cell from the heap may cause a garbage collection, which process requires time proportional to the heap size to finish. A real-time list processing system is presented which continuously reclaims garbage, including directed cycles, while linearizing and compacting the accessible cells into contiguous locations to avoid fragmenting the free storage pool. The program is small and requires no time-sharing interrupts, making it suitable for microcode. Finally, the system requires the same average time, and not more than twice the space, of a classical implementation, and those space requirements can be reduced to approximately classical proportions by compact list representation. Arrays of different sizes, a program stack, and hash linking are simple extensions to our system, and reference counting is found to be inferior for many applications.},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/ZGY7QHAM/Baker - 1978 - List processing in real time on a serial computer.pdf}
+}
+
 @online{blackshearMoveBorrowChecker2022,
   title = {The {{Move Borrow Checker}}},
   author = {Blackshear, Sam and Mitchell, John and Nowacki, Todd and Qadeer, Shaz},
@@ -61,6 +79,16 @@
   url = {https://rustc-dev-guide.rust-lang.org/},
   urldate = {2025-02-09},
   file = {/home/filip/Zotero/storage/F7X63E5U/rustc-dev-guide.rust-lang.org.html}
+}
+
+@online{glazarCodingRustBad2023,
+  title = {Is Coding in {{Rust}} as Bad as in {{C}}++?},
+  author = {Glazar, Matthew "strager"},
+  date = {2023-01-05T21:32:37-08:00},
+  url = {https://quick-lint-js.com/blog/cpp-vs-rust-build-times/},
+  urldate = {2025-08-18},
+  abstract = {A practical comparison of build and test speed between C++ and Rust.},
+  file = {/home/filip/Zotero/storage/5B9LMZQA/cpp-vs-rust-build-times.html}
 }
 
 @article{grossmanRegionBasedMemoryManagement,
@@ -147,7 +175,7 @@
   annotation = {OCLC: on1363816350}
 }
 
-@online{MemorySafety,
+@online{MemorySafetya,
   title = {Memory Safety},
   url = {https://www.chromium.org/Home/chromium-security/memory-safety/},
   urldate = {2025-08-15},
@@ -209,6 +237,13 @@
   file = {/home/filip/Zotero/storage/ZWA5K832/polonius-part-1.html}
 }
 
+@online{PoloniusRevisitedPartc,
+  title = {Polonius Revisited, Part 2 · Baby Steps},
+  url = {https://smallcultfollowing.com/babysteps/blog/2023/09/29/polonius-part-2/},
+  urldate = {2025-08-20},
+  file = {/home/filip/Zotero/storage/M4IQQNQ4/polonius-part-2.html}
+}
+
 @article{reedPatinaFormalizationRust,
   title = {Patina: {{A Formalization}} of the {{Rust Programming Language}}},
   author = {Reed, Eric},
@@ -234,7 +269,7 @@
   file = {/home/filip/Zotero/storage/38ES3KBQ/location.html}
 }
 
-@online{RvalueRustc_middleMira,
+@online{RvalueRustc_middleMir,
   title = {Rvalue in Rustc\_middle::Mir - {{Rust}}},
   url = {https://doc.rust-lang.org/nightly/nightly-rustc/rustc_middle/mir/enum.Rvalue.html},
   urldate = {2025-04-12},
@@ -332,6 +367,13 @@
   file = {/home/filip/Zotero/storage/RUZHJSKB/Weiss et al. - Oxide The Essence of Rust.pdf}
 }
 
+@online{WhatPoloniusPolonius,
+  title = {What Is {{Polonius}}? - {{Polonius}}},
+  url = {https://rust-lang.github.io/polonius/},
+  urldate = {2025-08-20},
+  file = {/home/filip/Zotero/storage/NGF4KTVA/polonius.html}
+}
+
 @article{yanovskiGhostCellSeparatingPermissions2021,
   title = {{{GhostCell}}: Separating Permissions from Data in {{Rust}}},
   shorttitle = {{{GhostCell}}},
@@ -349,4 +391,22 @@
   issue = {ICFP},
   langid = {english},
   file = {/home/filip/Zotero/storage/JTVPVVLZ/Yanovski et al. - 2021 - GhostCell separating permissions from data in Rust.pdf}
+}
+
+@inproceedings{zhaoLowlatencyHighthroughputGarbage2022,
+  title = {Low-Latency, High-Throughput Garbage Collection},
+  booktitle = {Proceedings of the 43rd {{ACM SIGPLAN International Conference}} on {{Programming Language Design}} and {{Implementation}}},
+  author = {Zhao, Wenyu and Blackburn, Stephen M. and McKinley, Kathryn S.},
+  date = {2022-06-09},
+  pages = {76--91},
+  publisher = {ACM},
+  location = {San Diego CA USA},
+  doi = {10.1145/3519939.3523440},
+  url = {https://dl.acm.org/doi/10.1145/3519939.3523440},
+  urldate = {2025-08-20},
+  abstract = {To achieve short pauses, state-of-the-art concurrent copying collectors such as C4, Shenandoah, and ZGC use substantially more CPU cycles and memory than simpler collectors. They suffer from design limitations: i) concurrent copying with inherently expensive read and write barriers, ii) scalability limitations due to tracing, and iii) immediacy limitations for mature objects that impose memory overheads.},
+  eventtitle = {{{PLDI}} '22: 43rd {{ACM SIGPLAN International Conference}} on {{Programming Language Design}} and {{Implementation}}},
+  isbn = {978-1-4503-9265-5},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/UWKLZZ86/Zhao et al. - 2022 - Low-latency, high-throughput garbage collection.pdf}
 }

@@ -10,7 +10,7 @@
 
 \addbibresource{thesis.bib}
 
-\title{Formalizacija originalne formulacije Polonius-a}
+\title{Formalizacija originalne formulacije Poloniusa}
 \author{Filip Trplan}
 \date{April 2025}
 \renewcommand{\refname}{Viri}
@@ -35,32 +35,37 @@
 Varnost na področju pisanja programske opreme je bila vedno relevantna tema. Napadalci lahko
 izkoristijo veliko različnih attack surfaces, vendar Microsoft je pokazal, da so ena izmed najbolj pogostih
 napake pri upravljanju s pomnilnikom \cite{Microsoft70Percent}. Pri projektu Chromium, ki je za enem
-izmed najbolj popularnih brskalnikov, so opazili, da okoli 70 procentov hroščev povzročiju tovrstne napake \cite{MemorySafety}.
+izmed najbolj popularnih brskalnikov, so opazili, da okoli 70 procentov hroščev povzročiju tovrstne napake \cite{MemorySafetya}.
 Zato so se jih razvijalci različnih jezikov lotili na več načinov.
 
-Eden najbolj uporabljenih jezikov je C, kjer je programerju povsem prepuščeno koliko pomnilnika zasede,
-kaj dela s kazalci in kdaj piše ter bere iz pomnilniških lokacij. Tovrsten pristop lahko vodi do izredno
-hitre kode in časov prevajanja ampak je tud vir številnih napak (cite).
+Eden najbolj uporabljenih jezikov je C, kjer je programerju povsem prepuščeno kako upravlja s pomnilnikom.
+Tovrsten pristop, imenovan ročno upravljanje s pomnilnikom, lahko vodi do izredno
+hitre kode in časov prevajanja (v primerjavi z bolj kompleksnimi jeziki kot je Rust \cite{glazarCodingRustBad2023}),
+ampak je tud vir številnih napak \cite{MemorySafetya}.
 
-Alternativni pristop je pa garbage collection, kjer se programski jezik namesto programerja
-ukvarja z alokacijami in sproščanjem pomnilnika ter s tem razbremeni programerja, da se lahko
-osredotoči na obnašanje samega programa. Kompromis, ki ga naredimo pa je, da se med izvajanjem
-programa moramo ustaviti in počistiti pomnilnik. To lahko vodi do razno raznih hiccupov (CITE? mogoce kej kok lahko GC steka).
+Alternativni pristop pa je avtomatsko čiščenje pomnilnika (\textit{garbage collection}), kjer programski jezik
+prevzame vlogo upravljanja z alokacijami in sproščanjem pomnilnika ter s tem razbremeni programerja, da se lahko
+osredotoči na obnašanje samega programa. Vendar to ni brez kompromisa, saj imajo jeziki z avtomatskim čiščenjem
+pomnilnika večjo poraba zaradi zakasnjenega sproščanja in pavze med izvajanjem programa
+(ali pa zakasnitve med operacijami v primeru štetja referenc), da lahko jezik najde pomnilniške lokacije za
+sprositi \cite{bakerListProcessingReal1978}.
 
 Programski jezik Rust se tega problema loti na drugačen način. Varnost dostopanja do pomnilniških
 lokacij se preverja med časom prevajanja s pomočjo preverjevalnika izposoj (\textit{borrow checker}), ki je
-del Rustovega prevajalnika, ki se ukvarja s tokom podatkov in pomnilniškimi lokacijami. Tak pristop
-nam teoretično, da najbolje obeh svetov: garancijo o varnih programih, ki nam jih da GC in hitrost izvajanja
-programov jezikov z ročnim upravljanjem pomnilnika (cite). Znana slabost Rusta je pa zato počasno prevajanje (cite),
-ki sicer ni samo odvisno od preverjevalnika izposoj, vendar zagotovo pripomore.
+del Rustovega prevajalnika, ki se ukvarja s tokom podatkov in pomnilniškimi lokacijami.
+Rust pravi pravilom, ki opisujejo delovanje preverjevalnika izposoj lastništvo (\textit{ownership}).
+Tak pristop nam teoretično, da najbolje obeh svetov: zagotovilo, da je naš program varen, ki nam jih da
+avtomatično čiščenje pomnilnika in hitrost izvajanja programov jezikov z ročnim upravljanjem pomnilnika \cite{klabnikRustProgrammingLanguage2023}.
+Znana slabost Rusta je pa zato počasno prevajanje \cite{glazarCodingRustBad2023}, ki sicer ni samo odvisno od preverjevalnika izposoj,
+vendar zagotovo ni njegov prispevek zanemarljiv.
 
 Preverjevalnik izposoj se je tekom razvoja Rusta bistveno spremenil od svoje prvotne implementacije.
 Na začetku je bila dokaj primitivna in ni sprejela veliko pravilnih programov zaradi svoje konzervativnosti
-pri zagotavljanju varnosti (cite NLL). Zato se je čez par let pojavila naslednja različica preverjevalnika,
+pri zagotavljanju varnosti \cite{2094nllRustRFC}. Zato se je čez par let pojavila naslednja različica preverjevalnika,
 imenovana NLL (\textit{non-lexical lifetimes}), ki je rešila veliko pogostih problem s prvotno različico.
-Vendar vseeno še vedno ne sprejema vseh veljavnih programov. Da rešijo probleme NLL-ja so Rustovi razvijalci
-predlagali najnovejšo verzijo preverjevalnika, Polonius, ki drugače zastavi problem izposoj in tako
-sprejme še večji delež pravilnih programov.
+Vendar vseeno še vedno ne sprejema vseh veljavnih programov. Da bi rešili probleme NLL-ja so Rustovi razvijalci
+predlagali najnovejšo verzijo preverjevalnika, Polonius, ki drugače zastavi problem lastništva in tako
+sprejme še večji delež pravilnih programov \cite{AliasbasedFormulationBorrow}.
 
 NLL je bil prvotno natančno opisan v RFC-ju z zelo točnim jezikom, kar je potem vodilo njegov razvoj (cite), Polonius
 pa je prvotno nastal kot predlog na spletnem blogu in se počasi razvijal s pomočjo dodatnih objav (cite). Do danes
@@ -75,6 +80,23 @@ intuicije za Rustovimi pravili posojanja ter nato končali z formalizacijo Polon
 \section{Pregled literature}
 
 \section{Formalizacija}
+
+% TODO: za popravit
+
+Zaradi Rustove uporabnosti se je skozi leta pojavilo veliko poskusov formalizacije jezika, ker jezik sam
+ni nikjer točno opisan. Ker so Rustova pravila posojanja del sistema tipov so jih klasično avtorji
+vključili kot del formaliziranega sistema tipov, ki so ga opisali v članku. Nekaj takih poskusov je Oxide \cite{weissOxideEssenceRust2019},
+Patina \cite{reedPatinaFormalizationRust}, RustBelt \cite{jungRustBeltSecuringFoundations2018}, ipd.
+Zaradi kompleksnosti jezika so vsi te članki predstavili samo formalizirano podmnožico vseh
+zmožnosti Rusta.
+
+Vsi zgoraj našteti poskusi pa so uporabljali NLL kot osnovo za svoj opis preverjevalnika izposoj.
+\citeauthor{stjernaModellingRustsReference} pa je nadgradila sistem tipov avtorjev Oxide z opisom
+novejšega Poloniusa in ga tudi formalizirala v Datalogu. Od leta \citeyear{stjernaModellingRustsReference} se
+je Rustov prevajalnik bistveno razvil in so se relevantna pravila spremenila ter so bila implementirana
+v samem jeziku (Rust), ne pa v Datalogu \cite{RustCompilerRustc_borrowck}.
+
+% END
 
 Tekom članka bomo uporabljali naslednji primer izvorne kode anotiran z abstraktnimi regijami (te nimajo čiste bijektivne korespondence z
 dejanskimi Rustovimi življenjskimi dobami). Vsi primeri so izvzeti iz originalne spletne objave.
