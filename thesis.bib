@@ -2,7 +2,7 @@
   title = {2094-Nll - {{The Rust RFC Book}}},
   url = {https://rust-lang.github.io/rfcs/2094-nll.html},
   urldate = {2025-01-13},
-  keywords = {✅,High},
+  keywords = {✅,High,NLL},
   file = {/home/filip/Zotero/storage/9WVTM9KY/2094-nll.html}
 }
 
@@ -44,7 +44,6 @@
   abstract = {The Move language provides abstractions for programming with digital assets via a mix of value semantics and reference semantics. Ensuring memory safety in programs with references that access a shared, mutable global ledger is difficult, yet essential for the use-cases targeted by Move. The language meets this challenge with a novel memory model and a modular, intraprocedural static reference safety analysis that leverages key properties of the memory. The analysis ensures the absence of memory safety violations in all Move programs (including ones that link against untrusted code) by running as part of a load-time bytecode verification pass similar to the JVM [12] and CLR [15]. We formalize the static analysis and prove that it enjoys three desirable properties: absence of dangling references, referential transparency for immutable references, and absence of memory leaks.},
   langid = {english},
   pubstate = {prepublished},
-  keywords = {Computer Science - Programming Languages},
   file = {/home/filip/Zotero/storage/DWDSHXR2/Blackshear et al. - 2022 - The Move Borrow Checker.pdf}
 }
 
@@ -113,7 +112,6 @@
   abstract = {The Rust programming language continues to rise in popularity, and as such, warrants the close attention of the programming languages community. In this work, we present a new foundational contribution towards the theoretical understanding of Rust's semantics. We prove that LLBC, a high-level, borrow-centric model previously proposed for Rust's semantics and execution, is sound with regards to a low-level pointer-based language \textbackslash `a la CompCert. Specifically, we prove the following: that LLBC is a correct view over a traditional model of execution; that LLBC's symbolic semantics are a correct abstraction of LLBC programs; and that LLBC's symbolic semantics act as a borrow-checker for LLBC, i.e. that symbolically-checked LLBC programs do not get stuck when executed on a heap-and-addresses model of execution. To prove these results, we introduce a new proof style that considerably simplifies our proofs of simulation, which relies on a notion of hybrid states. Equipped with this reasoning framework, we show that a new addition to LLBC's symbolic semantics, namely a join operation, preserves the abstraction and borrow-checking properties. This in turn allows us to add support for loops to the Aeneas framework; we show, using a series of examples and case studies, that this unlocks new expressive power for Aeneas.},
   langid = {english},
   pubstate = {prepublished},
-  keywords = {Computer Science - Programming Languages},
   file = {/home/filip/Zotero/storage/J8IEYLNZ/Ho et al. - 2024 - Sound Borrow-Checking for Rust via Symbolic Semantics (Long Version).pdf}
 }
 
@@ -171,7 +169,6 @@
   abstract = {"The Rust Programming Language, 2nd Edition is the official guide to Rust 2021: an open source systems programming language that will help you write faster, more reliable software. Rust provides control of low-level details along with high-level ergonomics, allowing you to improve productivity and eliminate the hassle traditionally associated with low-level languages. Klabnik and Nichols, alumni of the Rust Core Team, share their knowledge to help you get the most out of Rust's features so that you can create robust and scalable programs. You'll begin with basics like creating functions, choosing data types, and binding variables, then move on to more advanced concepts. In addition to the countless code examples, you'll find three chapters dedicated to building complete projects: a number-guessing game, a Rust implementation of a command line tool, and a multithreaded server."--Publisher marketing},
   isbn = {978-1-7185-0310-6},
   pagetotal = {527},
-  keywords = {Handbooks and manuals,Instructional and educational works,Rust (Computer program language)},
   annotation = {OCLC: on1363816350}
 }
 
@@ -210,6 +207,14 @@
   file = {/home/filip/Zotero/storage/M8DADJNS/after-nll-interprocedural-conflicts.html}
 }
 
+@online{NonlexicalLifetimesIntroduction,
+  title = {Non-Lexical Lifetimes: Introduction · Baby Steps},
+  url = {https://smallcultfollowing.com/babysteps/blog/2016/04/27/non-lexical-lifetimes-introduction/},
+  urldate = {2025-08-20},
+  keywords = {NLL,Pre-NLL},
+  file = {/home/filip/Zotero/storage/74AAQIAX/non-lexical-lifetimes-introduction.html}
+}
+
 @article{pearceLightweightFormalismReference2021,
   title = {A {{Lightweight Formalism}} for {{Reference Lifetimes}} and {{Borrowing}} in {{Rust}}},
   author = {Pearce, David J.},
@@ -230,18 +235,19 @@
 }
 
 @online{PoloniusRevisitedParta,
-  title = {Polonius Revisited, Part 1 · Baby Steps},
-  url = {https://smallcultfollowing.com/babysteps/blog/2023/09/22/polonius-part-1/},
-  urldate = {2025-03-01},
-  keywords = {✅},
-  file = {/home/filip/Zotero/storage/ZWA5K832/polonius-part-1.html}
-}
-
-@online{PoloniusRevisitedPartc,
   title = {Polonius Revisited, Part 2 · Baby Steps},
   url = {https://smallcultfollowing.com/babysteps/blog/2023/09/29/polonius-part-2/},
   urldate = {2025-08-20},
+  keywords = {Polonius},
   file = {/home/filip/Zotero/storage/M4IQQNQ4/polonius-part-2.html}
+}
+
+@online{PoloniusRevisitedPartc,
+  title = {Polonius Revisited, Part 1 · Baby Steps},
+  url = {https://smallcultfollowing.com/babysteps/blog/2023/09/22/polonius-part-1/},
+  urldate = {2025-03-01},
+  keywords = {✅,Polonius},
+  file = {/home/filip/Zotero/storage/ZWA5K832/polonius-part-1.html}
 }
 
 @article{reedPatinaFormalizationRust,
@@ -252,21 +258,32 @@
   file = {/home/filip/Zotero/storage/GBJRIJ3T/Reed - Patina A Formalization of the Rust Programming Language.pdf}
 }
 
-@online{RustCompilerRustc_borrowck,
-  title = {Rust/Compiler/Rustc\_borrowck/Src/Polonius at Master · Rust-Lang/Rust},
-  url = {https://github.com/rust-lang/rust/tree/master/compiler/rustc_borrowck/src/polonius},
-  urldate = {2025-04-12},
-  file = {/home/filip/Zotero/storage/44PRU4AB/polonius.html}
+@article{reedPatinaFormalizationRusta,
+  title = {Patina: {{A Formalization}} of the {{Rust Programming Language}}},
+  author = {Reed, Eric},
+  abstract = {Rust is a new systems language that uses some advanced type system features, specifically affine types and regions, to statically guarantee memory safety and eliminate the need for a garbage collector. While each individual addition to the type system is well understood in isolation and are known to be sound, the combined system is not known to be sound. Furthermore, Rust uses a novel checking scheme for its regions, known as the Borrow Checker, that is not known to be correct. Since Rust’s goal is to be a safer alternative to C/C++, we should ensure that this safety scheme actually works. We present a formal semantics that captures the key features relevant to memory safety, unique pointers and borrowed references, specifies how they guarantee memory safety, and describes the operation of the Borrow Checker. We use this model to prove the soudness of some core operations and justify the conjecture that the model, as a whole, is sound. Additionally, our model provides a syntactic version of the Borrow Checker, which may be more understandable than the non-syntactic version in Rust.},
+  langid = {english},
+  keywords = {Pre-NLL},
+  file = {/home/filip/Zotero/storage/LELVR5G6/Reed - Patina A Formalization of the Rust Programming Language.pdf}
 }
 
-@online{RustCompilerRustc_borrowcka,
+@online{RustCompilerRustc_borrowck,
   title = {Rust/Compiler/Rustc\_borrowck/Src/Polonius/Legacy/Location.Rs at 9c0bcb514f49cd1e6a30affb2fe4cfca060129a2 · Rust-Lang/Rust},
   url = {https://github.com/rust-lang/rust/blob/9c0bcb514f49cd1e6a30affb2fe4cfca060129a2/compiler/rustc_borrowck/src/polonius/legacy/location.rs},
   urldate = {2025-05-26},
   abstract = {Empowering everyone to build reliable and efficient software. - rust-lang/rust},
   langid = {english},
   organization = {GitHub},
+  keywords = {Polonius},
   file = {/home/filip/Zotero/storage/38ES3KBQ/location.html}
+}
+
+@online{RustCompilerRustc_borrowcka,
+  title = {Rust/Compiler/Rustc\_borrowck/Src/Polonius at Master · Rust-Lang/Rust},
+  url = {https://github.com/rust-lang/rust/tree/master/compiler/rustc_borrowck/src/polonius},
+  urldate = {2025-04-12},
+  keywords = {Polonius},
+  file = {/home/filip/Zotero/storage/44PRU4AB/polonius.html}
 }
 
 @online{RvalueRustc_middleMir,
@@ -314,7 +331,7 @@
   title = {Modelling {{Rust}}’s {{Reference Ownership Analysis Declaratively}} in {{Datalog}}},
   author = {Stjerna, Amanda},
   langid = {english},
-  keywords = {⏳},
+  keywords = {⏳,Polonius},
   file = {/home/filip/Zotero/storage/M3GSKVV8/Stjerna - Department of Information Technology.pdf}
 }
 
@@ -348,7 +365,6 @@
   urldate = {2025-05-15},
   abstract = {Rust is a new and promising high-level system programming language. It provides both memory safety and thread safety through its novel mechanisms such as ownership, moves and borrows. Ownership system ensures that at any point there is only one owner of any given resource. The ownership of a resource can be moved or borrowed according to the lifetimes. The ownership system establishes a clear lifetime for each value and hence Rust does not necessarily need garbage collection. These novel features bring Rust high performance, fine-grained low-level control over memory without garbage collection, which differentiate Rust from other existing prevalent languages. For formal analysis of Rust programs and helping programmers learn its new mechanisms and features, a formal semantics of Rust is desired and useful as a fundament for developing related tools. In this paper, we present a formal executable operational semantics of a subset of Rust, called KRust. The semantics is defined in K, a rewriting-based executable semantic framework for programming languages. The executable semantics yields automatically a formal interpreter and verification tools for Rust programs. KRust has been validated by testing with 182 tests, including 157 tests from the official Rust},
   eventtitle = {2018 {{International Symposium}} on {{Theoretical Aspects}} of {{Software Engineering}} ({{TASE}})},
-  keywords = {Formal operational semantics,K framework,Rust programming language},
   file = {/home/filip/Zotero/storage/IZSALAJQ/Wang et al. - 2018 - KRust A Formal Executable Semantics of Rust.pdf}
 }
 
@@ -363,7 +379,6 @@
   abstract = {Rust claims to advance industrial programming by bridging the gap between low-level systems programming and high-level application programming. At the heart of the argument that this enables programmers to build more reliable and efficient software is the borrow checker - a novel approach to ownership that aims to balance type system expressivity with usability. And yet, to date there is no core type system that captures Rust's notion of ownership and borrowing, and hence no foundation for research on Rust to build upon. In this work, we set out to capture the essence of this model of ownership by developing a type systems account of Rust's borrow checker. We present Oxide, a formalized programming language close to source-level Rust (but with fully-annotated types). This presentation takes a new view of lifetimes as an approximation of the provenances of references, and our type system is able to automatically compute this information through a substructural typing judgment. We provide the first syntactic proof of type safety for borrow checking using progress and preservation. Oxide is a simpler formulation of borrow checking - including recent features such as non-lexical lifetimes - that we hope researchers will be able to use as the basis for work on Rust.},
   pubstate = {prepublished},
   version = {4},
-  keywords = {FOS: Computer and information sciences,Programming Languages (cs.PL)},
   file = {/home/filip/Zotero/storage/RUZHJSKB/Weiss et al. - Oxide The Essence of Rust.pdf}
 }
 
@@ -371,6 +386,7 @@
   title = {What Is {{Polonius}}? - {{Polonius}}},
   url = {https://rust-lang.github.io/polonius/},
   urldate = {2025-08-20},
+  keywords = {Polonius},
   file = {/home/filip/Zotero/storage/NGF4KTVA/polonius.html}
 }
 

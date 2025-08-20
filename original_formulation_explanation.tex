@@ -67,10 +67,12 @@ Vendar vseeno še vedno ne sprejema vseh veljavnih programov. Da bi rešili prob
 predlagali najnovejšo verzijo preverjevalnika, Polonius, ki drugače zastavi problem lastništva in tako
 sprejme še večji delež pravilnih programov \cite{AliasbasedFormulationBorrow}.
 
-NLL je bil prvotno natančno opisan v RFC-ju z zelo točnim jezikom, kar je potem vodilo njegov razvoj (cite), Polonius
-pa je prvotno nastal kot predlog na spletnem blogu in se počasi razvijal s pomočjo dodatnih objav (cite). Do danes
-ne obstaja centraliziranega formalnega zapisa o točnem delovanju Poloniusa, le nekaj spletnih objav, nedokončana knjiga(cite)
-ter trenutna implementacija v Rustovem prevajalniku (cite).
+NLL je bil prvotno natančno opisan v RFC-ju z zelo točnim jezikom, kar je potem vodilo njegov razvoj, Polonius
+pa je prvotno nastal kot predlog na spletnem blogu in se počasi razvijal s pomočjo dodatnih objav
+\cite{PoloniusRevisitedParta,PoloniusRevisitedPartc,WhatPoloniusPolonius}. Do danes ne obstaja celovit centraliziran formalen opis
+Poloniusa, le nekaj spletnih objav, nedokončana knjiga(cite), ter trenutna implementacija v Rustovem prevajalniku (cite).
+
+% Zgornje sicer ni res saj sem pred kratkim odkril objavo!! Pogovori se s Slivnikom
 
 Cilj te naloge je potemtakem matematično formalizirati najnovejšo različico preverjevalnika izposoj in razčistiti
 podrobnosti, ki so se izgubile v bolj nenatančnem jeziku spletnih blogov in video posnetkov. Prvo bomo raziskali
@@ -78,6 +80,99 @@ pretekle poskuse formalizacije Rusta in sorodne načine upravljanja s pomnilniko
 intuicije za Rustovimi pravili posojanja ter nato končali z formalizacijo Poloniusa.
 
 \section{Pregled literature}
+
+\subsection{Razvoj Rustovega preverjevalnika izposoj}
+
+Rustov v primerjavi z sorodnimi sistemskimi jeziki kot sta C in C++ implementira kot del procesa prevajanja
+preverjevalnik izposoj. Ta skrbi, da se nikoli ne uporabi neveljavna pomnilniška lokacija. S tem namenom
+enforca tri pravila:
+- Vsak vrednost v Rustu ima lastnika.
+- Vsaka vrednost ima lahko natanko enega lastnika hkrati.
+- Ko lastnik goes out of scope, se vrednost sprosti.
+Zaradi zgornjih pravil pravimo temu modelu \textbf{lastništvo} (\textit{ownership}) \cite{klabnikRustProgrammingLanguage2023}.
+
+Lastnik je spremenljivka oziroma binding na katerega je ta vrednost vezana. V spodnjem preprostem
+primeru opazimo, da je vrednost "hello" enkrat zamenja lastnika, torej njen prvotni lastnik a ni
+potem več veljaven. Če hočemo uporabiti a po tem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
+
+% preveri ali je to res
+\begin{lstlisting}
+let a = "hello";
+let b = a;
+println("{}", a); // vrne napako
+\end{lstlisting}
+
+Koncept scopa pa lahko preprosto prikažemo z leksičnim scopom, tako da inicializiramo novo vrednost a-ja
+znotraj gnezdenega bloka, ki ustvari nov scope.
+
+% preveri ali je to res
+\begin{lstlisting}
+let mut a = "hello";
+{
+    a = "goodbye";
+}
+println("{}", a); // vrne napako ker vrednost "goodbye" ni več veljavna
+\end{lstlisting}
+
+% obrazloži kako se lastništvo povezuje z življenjskimi dobami in referencami
+
+V zgornjih primerih nismo videli večje razlike med Rustom in sorodnimi jeziki. Vendar kjer se pa Rust razlikuje
+je pa v definicijah referenc in razdelitvi teh na tipe. Ko v Rustu govorimo o referencah, lahko rečemo, da so na
+prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. A ključna razlika je v tem, da prevajalnik
+v Rustu poskrbi, da takšna referenca vedno kaže na veljavno vrednost pravega tipa – in to skozi celotno življenjsko
+dobo te reference \cite{klabnikRustProgrammingLanguage2023}. Ta varnostni mehanizem nam omogoča nekaj, kar je v
+mnogih drugih jezikih bistveno težje doseči: gotovost, da reference “ne visijo v prazno” in da ne dostopamo do
+podatkov, ki morda sploh več ne obstajajo.
+
+Te reference pa niso vse enake. Ločimo jih v dve glavni skupini \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust2019}.
+Prva vrsta so deljene oziroma nespremenljive reference. Takih lahko imamo v istem trenutku več, vse lahko kažejo
+na isto mesto v pomnilniku, a skupno pravilo je, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so
+spremenljive reference (v literaturi jih pogosto poimenujejo unique, a izraz “spremenljiva” je verjetno bliže resničnemu
+občutku, saj nam »edinstvena« v slovenščini ne zveni naravno). Pri teh je zgodba ravno obratna: lahko jih imamo zgolj eno,
+a ta nam daje možnost, da z vrednostjo, na katero kaže, tudi poljubno manipuliramo. Te refe
+
+Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo za vsako pokazali veljaven primer uporabe
+in nato še neveljaven.
+
+\begin{lstlisting}[caption=Uporaba deljene reference, label={lst:uporabadeljena}]
+let a = 6;
+let b = &a; // ustvarimo deljeno referenco
+println("{}", a); // lahko jo uporabimo, ker za izpis na ekran potrebujemo samo branje
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Uporaba spremenljive reference, label=lst:uporabaspremenljiva]
+let mut a = 6;
+let b = &mut a;
+*b = 7; // lahko spremenimo pomnilniško lokacijo, ker je referenca spremenljiva
+\end{lstlisting}
+
+Obratne operacije pri obeh primerih bi vrnile napako zaradi kršitve pravil referenc. Torej, če bi poskusili pisati
+v deljeno referenco kot v primeru \ref{lst:uporabadeljena} bi nam prevajalnik vrnil napako zaradi kršitve zagotovila o preprečitvi
+branja. Prav tako če bi poskusili izpisati spremenljivko a, ki je bila spremenljivo izposojena v primeru \ref{lst:uporabaspremenljiva},
+bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali lastnika vrednosti in njeno spremenljivo referenco.
+
+To razmerje med obema vrstama referenc – večkratne nespremenljive ali pa ena sama spremenljiva – lahko strnemo v načelo, ki ga imenujemo aliasing XOR mutability. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več aliasov), a potem jih samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da imamo v tistem trenutku do njih dostop le mi. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
+
+
+% tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa
+% prednosti in slabosti vsakega sistema
+
+\subsection{Poskusi formalizacije Rusta}
+
+% za vsak poskus povej iz katerega vidika so se ga lotili in kaj manjka
+
+\subsection{Sorodni modeli lastnistvu}
+
+% GhostCell 
+% permission calculus
+% kako se povezujejo z Rustom
+
+\subsection{Polonius v akademiji in praksi}
+
+% kako je bil opisan z blog postom
+% integracija v rustc
+% Stjernova formalizacija v Datalogu in Crichtonov borrow checker
+% omejitve trenutnih opisov
 
 \section{Formalizacija}
 
