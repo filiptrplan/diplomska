@@ -404,10 +404,45 @@ da lastnik ni več $m$ ampak nekdo drug. Torej pravilo velja ko:
 
 
 \begin{equation}
-	\begin{align}
+	\begin{aligned}
 		 & \text{Move-Deinit}(m, p) \iff \\ &\nexists \pi \in \text{Poti}(p), m_{2}: \text{Prekrivanje}(m, m_{2}) \land \text{Premaknjen}(\pi, m_{2}, p)
-	\end{align}
+	\end{aligned}
 \end{equation}
+
+Za naslednji pravili Shared-Readonly in Unique-Write moramo definirati še nekaj predikatov. Ker se tokrat
+ukvarjamo s posojami, moramo razločevati met deljenimi in spremenljivimi (unikatnimi). V ta namen vpeljemo
+predikat $\text{VrstaPosoje}(L) \in \{shrd, uniq\}$. Da pa lahko razločimo med aktivnimi in poteklimi posojami
+pa ustvarimo predikat $\text{PosojaAktivna}(L,p)$, ki velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$.
+
+Mesto, ki je bilo sposojeno z posojo $L$ označimo z $O(L)$.
+
+Poleg predikatov za posoje pa nam še manjkajo predikati, ki opisujejo operacije, ki se izvajajo nad mesti.
+Intuitivno je to lahko več različnih operacij vendar nas zanimajo dve vrsti. Take, ki bi razveljavile deljeno
+posojo označimo z $\text{RazveljaviDeljeno}(m,p)$ in velja natanko tedaj, ko se v točki $p$ nad mestom $m$ izvede
+taka operacija, ki bi lahko razveljavila posojo, ki si sposoja iz mesta $m$ (to bi bilo ali pisanje v mesto $m$ ali
+pa ustvarjanje spremenljive posoje).
+
+Na podoben način definiramo $\text{RazveljaviSpremenljivo}(m,p)$, ki velja ko je operacija taka, ki razveljavi
+spremenljivo posojo (ustvarjanje kakršnekoli nove posoje, pisanje v mesto, branje iz mesta).
+
+Tako lahko sestavimo naši naslednji dve pravili:
+
+\begin{equation}
+	\begin{aligned}
+		\text{Shared-Readonly}(p)   & \iff  \nexists L,m:
+		\\ \text{PosojaAktivna}(L,p) &\land \text{VrstaPosoje} = shrd \land \\
+		\text{Prekrivanje}(m, O(L)) & \land \text{RazveljaviDeljeno}(m,p)
+	\end{aligned}
+\end{equation}
+
+\begin{equation}
+	\begin{aligned}
+		\text{Unique-Write}(p)      & \iff  \nexists L,m:
+		\\ \text{PosojaAktivna}(L,p) &\land \text{VrstaPosoje} = uniq \land \\
+		\text{Prekrivanje}(m, O(L)) & \land \text{RazveljaviSpremenljivo}(m,p)
+	\end{aligned}
+\end{equation}
+
 
 
 
