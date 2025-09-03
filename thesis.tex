@@ -552,9 +552,9 @@ fn main() {
   let mut x: i32 = 22;
   let mut v: Vec<&'0 i32> = vec![];
   let r: &'1 mut Vec<&'2 i32> = &'3 mut v; 
-  // $('3, L_{0}, P) \in \psi 
+  // $('3, L_{0}, P) \in \psi $
   let p: &'5 i32 = &'4 x; 
-  // $('4, L_{1}, P) \in \psi 
+  // $('4, L_{1}, P) \in \psi $
   r.push(p);
   x += 1; // tukaj razveljavimo $L_{1}$ z mutacijo deljenega referenta (ustvarili smo deljeno referenco v p)
   take::<Vec<&'6 i32>>(v);
@@ -711,7 +711,7 @@ fn main() {
   // relacije, ki so ustvarjene tukaj niso relevantne za napako 
 
   let p: &'5 i32 = &'4 x;
-  // $('4, L_{1}) \in \zeta 
+  // $('4, L_{1}) \in \zeta $
   // $('4, '5) \in \beta \implies ('5, L_{1}) \in \zeta$
 
   r.push(p);
