@@ -12,7 +12,9 @@
 \usepackage{listings}
 \usepackage{caption}
 \usepackage{array}
+\usepackage[normalem]{ulem}
 \usepackage{minted}
+\usepackage{booktabs}
 \usepackage[backend=biber]{biblatex}
 
 \addbibresource{thesis.bib}
@@ -21,6 +23,9 @@
 \author{Filip Trplan}
 \date{April 2025}
 \renewcommand{\refname}{Viri}
+
+\newcommand{\goodexample}[1]{\colorbox{green}{#1}}
+\newcommand{\badexample}[1]{\colorbox{red}{\sout{#1}}}
 
 \setminted[rust]{
     mathescape
@@ -229,6 +234,143 @@ Da Rustov preverjevalnik izposoj zadosti zagotovilom o varnosti programa mora za
 ki se ne drzijo naslednjih pravil izvzetih iz \cite{stjernaModellingRustsReference}.
 
 % TODO: pravila tabel
+
+{ \renewcommand{\arraystretch}{2.0}
+\begin{table}[!htbp]
+	\begin{tabular}{p{0.18\textwidth} p{0.41\textwidth} p{0.41\textwidth}}
+		Pravilo                                                     & Pozitiven primer & Negativen primer \\ \toprule
+		Use-Init                                                    &                                     % Positive example:
+		\begin{minipage}[t]{0.41\textwidth}
+			\begin{minted}[escapeinside=||, autogobble]{rust}
+     let x: u32;
+
+     if random() {
+         |\goodexample{x =}| 17;
+     } else {
+         |\goodexample{x =}| 18;
+     }
+
+     let y = |\goodexample{x}| + 1;
+    \end{minted}
+		\end{minipage}           &                                                  % Negative example:
+		\begin{minipage}[t]{0.41\textwidth}
+			\begin{minted}[escapeinside=||, autogobble]{rust}
+     let x: u32;
+
+     if random() {
+         |\goodexample{x =}| 17;
+     }
+
+     // ERROR: x not initialized:
+     let y = |\badexample{x}| + 1;
+    \end{minted}
+		\end{minipage}                                                  \\
+		Move-Deinit                                                 &                                     % Positive example of move-deinit
+		\begin{minipage}[t]{0.41\textwidth}
+			\begin{minted}[escapeinside=||,autogobble]{rust}
+    let tuple = (vec![1], vec![2]);
+
+    moves_argument(|\goodexample{tuple.1}|);
+
+    // Does not overlap tuple.1:
+    let x = |\goodexample{tuple.0}|[0];
+\end{minted}
+		\end{minipage}            &                                                   % Negative example of move-deinit
+		\begin{minipage}[t]{0.41\textwidth}
+			\begin{minted}[escapeinside=||, autogobble]{rust}
+    let tuple = (vec![1], vec![2]);
+
+    moves_argument(|\goodexample{tuple.0}|);
+
+    // ERROR: use of moved value:
+    let x = |\badexample{tuple.0}|[0];
+\end{minted}
+		\end{minipage}                                                  \\
+		Shared-Readonly                                             &                                     % Positive example of shared-readonly
+		\begin{minipage}[t]{0.41\textwidth}
+			\begin{minted}[escapeinside=||, autogobble]{rust}
+struct Point(u32, u32);
+let mut pt = Point(13, 17);
+
+let x = |\goodexample{\&pt}|;
+let y = |\goodexample{\&pt}|;
+
+dummy_use(|\goodexample{x}|); dummy_use(|\goodexample{y}|);
+\end{minted}
+		\end{minipage} &                                        % Negative example of shared-readonly
+		\begin{minipage}[t]{0.41\textwidth}
+			\begin{minted}[escapeinside=||, autogobble]{rust}
+struct Point(u32, u32);
+let mut pt = Point(13, 17);
+
+let x = |\goodexample{\&pt}|;
+// ERROR: assigned to
+//   borrowed value:
+|\badexample{pt.0 += 1}|;
+dummy_use(|\goodexample{x}|);
+\end{minted}
+		\end{minipage}                                                  \\
+		Unique-Write                                                &                                     % Positive example of unique-write
+		\begin{minipage}[t]{0.41\textwidth}
+			\begin{minted}[escapeinside=||, autogobble]{rust}
+struct Point(u32, u32);
+let mut pt = Point(13, 17);
+
+let x = |\goodexample{\&mut pt}|;
+let y = |\goodexample{\&mut pt}|;
+
+//dummy_use(x);
+dummy_use(|\goodexample{y}|);
+\end{minted}
+		\end{minipage}           &                                                  % Negative example of unique-write
+		\begin{minipage}[t]{0.41\textwidth}
+			\begin{minted}[escapeinside=||, autogobble]{rust}
+struct Point(u32, u32);
+let mut pt = Point(13, 17);
+
+let x = |\badexample{\&mut pt}|;
+// ERROR: cannot borrow `pt`
+// as mutable more than once:
+let y = |\badexample{\&mut pt}|;
+
+dummy_use(|\badexample{x}|);
+dummy_use(|\goodexample{y}|);
+\end{minted}
+		\end{minipage}                                                  \\
+		Ref-Live                                                    &                                     % Positive example of ref-live
+		\begin{minipage}[t]{0.41\textwidth}
+			\begin{minted}[escapeinside=||, autogobble]{rust}
+struct Point(u32, u32);
+let pt = Point(6, 9);
+let x = {
+    |\goodexample{\&pt}|
+}; // pt still in scope
+
+
+let z = |\goodexample{x.0}|;
+\end{minted}
+		\end{minipage}           &                                                  % Negative example of ref-live
+		\begin{minipage}[t]{0.41\textwidth}
+			\begin{minted}[escapeinside=||, autogobble]{rust}
+struct Point(u32, u32);
+let x = {
+    let pt = Point(6, 9);
+    |\badexample{\&pt}|
+}; // pt goes out of scope
+
+// ERROR: pt does not live
+// long enough:
+let z = |\badexample{x.0}|;
+\end{minted}
+		\end{minipage}
+	\end{tabular}
+	\caption[The Rules of the Borrow Check]{
+		Pravila preverjevalnika izposoj iz \cite{stjernaModellingRustsReference}. \goodexample{Pozitivni}
+		primeri so označeni z zeleno barvo in \badexample{negativni} z rdečo. Označeni deli kode predstavljajo mesta,
+		kjer bi preverjevalnik lahko zavrnil ali sprejel kodo.
+	}\label{tab:borrow-check}
+\end{table}%
+}
 
 Pravilo \verb|Use-Init| nam pove, da lahko uporabljamo samo spremenljivke, ki so zagotovo inicializirane
 na točki v programu, kjer jih uporabljamo. Glede na prvotno implementacije Poloniusa Rustove ekipe poleg
