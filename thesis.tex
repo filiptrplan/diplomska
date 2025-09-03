@@ -4,6 +4,7 @@
 \usepackage{listings, listings-rust}
 \usepackage{amsfonts} % For \mathcal
 \usepackage[utf8]{inputenc} % For Slovenian characters
+\usepackage[T1]{fontenc} % For Slovenian characters
 \usepackage{csquotes}
 \usepackage{float}
 \usepackage{tabularx}
@@ -11,6 +12,7 @@
 \usepackage{listings}
 \usepackage{caption}
 \usepackage{array}
+\usepackage{minted}
 \usepackage[backend=biber]{biblatex}
 
 \addbibresource{thesis.bib}
@@ -19,6 +21,10 @@
 \author{Filip Trplan}
 \date{April 2025}
 \renewcommand{\refname}{Viri}
+
+\setminted[rust]{
+    mathescape
+}
 
 \lstset{
     language=Rust,
@@ -101,11 +107,11 @@ primeru opazimo, da je vrednost "hello" enkrat zamenja lastnika, torej njen prvo
 potem več veljaven. Če hočemo uporabiti a po tem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
 
 % preveri ali je to res
-\begin{lstlisting}
+\begin{minted}{rust}
 let a = "hello";
 let b = a;
 println("{}", a); // vrne napako
-\end{lstlisting}
+\end{minted}
 
 Koncept scopa pa lahko preprosto prikažemo z leksičnim scopom, tako da inicializiramo novo vrednost a-ja
 znotraj gnezdenega bloka, ki ustvari nov scope.
