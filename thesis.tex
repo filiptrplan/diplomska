@@ -411,7 +411,7 @@ da lastnik ni več $m$ ampak nekdo drug. Torej pravilo velja ko:
 
 Za naslednji pravili Shared-Readonly in Unique-Write moramo definirati še nekaj predikatov. Ker se tokrat
 ukvarjamo s posojami, moramo razločevati met deljenimi in spremenljivimi (unikatnimi). V ta namen vpeljemo
-predikat $\text{VrstaPosoje}(L) \in \{shrd, uniq\}$. Da pa lahko razločimo med aktivnimi in poteklimi posojami
+predikat $\text{VrstaPosoje}(L) \in \{shrd, uniq\}$. Da pa lahko razločimo med aktivnimi in preteklimi posojami
 pa ustvarimo predikat $\text{PosojaAktivna}(L,p)$, ki velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$.
 
 Mesto, ki je bilo sposojeno z posojo $L$ označimo z $O(L)$.
@@ -443,9 +443,15 @@ Tako lahko sestavimo naši naslednji dve pravili:
 	\end{aligned}
 \end{equation}
 
+Za zadnje pravilo potrebujemo še en predikat imenovan $\text{MestoAktivno}(m,p)$, ki velja natanko tedaj,
+ko je mesto $m$ še aktivno (torej ni bilo dropped) na točki $p$. Potem pravilo Ref-Live lahko zapišemo tako:
 
-
-
+\begin{equation}
+	\begin{aligned}
+		\text{Ref-Live}(p) & \iff \nexists L, m: \\ \text{PosojaAktivna}(L,p) &\land \text{Prekrivanje}(m, O(L)) \land
+		\neg \text{MestoAktivno}(m,p)
+	\end{aligned}
+\end{equation}
 
 
 % zgleda kot da je nekaj z var_partially_initialized
