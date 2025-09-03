@@ -383,8 +383,35 @@ v programu. Potem lahko definiramo še predikat $Init(\pi, x, p)$, ki velja nata
 $x$ skozi pot $\pi$ definirana na točki $p$. Končno pravilo se nato glasi:
 
 \begin{equation}
-	Use-Init(x, p) \iff \forall \pi \in Poti(p): Init(\pi, x, p)
+	\text{Use-Init}(x, p) \iff \forall \pi \in \text{Poti}(p): \text{Init}(\pi, x, p)
 \end{equation}
+
+% https://rustc-dev-guide.rust-lang.org/borrow_check/moves_and_initialization/move_paths.html za definicijo move path
+
+Opomba o mestih in poteh premika (\textit{move path}): pojem predpone (\textit{prefix}) je načeloma definiran za pot
+premika, vendar ga tukaj posplošimo na mesta iz MIR, ker se nam bolj sklada s terminologijo, ki jo uporabljamo.
+Rustov priročnik za prevajalnik tudi omeni, da sta ta pojma približno enaka. Uporabljamo ga namesto spremenljivk
+zaradi tega, ker nam opiše lahko bolj fino dostopne podatke kot so polja struktov.
+
+Za pravilo Move-Deinit moramo vpeljati še dva predikata. Prvi nam bo povedal ali se mesti
+prekrivata t.j. ali je katero mesto predpona drugega (v Rustovem prevajalniku se temu reče \textit{prefix}). Poimenovali
+ga bomo $Prekrivanje(m_{1}, m_{2})$, ki velja natanko tedaj, ko je $m_{1}$ predpona $m_{2}$ ali obratno. Torej
+$Prekrivanje(tuple.0, tuple.0.1)$ bi veljalo, $Prekrivanje(tuple.0, tuple.1)$ pa ne.
+
+Naslednji predikat, ki ga uvedemo je $Premaknjen(\pi, m, p)$, ki velja natanko tedaj, ko je bilo mesto $m$ premaknjeno
+pred točko $p$ na poti $\pi$. Kaj točno je premik moram še malo pobrskati po dokumentaciji ampak konceptualno to pomeni,
+da lastnik ni več $m$ ampak nekdo drug. Torej pravilo velja ko:
+
+
+\begin{equation}
+	\begin{align}
+		 & \text{Move-Deinit}(m, p) \iff \\ &\nexists \pi \in \text{Poti}(p), m_{2}: \text{Prekrivanje}(m, m_{2}) \land \text{Premaknjen}(\pi, m_{2}, p)
+	\end{align}
+\end{equation}
+
+
+
+
 
 % zgleda kot da je nekaj z var_partially_initialized
 %     // var_maybe_partly_initialized_on_exit(var, point): Upon leaving `point`,
