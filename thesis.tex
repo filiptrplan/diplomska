@@ -376,8 +376,8 @@ mestih:
 fn main() {
   let mut x: i32 = 22;
   let mut v: Vec<&'0 i32> = vec![];
-  let r: &'1 mut Vec<&'2 i32> = &'3 mut v; (* \fbox{posoja $L_{0}$} *)
-  let p: &'5 i32 = &'4 x; (* \fbox{posoja $L_{1}$} *)
+  let r: &'1 mut Vec<&'2 i32> = &'3 mut v; // \fbox{posoja $L_{0}$}
+  let p: &'5 i32 = &'4 x; // \fbox{posoja $L_{1}$}
   r.push(p);
   x += 1;
   take::<Vec<&'6 i32>>(v);
@@ -552,11 +552,11 @@ fn main() {
   let mut x: i32 = 22;
   let mut v: Vec<&'0 i32> = vec![];
   let r: &'1 mut Vec<&'2 i32> = &'3 mut v; 
-  (* $('3, L_{0}, P) \in \psi $ *)
+  // $('3, L_{0}, P) \in \psi 
   let p: &'5 i32 = &'4 x; 
-  (* $('4, L_{1}, P) \in \psi $ *)
+  // $('4, L_{1}, P) \in \psi 
   r.push(p);
-  x += 1; // tukaj razveljavimo (* $L_{1}$ *) z mutacijo deljenega referenta (ustvarili smo deljeno referenco v p)
+  x += 1; // tukaj razveljavimo $L_{1}$ z mutacijo deljenega referenta (ustvarili smo deljeno referenco v p)
   take::<Vec<&'6 i32>>(v);
 }
 \end{minted}
@@ -656,19 +656,19 @@ za propagacijo aktivna na naslednji točki $Q$. Z naslednjim primerom ponazorimo
 let x = 22;
 let y = 44;
 
-let mut p: &'0 i32 = &'1 x; (* posoja $L_{0}$ *)
-(* $('1,'0) \in \beta$ *)
-(* $('1, L_{0}) \in \zeta$ *)
+let mut p: &'0 i32 = &'1 x; // posoja $L_{0}$
+// $('1,'0) \in \beta$
+// $('1, L_{0}) \in \zeta$
 
-p = &'3 y; (* posoja $L_{1}$ *)
-(* $('3,'0) \in \beta$ *)
-(* $('3, L_{1}) \in \zeta$ *)
-//'1 ni več aktivna, ker smo jo prepisali z '3 
+p = &'3 y; // posoja $L_{1}$
+// $('3,'0) \in \beta$
+// $('3, L_{1}) \in \zeta$
+// '1 ni več aktivna, ker smo jo prepisali z '3 
 
 x += 1;
-// razveljavi se posoja (* $L_{0}$ $(L_{0}) \in \iota$ *)
+// razveljavi se posoja $L_{0}$ $(L_{0}) \in \iota$
 // tukaj bi brez pravila o aktivnosti regij še vedno zahtevali 
-// (* $(L_{0}, '0) \in \zeta$ *) zaradi pravila o propagaciji 
+// $(L_{0}, '0) \in \zeta$ zaradi pravila o propagaciji 
 
 print( *p );
 // ta izraz posledično ne bi bil veljaven
@@ -711,19 +711,19 @@ fn main() {
   // relacije, ki so ustvarjene tukaj niso relevantne za napako 
 
   let p: &'5 i32 = &'4 x;
-  (* $('4, L_{1}) \in \zeta $ *)
-  (* $('4, '5) \in \beta \implies ('5, L_{1}) \in \zeta$ *)
+  // $('4, L_{1}) \in \zeta 
+  // $('4, '5) \in \beta \implies ('5, L_{1}) \in \zeta$
 
   r.push(p);
-  (* $('5, '2) \in \beta \implies ('2, L_{1} \in \zeta)$ *)
+  // $('5, '2) \in \beta \implies ('2, L_{1} \in \zeta)$
   
   x += 1;
-  // Tukaj se razveljavi posoja (* $L_{1}$: $(L_{1}) \in \iota$ *).
-  // Da se nam javi napaka mora biti ta posoja aktivna (* $(L_{1}) \in \nabla_{L}$ *).
+  // Tukaj se razveljavi posoja $L_{1}$: $(L_{1}) \in \iota$.
+  // Da se nam javi napaka mora biti ta posoja aktivna $(L_{1}) \in \nabla_{L}$.
   // Torej jo mora zahtevati neka aktivna regija, na trenutni točki pa je 
   // aktivna regija '2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš 
-  // vektor `v`. Elementi vektorja pa imajo regijo `'2`, ki pa je del posoje (* $L_{1}$ *).
-  // Torej, ker smo razveljavili posojo (* $L_{1}$ *), medtem ko je bila aktivna regija,
+  // vektor `v`. Elementi vektorja pa imajo regijo `'2`, ki pa je del posoje $L_{1}$.
+  // Torej, ker smo razveljavili posojo $L_{1}$, medtem ko je bila aktivna regija,
   // ki jo ta posoja zahteva, javimo napako.
 
   take::<Vec<&'6 i32>>(v);
