@@ -258,7 +258,8 @@ $x$ skozi pot $\pi$ definirana na točki $p$. Končno pravilo se nato glasi:
 Tekom članka bomo uporabljali naslednji primer izvorne kode anotiran z abstraktnimi regijami (te nimajo čiste bijektivne korespondence z
 dejanskimi Rustovimi življenjskimi dobami). Vsi primeri so izvzeti iz originalne spletne objave.
 
-\begin{lstlisting}
+\begin{listing}[!ht]
+\begin{minted}{rust}
 fn main() {
   let mut x: i32 = 22;
   let mut v: Vec<&'0 i32> = vec![];
@@ -270,7 +271,10 @@ fn main() {
 }
 
 fn take<T>(p: T) { .. }
-\end{lstlisting}
+\end{minted}
+\caption{Primer programa za Polonius}
+\label{listing:primerPolonius}
+\end{listing}
 
 % TODO: Mogoce omeni delo na \cite{crichtonGroundedConceptualModel2023} kjer so tudi na hitro opisali polonius formalno.
 
