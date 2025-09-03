@@ -108,13 +108,13 @@ potem več veljaven. Če hočemo uporabiti a po tem, ko ni več lastnik vrednost
 
 % preveri ali je to res
 \begin{listing}[!ht]
-\begin{minted}{rust}
+	\begin{minted}{rust}
 let a = "hello";
 let b = a;
 println("{}", a); // vrne napako
 \end{minted}
-\caption{Primer lastništva}
-\label{listing:ownership1}
+	\caption{Primer lastništva}
+	\label{listing:ownership1}
 \end{listing}
 
 Koncept scopa pa lahko preprosto prikažemo z leksičnim scopom, tako da inicializiramo novo vrednost a-ja
@@ -122,15 +122,15 @@ znotraj gnezdenega bloka, ki ustvari nov scope.
 
 % preveri ali je to res
 \begin{listing}[!ht]
-\begin{minted}{rust}
+	\begin{minted}{rust}
 let mut a = "hello";
 {
     a = "goodbye";
 }
 println("{}", a); // vrne napako ker vrednost "goodbye" ni več veljavna
 \end{minted}
-\caption{Primer scopa}
-\label{listing:scope1}
+	\caption{Primer scopa}
+	\label{listing:scope1}
 \end{listing}
 
 % obrazloži kako se lastništvo povezuje z življenjskimi dobami in referencami
@@ -154,23 +154,23 @@ Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo 
 in nato še neveljaven.
 
 \begin{listing}[!ht]
-\begin{minted}{rust}
+	\begin{minted}{rust}
 let a = 6;
 let b = &a; // ustvarimo deljeno referenco
 println("{}", a); // lahko jo uporabimo, ker za izpis na ekran potrebujemo samo branje
 \end{minted}
-\caption{Uporaba deljene reference}
-\label{lst:uporabadeljena}
+	\caption{Uporaba deljene reference}
+	\label{lst:uporabadeljena}
 \end{listing}
 
 \begin{listing}[!ht]
-\begin{minted}{rust}
+	\begin{minted}{rust}
 let mut a = 6;
 let b = &mut a;
 *b = 7; // lahko spremenimo pomnilniško lokacijo, ker je referenca spremenljiva
 \end{minted}
-\caption{Uporaba spremenljive reference}
-\label{lst:uporabaspremenljiva}
+	\caption{Uporaba spremenljive reference}
+	\label{lst:uporabaspremenljiva}
 \end{listing}
 
 Obratne operacije pri obeh primerih bi vrnile napako zaradi kršitve pravil referenc. Torej, če bi poskusili pisati
@@ -259,7 +259,7 @@ Tekom članka bomo uporabljali naslednji primer izvorne kode anotiran z abstrakt
 dejanskimi Rustovimi življenjskimi dobami). Vsi primeri so izvzeti iz originalne spletne objave.
 
 \begin{listing}[!ht]
-\begin{minted}{rust}
+	\begin{minted}{rust}
 fn main() {
   let mut x: i32 = 22;
   let mut v: Vec<&'0 i32> = vec![];
@@ -272,8 +272,8 @@ fn main() {
 
 fn take<T>(p: T) { .. }
 \end{minted}
-\caption{Primer programa za Polonius}
-\label{listing:primerPolonius}
+	\caption{Primer programa za Polonius}
+	\label{listing:primerPolonius}
 \end{listing}
 
 % TODO: Mogoce omeni delo na \cite{crichtonGroundedConceptualModel2023} kjer so tudi na hitro opisali polonius formalno.
@@ -364,15 +364,15 @@ Iz NLL RFC-ja \cite{2094nllRustRFC}:
 kjer je pojem \textit{prefix} definiran tako:
 
 \begin{displayquote}
-\textbf{Prefixes}. We say that the prefixes of an lvalue are all the lvalues you get by stripping away fields and derefs.
-The prefixes of \verb|*a.b| would be \verb|*a.b|, \verb|a.b|, and \verb|a|.
+	\textbf{Prefixes}. We say that the prefixes of an lvalue are all the lvalues you get by stripping away fields and derefs.
+	The prefixes of \verb|*a.b| would be \verb|*a.b|, \verb|a.b|, and \verb|a|.
 \end{displayquote}
 
 V članku avtor pravi posojam tudi izrazi izposoje (\textit{borrow expressions}). V našem primeru bi se posoje ustvarile na naslednjih
 mestih:
 
 \begin{listing}[!ht]
-\begin{minted}{rust}
+	\begin{minted}{rust}
 fn main() {
   let mut x: i32 = 22;
   let mut v: Vec<&'0 i32> = vec![];
@@ -385,8 +385,8 @@ fn main() {
 
 fn take<T>(p: T) { .. }
 \end{minted}
-\caption{Posoje v programu}
-\label{listing:loans}
+	\caption{Posoje v programu}
+	\label{listing:loans}
 \end{listing}
 
 \subsubsection{Množica regij $\mathcal{R}$}
@@ -495,9 +495,9 @@ fn main() {
   let mut x: i32 = 22;
   let mut v: Vec<&'0 i32> = vec![];
   let r: &'1 mut Vec<&'2 i32> = &'3 mut v; 
-  (* $('3, L_{0}, P) \in \psi $ *)
+  // $('3, L_{0}, P) \in \psi $
   let p: &'5 i32 = &'4 x; 
-  (* $('4, L_{1}, P) \in \psi $ *)
+  // $('4, L_{1}, P) \in \psi $
   r.push(p);
   x += 1;
   take::<Vec<&'6 i32>>(v);
@@ -522,7 +522,7 @@ pogojev smo definirali že zgoraj. To se običajno zgodi na sredini prireditvene
 V našem primeru nimamo nobenega primera prekinitve posoje, je pa relacija ključna v naslednjem primeru:
 
 \begin{listing}[!ht]
-\begin{minted}{rust}
+	\begin{minted}{rust}
 let p = 22;
 let q = 44;
 let x: &mut i32 = &mut p; // `x` kaže na `p`
@@ -531,8 +531,8 @@ let y = &mut *x; // Posoja L0, `y` kaže tudi na `p`
 x = &mut q; // `x` kaže na `q`; prekine L0
 // Lahko uporabimo *x tukaj
 \end{minted}
-\caption{Primer prekinitve posoje}
-\label{listing:loanKilled}
+	\caption{Primer prekinitve posoje}
+	\label{listing:loanKilled}
 \end{listing}
 
 V tem primeru je \verb|x| referenca na \verb|p|, ki je prekopirana v \verb|y|. Dostop do \verb|*x| bi bil tukaj neveljaven,
@@ -547,7 +547,7 @@ To pomeni, da dejanje na točki $P$ (recimo mutacija izposojenega mesta) razvelj
 je že opisano v poglavju o definicije množice $\mathcal{L}$.
 
 \begin{listing}[!ht]
-\begin{minted}{rust}
+	\begin{minted}{rust}
 fn main() {
   let mut x: i32 = 22;
   let mut v: Vec<&'0 i32> = vec![];
@@ -560,8 +560,8 @@ fn main() {
   take::<Vec<&'6 i32>>(v);
 }
 \end{minted}
-\caption{Primer razveljavitve posoje}
-\label{listing:loanInvalidated}
+	\caption{Primer razveljavitve posoje}
+	\label{listing:loanInvalidated}
 \end{listing}
 
 \subsection{Izpeljane relacije}
@@ -597,7 +597,7 @@ $\Gamma \subseteq \mathcal{R} \times \mathcal{R} \times \mathcal{P}$. Definirana
 Na primeru ustvarimo naslednje relacije:
 
 \begin{listing}[!ht]
-\begin{minted}{rust}
+	\begin{minted}{rust}
 fn main() {
   let mut x: i32 = 22;
   let mut v: Vec<&'0 i32> = vec![];
@@ -625,8 +625,8 @@ fn main() {
 
 fn take<T>(p: T) { .. }
 \end{minted}
-\caption{Relacija vsebovanosti}
-\label{listing:subsetRelations}
+	\caption{Relacija vsebovanosti}
+	\label{listing:subsetRelations}
 \end{listing}
 
 \subsubsection{Relacija zahteve}
@@ -652,7 +652,7 @@ Opazimo, da pri relaciji vsebovanosti $\beta$ in pri relaciji zahteve $\zeta$ mo
 za propagacijo aktivna na naslednji točki $Q$. Z naslednjim primerom ponazorimo zakaj je to ključna omejitev.
 
 \begin{listing}[!ht]
-\begin{minted}{rust}
+	\begin{minted}{rust}
 let x = 22;
 let y = 44;
 
@@ -673,8 +673,8 @@ x += 1;
 print( *p );
 // ta izraz posledično ne bi bil veljaven
 \end{minted}
-\caption{Primer relacije zahteve}
-\label{listing:reqRelation}
+	\caption{Primer relacije zahteve}
+	\label{listing:reqRelation}
 \end{listing}
 
 \subsubsection{Relacija aktivnosti posoje}
@@ -702,7 +702,7 @@ aktivna na točki $P$.
 Poglejmo še kako se dokončno napaka javi na našem primeru:
 
 \begin{listing}[!ht]
-\begin{minted}{rust}
+	\begin{minted}{rust}
 fn main() {
   let mut x: i32 = 22;
   let mut v: Vec<&'0 i32> = vec![];
@@ -731,8 +731,8 @@ fn main() {
 
 fn take<T>(p: T) { .. }
 \end{minted}
-\caption{Napaka v programu}
-\label{listing:error}
+	\caption{Napaka v programu}
+	\label{listing:error}
 \end{listing}
 
 \printbibliography
