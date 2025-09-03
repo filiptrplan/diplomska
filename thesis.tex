@@ -603,24 +603,24 @@ fn main() {
   let mut v: Vec<&'0 i32> = vec![];
 
   let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
+  // $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$
 
   let p: &'5 i32 = &'4 x;
-  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
-  (* $('4, '5) \in \beta$ *)
+  // $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$
+  // $('4, '5) \in \beta$
 
   r.push(p);
-  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
-  (* $('4, '5) \in \beta$ *)
-  (* $('5, '2) \in \beta$ *)
+  // $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$
+  // $('4, '5) \in \beta$
+  // $('5, '2) \in \beta$
   
   x += 1;
 
   take::<Vec<&'6 i32>>(v);
-  (* $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$ *)
-  (* $('4, '5) \in \beta$ *)
-  (* $('5, '2) \in \beta$ *)
-  (* $('0, '6) \in \beta$ *)
+  // $('3, '1) \in \beta, ('0, '2) \in \beta, ('2, '0) \in \beta$
+  // $('4, '5) \in \beta$
+  // $('5, '2) \in \beta$
+  // $('0, '6) \in \beta$
 }
 
 fn take<T>(p: T) { .. }
