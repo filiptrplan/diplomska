@@ -153,6 +153,7 @@ bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali las
 
 To razmerje med obema vrstama referenc – večkratne nespremenljive ali pa ena sama spremenljiva – lahko strnemo v načelo, ki ga imenujemo aliasing XOR mutability. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več aliasov), a potem jih samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da imamo v tistem trenutku do njih dostop le mi. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
 
+% intuicija glede 2015 verzije borrow checkerja pred NLL: https://youtu.be/uCN_LRcswts?si=S2Ii5VHYF4X7HDo-&t=515
 
 % tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa
 % prednosti in slabosti vsakega sistema
@@ -168,6 +169,8 @@ To razmerje med obema vrstama referenc – večkratne nespremenljive ali pa ena 
 % kako se povezujejo z Rustom
 
 \subsection{Polonius v akademiji in praksi}
+
+% Poglej si se ownership types in linear types!!!
 
 % kako je bil opisan z blog postom
 % integracija v rustc
