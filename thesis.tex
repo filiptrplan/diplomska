@@ -6,6 +6,11 @@
 \usepackage[utf8]{inputenc} % For Slovenian characters
 \usepackage{csquotes}
 \usepackage{float}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{array}
 \usepackage[backend=biber]{biblatex}
 
 \addbibresource{thesis.bib}
@@ -204,24 +209,24 @@ ki se ne drzijo naslednjih pravil izvzetih iz \cite{stjernaModellingRustsReferen
 % TODO: pravila tabel
 
 Pravilo \verb|Use-Init| nam pove, da lahko uporabljamo samo spremenljivke, ki so zagotovo inicializirane
-na točki v programu, kjer jih uporabljamo. Glede na prvotno implementacije Poloniusa Rustove ekipe poleg 
-osnovnih dejstev opisanih v spletni objavi dobimo še dejstva \verb|var_defined_at|, \verb|var_used_at| in 
+na točki v programu, kjer jih uporabljamo. Glede na prvotno implementacije Poloniusa Rustove ekipe poleg
+osnovnih dejstev opisanih v spletni objavi dobimo še dejstva \verb|var_defined_at|, \verb|var_used_at| in
 \verb|var_dropped_at| \cite{RustlangPoloniusDefines}.
 
 Mogoče tole zgoraj ni tako relevantno, ker se ukvarjamo z implementacijo že. Lahko definiramo množico
 $Poti(p)$, ki nam poda vse poti skozi graf poteka od začetka funkcije do začetka trenutne točke $p$
 v programu. Potem lahko definiramo še predikat $Init(\pi, x, p)$, ki velja natanko tedaj, ko je spremenljivka
 $x$ skozi pot $\pi$ definirana na točki $p$. Končno pravilo se nato glasi:
-    
+
 \begin{equation}
-    Use-Init(x, p) \iff \forall \pi \in Poti(p): Init(\pi, x, p)
-\end{equation} 
+	Use-Init(x, p) \iff \forall \pi \in Poti(p): Init(\pi, x, p)
+\end{equation}
 
 % zgleda kot da je nekaj z var_partially_initialized
 %     // var_maybe_partly_initialized_on_exit(var, point): Upon leaving `point`,
-    % // `var` is partially initialized for some path through the CFG, that is
-    % // there has been an initialization of var, and var has not been moved in
-    % // all paths through the CFG.
+% // `var` is partially initialized for some path through the CFG, that is
+% // there has been an initialization of var, and var has not been moved in
+% // all paths through the CFG.
 % https://github.com/rust-lang/polonius/blob/2ea65ee209e3e07412d1de9f90f23b9b901354e4/polonius-engine/src/output/initialization.rs#L120
 % torej za to ze poskrbi compute_move_errors zgleda da?
 
