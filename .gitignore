@@ -9,6 +9,8 @@
 *.bbl
 *.bcf
 *.run.xml
+*.dvi
+*.synctex*
 examples/mir_dump
 *-SAVE-ERROR
 
