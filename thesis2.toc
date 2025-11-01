@@ -5,29 +5,30 @@
 \contentsline {chapter}{Abstract}{}{chapter*.3}%
 \babel@toc {slovene}{}\relax 
 \contentsline {chapter}{\numberline {1}Uvod}{1}{chapter.1}%
-\contentsline {chapter}{\numberline {2}Pregled literature}{5}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Razvoj Rustovega preverjevalnika izposoj}{5}{section.2.1}%
-\contentsline {section}{\numberline {2.2}Poskusi formalizacije Rusta}{8}{section.2.2}%
-\contentsline {section}{\numberline {2.3}Sorodni modeli lastnistvu}{8}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Polonius v akademiji in praksi}{8}{section.2.4}%
-\contentsline {chapter}{\numberline {3}Formalizacija}{9}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Formalizacija pravil}{9}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Primer}{13}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Definicije pojmov}{13}{section.3.3}%
-\contentsline {section}{\numberline {3.4}Osnovne množice in elementi}{16}{section.3.4}%
-\contentsline {subsection}{\numberline {3.4.1}Množica posoj $\mathcal {L}$}{16}{subsection.3.4.1}%
-\contentsline {subsection}{\numberline {3.4.2}Množica regij $\mathcal {R}$}{17}{subsection.3.4.2}%
-\contentsline {subsection}{\numberline {3.4.3}Graf poteka izposoje}{17}{subsection.3.4.3}%
-\contentsline {subsubsection}{Množica stavkov in točk}{18}{section*.6}%
-\contentsline {subsection}{\numberline {3.4.4}Začetne relacije}{18}{subsection.3.4.4}%
-\contentsline {subsubsection}{Začetna relacija vsebovanosti}{19}{section*.7}%
-\contentsline {subsubsection}{Začetna relacija posoje regij}{20}{section*.8}%
-\contentsline {subsubsection}{Relacija aktivnosti regije}{20}{section*.9}%
-\contentsline {subsubsection}{Relacija prekinitve posoje}{20}{section*.10}%
-\contentsline {subsubsection}{Relacija razveljavitve posoje}{21}{section*.11}%
-\contentsline {subsection}{\numberline {3.4.5}Izpeljane relacije}{21}{subsection.3.4.5}%
-\contentsline {subsubsection}{Relacija vsebovanosti}{22}{section*.12}%
-\contentsline {subsubsection}{Relacija zahteve}{23}{section*.13}%
-\contentsline {subsubsection}{Relacija aktivnosti posoje}{24}{section*.14}%
-\contentsline {subsection}{\numberline {3.4.6}Javljanje napake}{25}{subsection.3.4.6}%
-\contentsline {chapter}{Celotna literatura}{29}{chapter*.15}%
+\contentsline {subsection}{\numberline {1.0.1}Motivacijski primer}{3}{subsection.1.0.1}%
+\contentsline {chapter}{\numberline {2}Pregled literature}{7}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Razvoj Rustovega preverjevalnika izposoj}{7}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Poskusi formalizacije Rusta}{10}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Sorodni modeli lastnistvu}{10}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Polonius v akademiji in praksi}{10}{section.2.4}%
+\contentsline {chapter}{\numberline {3}Formalizacija}{11}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Formalizacija pravil}{11}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Primer}{15}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Definicije pojmov}{15}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Osnovne množice in elementi}{18}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Množica posoj $\mathcal {L}$}{18}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Množica regij $\mathcal {R}$}{19}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Graf poteka izposoje}{19}{subsection.3.4.3}%
+\contentsline {subsubsection}{Množica stavkov in točk}{20}{section*.6}%
+\contentsline {subsection}{\numberline {3.4.4}Začetne relacije}{20}{subsection.3.4.4}%
+\contentsline {subsubsection}{Začetna relacija vsebovanosti}{21}{section*.7}%
+\contentsline {subsubsection}{Začetna relacija posoje regij}{22}{section*.8}%
+\contentsline {subsubsection}{Relacija aktivnosti regije}{22}{section*.9}%
+\contentsline {subsubsection}{Relacija prekinitve posoje}{22}{section*.10}%
+\contentsline {subsubsection}{Relacija razveljavitve posoje}{23}{section*.11}%
+\contentsline {subsection}{\numberline {3.4.5}Izpeljane relacije}{23}{subsection.3.4.5}%
+\contentsline {subsubsection}{Relacija vsebovanosti}{24}{section*.12}%
+\contentsline {subsubsection}{Relacija zahteve}{25}{section*.13}%
+\contentsline {subsubsection}{Relacija aktivnosti posoje}{26}{section*.14}%
+\contentsline {subsection}{\numberline {3.4.6}Javljanje napake}{27}{subsection.3.4.6}%
+\contentsline {chapter}{Celotna literatura}{31}{chapter*.15}%

@@ -73,6 +73,17 @@
   file = {/home/filip/Zotero/storage/3J6BQDCN/Crichton et al. - 2023 - A Grounded Conceptual Model for Ownership Types in Rust.pdf}
 }
 
+@video{eurorustFirstSixYears2024,
+  entrysubtype = {video},
+  title = {The First Six Years in the Development of {{Polonius}} - {{Amanda Stjerna}} | {{EuroRust}} 2024},
+  editor = {{EuroRust}},
+  editortype = {director},
+  date = {2024-11-14},
+  url = {https://www.youtube.com/watch?v=uCN_LRcswts},
+  urldate = {2025-11-01},
+  abstract = {When the current borrow checker, non-lexical lifetimes (NLL), was developed, one of the patterns the Rust developers wanted to add support for had to be abandoned: Case 3, in which a reference is conditionally returned early from a function. This case is particularly tricky to support as it requires a high-resolution analysis of the conditional flow references beyond the means of the current borrow checker. Therefore, current Rust does not support this code pattern (and others like it), even though it is provably safe.}
+}
+
 @online{GettingStartedRust,
   title = {Getting {{Started}} - {{Rust Compiler Development Guide}}},
   url = {https://rustc-dev-guide.rust-lang.org/},
@@ -172,7 +183,7 @@
   annotation = {OCLC: on1363816350}
 }
 
-@online{MemorySafety,
+@online{MemorySafetya,
   title = {Memory Safety},
   url = {https://www.chromium.org/Home/chromium-security/memory-safety/},
   urldate = {2025-08-15},
@@ -248,6 +259,14 @@
   file = {/home/filip/Zotero/storage/K5DKK7MH/polonius-and-region-errors.html}
 }
 
+@online{PoloniusRevisitedPart,
+  title = {Polonius Revisited, Part 2 · Baby Steps},
+  url = {https://smallcultfollowing.com/babysteps/blog/2023/09/29/polonius-part-2/},
+  urldate = {2025-08-20},
+  keywords = {Polonius},
+  file = {/home/filip/Zotero/storage/M4IQQNQ4/polonius-part-2.html}
+}
+
 @online{PoloniusRevisitedParta,
   title = {Polonius Revisited, Part 1 · Baby Steps},
   url = {https://smallcultfollowing.com/babysteps/blog/2023/09/22/polonius-part-1/},
@@ -256,23 +275,7 @@
   file = {/home/filip/Zotero/storage/ZWA5K832/polonius-part-1.html}
 }
 
-@online{PoloniusRevisitedPartc,
-  title = {Polonius Revisited, Part 2 · Baby Steps},
-  url = {https://smallcultfollowing.com/babysteps/blog/2023/09/29/polonius-part-2/},
-  urldate = {2025-08-20},
-  keywords = {Polonius},
-  file = {/home/filip/Zotero/storage/M4IQQNQ4/polonius-part-2.html}
-}
-
 @article{reedPatinaFormalizationRust,
-  title = {Patina: {{A Formalization}} of the {{Rust Programming Language}}},
-  author = {Reed, Eric},
-  abstract = {Rust is a new systems language that uses some advanced type system features, specifically affine types and regions, to statically guarantee memory safety and eliminate the need for a garbage collector. While each individual addition to the type system is well understood in isolation and are known to be sound, the combined system is not known to be sound. Furthermore, Rust uses a novel checking scheme for its regions, known as the Borrow Checker, that is not known to be correct. Since Rust’s goal is to be a safer alternative to C/C++, we should ensure that this safety scheme actually works. We present a formal semantics that captures the key features relevant to memory safety, unique pointers and borrowed references, specifies how they guarantee memory safety, and describes the operation of the Borrow Checker. We use this model to prove the soudness of some core operations and justify the conjecture that the model, as a whole, is sound. Additionally, our model provides a syntactic version of the Borrow Checker, which may be more understandable than the non-syntactic version in Rust.},
-  langid = {english},
-  file = {/home/filip/Zotero/storage/GBJRIJ3T/Reed - Patina A Formalization of the Rust Programming Language.pdf}
-}
-
-@article{reedPatinaFormalizationRusta,
   title = {Patina: {{A Formalization}} of the {{Rust Programming Language}}},
   author = {Reed, Eric},
   abstract = {Rust is a new systems language that uses some advanced type system features, specifically affine types and regions, to statically guarantee memory safety and eliminate the need for a garbage collector. While each individual addition to the type system is well understood in isolation and are known to be sound, the combined system is not known to be sound. Furthermore, Rust uses a novel checking scheme for its regions, known as the Borrow Checker, that is not known to be correct. Since Rust’s goal is to be a safer alternative to C/C++, we should ensure that this safety scheme actually works. We present a formal semantics that captures the key features relevant to memory safety, unique pointers and borrowed references, specifies how they guarantee memory safety, and describes the operation of the Borrow Checker. We use this model to prove the soudness of some core operations and justify the conjecture that the model, as a whole, is sound. Additionally, our model provides a syntactic version of the Borrow Checker, which may be more understandable than the non-syntactic version in Rust.},
@@ -281,15 +284,15 @@
   file = {/home/filip/Zotero/storage/LELVR5G6/Reed - Patina A Formalization of the Rust Programming Language.pdf}
 }
 
-@online{RustCompilerRustc_borrowck,
-  title = {Rust/Compiler/Rustc\_borrowck/Src/Polonius at Master · Rust-Lang/Rust},
-  url = {https://github.com/rust-lang/rust/tree/master/compiler/rustc_borrowck/src/polonius},
-  urldate = {2025-04-12},
-  keywords = {Polonius},
-  file = {/home/filip/Zotero/storage/44PRU4AB/polonius.html}
+@article{reedPatinaFormalizationRusta,
+  title = {Patina: {{A Formalization}} of the {{Rust Programming Language}}},
+  author = {Reed, Eric},
+  abstract = {Rust is a new systems language that uses some advanced type system features, specifically affine types and regions, to statically guarantee memory safety and eliminate the need for a garbage collector. While each individual addition to the type system is well understood in isolation and are known to be sound, the combined system is not known to be sound. Furthermore, Rust uses a novel checking scheme for its regions, known as the Borrow Checker, that is not known to be correct. Since Rust’s goal is to be a safer alternative to C/C++, we should ensure that this safety scheme actually works. We present a formal semantics that captures the key features relevant to memory safety, unique pointers and borrowed references, specifies how they guarantee memory safety, and describes the operation of the Borrow Checker. We use this model to prove the soudness of some core operations and justify the conjecture that the model, as a whole, is sound. Additionally, our model provides a syntactic version of the Borrow Checker, which may be more understandable than the non-syntactic version in Rust.},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/GBJRIJ3T/Reed - Patina A Formalization of the Rust Programming Language.pdf}
 }
 
-@online{RustCompilerRustc_borrowcka,
+@online{RustCompilerRustc_borrowck,
   title = {Rust/Compiler/Rustc\_borrowck/Src/Polonius/Legacy/Location.Rs at 9c0bcb514f49cd1e6a30affb2fe4cfca060129a2 · Rust-Lang/Rust},
   url = {https://github.com/rust-lang/rust/blob/9c0bcb514f49cd1e6a30affb2fe4cfca060129a2/compiler/rustc_borrowck/src/polonius/legacy/location.rs},
   urldate = {2025-05-26},
@@ -300,6 +303,14 @@
   file = {/home/filip/Zotero/storage/38ES3KBQ/location.html}
 }
 
+@online{RustCompilerRustc_borrowcka,
+  title = {Rust/Compiler/Rustc\_borrowck/Src/Polonius at Master · Rust-Lang/Rust},
+  url = {https://github.com/rust-lang/rust/tree/master/compiler/rustc_borrowck/src/polonius},
+  urldate = {2025-04-12},
+  keywords = {Polonius},
+  file = {/home/filip/Zotero/storage/44PRU4AB/polonius.html}
+}
+
 @online{RustlangPoloniusDefines,
   title = {Rust-Lang/Polonius: {{Defines}} the {{Rust}} Borrow Checker.},
   url = {https://github.com/rust-lang/polonius/tree/master},
@@ -307,7 +318,7 @@
   file = {/home/filip/Zotero/storage/3BGA78CP/master.html}
 }
 
-@online{RvalueRustc_middleMira,
+@online{RvalueRustc_middleMir,
   title = {Rvalue in Rustc\_middle::Mir - {{Rust}}},
   url = {https://doc.rust-lang.org/nightly/nightly-rustc/rustc_middle/mir/enum.Rvalue.html},
   urldate = {2025-04-12},
