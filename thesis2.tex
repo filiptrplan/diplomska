@@ -18,7 +18,7 @@
 %\documentclass[a4paper, 12pt, openright, draft]{book}  Nalogo preverite tudi z opcijo draft, ki pokaže, katere vrstice so predolge! Pozor, v draft opciji, se slike ne pokažejo!
  
 \usepackage[utf8]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
-\usepackage[slovene,english]{babel}    % naloži, med drugim, slovenske delilne vzorce
+\usepackage[main=slovenian, english]{babel}    % naloži, med drugim, slovenske delilne vzorce
 \usepackage[pdftex]{graphicx}  % omogoča vlaganje slik različnih formatov
 \usepackage{fancyhdr}          % poskrbi, na primer, za glave strani
 \usepackage{amssymb}           % dodatni matematični simboli
@@ -85,6 +85,8 @@ sorting=nty,
     literate={č}{{\v{c}}}1 {ž}{{\v{z}}}1 {š}{{\v{s}}}1
 }
 
+\renewcommand\listingscaption{Primer}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % postavitev strani
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
@@ -125,7 +127,7 @@ sorting=nty,
 % define medatata
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \def\Title{\ttitle}
-\def\Author{\tauthor, filip.trplan@student.uni-lj.si}
+\def\Author{\tauthor, filip@trplan.si}
 \def\Subject{\ttitleEn}
 \def\Keywords{\tkeywordsEn}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -206,14 +208,13 @@ sorting=nty,
 		{\titfont \ttitle \par}%
 		{\vskip 3em \textsc{DIPLOMSKO DELO\\[5mm]         % dodal Solina za ostale študijske programe
 				%    VISOKOŠOLSKI STROKOVNI ŠTUDIJSKI PROGRAM\\ PRVE STOPNJE\\ RAČUNALNIŠTVO IN INFORMATIKA}\par}%
-				UNIVERZITETNI  ŠTUDIJSKI PROGRAM\\ PRVE STOPNJE\\ RAČUNALNIŠTVO IN INFORMATIKA}\par}%
-	%    INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ MULTIMEDIJA}\par}%
-	%    INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ UPRAVNA INFORMATIKA}\par}%
-	%    INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ RAČUNALNIŠTVO IN MATEMATIKA}\par}%
+				% UNIVERZITETNI  ŠTUDIJSKI PROGRAM\\ PRVE STOPNJE\\ RAČUNALNIŠTVO IN MATEMATIKA}\par}%
+				%    INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ MULTIMEDIJA}\par}%
+				%    INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ UPRAVNA INFORMATIKA}\par}%
+				INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ RAČUNALNIŠTVO IN MATEMATIKA}\par}
 	\vfill\null%
 	% izberite pravi habilitacijski naziv mentorja!
-	{\large \textsc{Mentor}: viš. pred./doc./izr. prof./prof. dr. Peter Klepec\par}%
-	{\large \textsc{Somentor}:  viš. pred./doc./izr. prof./prof. dr.  Martin Krpan \par}%
+	{\large \textsc{Mentor}: doc. dr. Boštjan Slivnik\par}%
 	{\vskip 2em \large Ljubljana, \the\year \par}%
 \end{center}
 % prazna stran
@@ -260,19 +261,16 @@ sorting=nty,
 \bigskip
 \noindent\textbf{Kandidat:} Filip Trplan\\
 \noindent\textbf{Naslov:} Formalizacija originalne formulacije Poloniusa\\
-% vstavite ustrezen naziv študijskega programa!
-\noindent\textbf{Vrsta naloge:} Diplomska naloga na univerzitetnem programu prve stopnje Računalništvo in informatika \\
-% izberite pravi habilitacijski naziv mentorja!
-\noindent\textbf{Mentor:} viš. pred. / doc. / izr. prof. / prof. dr. Ime Priimek\\
-\noindent\textbf{Somentor:} isto kot za mentorja
-\bigskip
+\noindent\textbf{Vrsta naloge:} Diplomska naloga na univerzitetnem programu prve stopnje Računalništvo in matematika \\
+\noindent\textbf{Mentor:} doc. dr. Boštjan Slivnik \\
+
 \noindent\textbf{Opis:}\\
 Besedilo teme diplomskega dela študent prepiše iz študijskega informacijskega sistema, kamor ga je vnesel mentor.
 V nekaj stavkih bo opisal, kaj pričakuje od kandidatovega diplomskega dela.
 Kaj so cilji, kakšne metode naj uporabi, morda bo zapisal tudi ključno literaturo.
 \bigskip
-\noindent\textbf{Title:} Formalization of the Original Formulation of Polonius
-\bigskip
+
+\noindent\textbf{Title:} Formalization of the Original Formulation of Polonius \\
 \noindent\textbf{Description:}\\
 opis diplome v angleščini
 \vfill
@@ -280,22 +278,6 @@ opis diplome v angleščini
 \vspace{2cm}
 % prazna stran
 \clearemptydoublepage
-% zahvala
-\thispagestyle{empty}\mbox{}\vfill\null\it%
-\noindent
-Na tem mestu zapišite, komu se zahvaljujete za pomoč pri izdelavi diplomske naloge oziroma pri vašem študiju nasploh. Pazite, da ne boste koga pozabili. Utegnil vam bo zameriti. Temu se da izogniti tako, da celotno zahvalo izpustite.
-\rm\normalfont
-% prazna stran
-\clearemptydoublepage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% posvetilo, če sama zahvala ne zadošča :-)
-\thispagestyle{empty}\mbox{}{\vskip0.20\textheight}\mbox{}\hfill\begin{minipage}{0.55\textwidth}%
-	Svoji dragi Alenčici.
-	\normalfont\end{minipage}
-% prazna stran
-\clearemptydoublepage
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % kazalo
 \pagestyle{empty}
 \def\thepage{}% preprečimo težave s številkami strani v kazalu
@@ -305,7 +287,7 @@ Na tem mestu zapišite, komu se zahvaljujete za pomoč pri izdelavi diplomske na
 \clearemptydoublepage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % seznam kratic
-\chapter*{Seznam uporabljenih kratic}
+\chapter*{Seznam uporabljenih kratic NEDOKONCAN}
 \noindent\begin{tabular}{p{0.11\textwidth}|p{.39\textwidth}|p{.39\textwidth}}    % po potrebi razširi prvo kolono tabele na račun drugih dveh!
 	{\bf kratica} & {\bf angleško}                        & {\bf slovensko}                   \\ \hline
 	{\bf MIR}     & Mid-level Intermediate Representation & Vmesna predstavitev srednje ravni \\
@@ -322,11 +304,14 @@ Na tem mestu zapišite, komu se zahvaljujete za pomoč pri izdelavi diplomske na
 \chapter*{Povzetek}
 \noindent\textbf{Naslov:} \ttitle
 \bigskip
+
 \noindent\textbf{Avtor:} \tauthor
 \bigskip
-%\noindent\textbf{Povzetek:} 
-\noindent Ta diplomska naloga se ukvarja s formalizacijo Poloniusa, najnovejše različice preverjevalnika izposoj v programskem jeziku Rust. Rust implementira varnost pomnilnika s pomočjo sistema lastništva, ki preprečuje napake kot so visije kazalci in uporaba sproščenega pomnilnika. Medtem ko so bile prejšnje različice preverjevalnika dobro dokumentirane, Polonius obstaja predvsem v obliki spletnih objav in eksperimentalne implementacije. Ta naloga predstavlja celovit matematično formalen opis Poloniusa z definicijo osnovnih množic, relacij in pravil, ki zagotavljajo varnost pomnilnika.
+
+\noindent\textbf{Povzetek:}
+\noindent Ta diplomska naloga se ukvarja s formalizacijo Poloniusa, najnovejše različice preverjevalnika izposoj v programskem jeziku Rust. Rust implementira varnost pomnilnika s pomočjo sistema lastništva, ki preprečuje napake kot so viseči kazalci in uporaba že sproščenega pomnilnika. Medtem ko so bile prejšnje različice preverjevalnika dobro dokumentirane, Polonius obstaja predvsem v obliki spletnih objav in eksperimentalne implementacije. Ta naloga poskusi matematično opisati Polonius z definicijo osnovnih množic, relacij in pravil.
 \bigskip
+
 \noindent\textbf{Ključne besede:} \tkeywords.
 % prazna stran
 \clearemptydoublepage
@@ -337,11 +322,14 @@ Na tem mestu zapišite, komu se zahvaljujete za pomoč pri izdelavi diplomske na
 \chapter*{Abstract}
 \noindent\textbf{Title:} \ttitleEn
 \bigskip
+
 \noindent\textbf{Author:} \tauthor
 \bigskip
-%\noindent\textbf{Abstract:} 
-\noindent This thesis deals with the formalization of Polonius, the latest version of the borrow checker in the Rust programming language. Rust implements memory safety through an ownership system that prevents errors such as dangling pointers and use-after-free bugs. While previous versions of the borrow checker have been well documented, Polonius exists primarily in the form of blog posts and experimental implementations. This thesis presents a comprehensive mathematical formal description of Polonius with definitions of basic sets, relations, and rules that ensure memory safety.
+
+\noindent\textbf{Abstract:}
+\noindent This thesis deals with the formalization of Polonius, the latest version of the borrow checker in the Rust programming language. Rust implements memory safety through an ownership system that prevents errors such as dangling pointers and use-after-free. While previous versions of the checker have been well documented, Polonius exists primarily in the form of blog posts and an experimental implementation. This thesis attempts to mathematically describe Polonius by defining basic sets, relations, and rules.
 \bigskip
+
 \noindent\textbf{Keywords:} \tkeywordsEn.
 \selectlanguage{slovene}
 % prazna stran
@@ -371,7 +359,7 @@ NLL je bil prvotno natančno opisan v RFC-ju z zelo točnim jezikom, kar je pote
 
 Cilj te naloge je potemtakem matematično formalizirati najnovejšo različico preverjevalnika izposoj in razčistiti podrobnosti, ki so se izgubile v bolj nenatančnem jeziku spletnih blogov in video posnetkov. Prvo bomo raziskali pretekle poskuse formalizacije Rusta in sorodne načine upravljanja s pomnilnikom. Nato sledi kratek pregled intuicije za Rustovimi pravili posojanja ter bomo nato končali s formalizacijo Poloniusa.
 
-\subsection{Motivacijski primer}
+\section{Motivacijski primer}
 
 Za grajenje intuicije o razlikah med trenutno različico preverjevalnika izposoj (NLL) in med naslednjo (Polonius) bomo obravnavali motivacijski primer, ki ga NLL zavrne in Polonius sprejme. Primer je prilagojen iz prvotnega predloga NLL-ja \cite{2094nllRustRFC}.
 
