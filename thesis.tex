@@ -358,6 +358,7 @@ NLL je bil prvotno natančno opisan v RFC-ju z zelo točnim jezikom, kar je pote
 Cilj te naloge je potemtakem na svoj način formalizirati inferenčna pravila, ki sestavljajo Polonius, in nadgraditi nekaj že vzpostavljenih formalizacij \cite{stjernaModellingRustsReference}. Najprej bomo raziskali pretekle poskuse formalizacije Rusta in sorodne načine upravljanja s pomnilnikom. Nato sledi intuitivni opis Rustovih pravili izposojanja ter bomo nato končali s formalizacijo Poloniusa ter pravil preverjevalnika izposoj.
 
 \section{Motivacijski primer}
+\label{chap:motivacijski-primer}
 
 Za grajenje intuicije o razlikah med trenutno različico preverjevalnika izposoj (NLL) in med naslednjo (Polonius) bomo obravnavali motivacijski primer, ki ga NLL zavrne in Polonius sprejme. Primer je prilagojen iz prvotnega predloga NLL-ja \cite{2094nllRustRFC}.
 
@@ -415,94 +416,6 @@ Pri primeru \ref{listing:mot_ex}, kjer se NLL ne sprejme pravilnega programa, pa
 
 \chapter{Pregled literature}
 
-\section{Razvoj Rustovega preverjevalnika izposoj}
-Rustov v primerjavi z sorodnimi sistemskimi jeziki kot sta C in C++ implementira kot del procesa prevajanja
-preverjevalnik izposoj. Ta skrbi, da se nikoli ne uporabi neveljavna pomnilniška lokacija. S tem namenom
-enforca tri pravila:
-- Vsak vrednost v Rustu ima lastnika.
-- Vsaka vrednost ima lahko natanko enega lastnika hkrati.
-- Ko lastnik goes out of scope, se vrednost sprosti.
-
-Zaradi zgornjih pravil pravimo temu modelu \textbf{lastništvo} (\textit{ownership}) \cite{klabnikRustProgrammingLanguage2023}.
-Lastnik je spremenljivka oziroma binding na katerega je ta vrednost vezana. V spodnjem preprostem
-primeru opazimo, da je vrednost "hello" enkrat zamenja lastnika, torej njen prvotni lastnik a ni
-potem več veljaven. Če hočemo uporabiti a po tem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
-% preveri ali je to res
-
-\begin{listing}[!ht]
-	\begin{minted}{rust}
-let a = "hello";
-let b = a;
-println("{}", a); // vrne napako
-\end{minted}
-	\caption{Primer lastništva}
-	\label{listing:ownership1}
-\end{listing}
-
-Koncept scopa pa lahko preprosto prikažemo z leksičnim scopom, tako da inicializiramo novo vrednost a-ja
-znotraj gnezdenega bloka, ki ustvari nov scope.
-% preveri ali je to res
-
-\begin{listing}[!ht]
-	\begin{minted}{rust}
-let mut a = "hello";
-{
-    a = "goodbye";
-}
-println("{}", a); // vrne napako ker vrednost "goodbye" ni več veljavna
-\end{minted}
-	\caption{Primer scopa}
-	\label{listing:scope1}
-\end{listing}
-
-% obrazloži kako se lastništvo povezuje z življenjskimi dobami in referencami
-V zgornjih primerih nismo videli večje razlike med Rustom in sorodnimi jeziki. Vendar kjer se pa Rust razlikuje
-je pa v definicijah referenc in razdelitvi teh na tipe. Ko v Rustu govorimo o referencah, lahko rečemo, da so na
-prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. A ključna razlika je v tem, da prevajalnik
-v Rustu poskrbi, da takšna referenca vedno kaže na veljavno vrednost pravega tipa – in to skozi celotno življenjsko
-dobo te reference \cite{klabnikRustProgrammingLanguage2023}. Ta varnostni mehanizem nam omogoča nekaj, kar je v
-mnogih drugih jezikih bistveno težje doseči: gotovost, da reference "ne visijo v prazno" in da ne dostopamo do
-podatkov, ki morda sploh več ne obstajajo.
-
-Te reference pa niso vse enake. Ločimo jih v dve glavni skupini \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust2019}.
-Prva vrsta so deljene oziroma nespremenljive reference. Takih lahko imamo v istem trenutku več, vse lahko kažejo
-na isto mesto v pomnilniku, a skupno pravilo je, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so
-spremenljive reference (v literaturi jih pogosto poimenujejo unique, a izraz "spremenljiva" je verjetno bliže resničnemu
-občutku, saj nam "edinstvena" v slovenščini ne zveni naravno). Pri teh je zgodba ravno obratna: lahko jih imamo zgolj eno,
-a ta nam daje možnost, da z vrednostjo, na katero kaže, tudi poljubno manipuliramo. Te refe
-
-Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo za vsako pokazali veljaven primer uporabe
-in nato še neveljaven.
-
-\begin{listing}[!ht]
-	\begin{minted}{rust}
-let a = 6;
-let b = &a; // ustvarimo deljeno referenco
-println("{}", a); // lahko jo uporabimo, ker za izpis na ekran potrebujemo samo branje
-\end{minted}
-	\caption{Uporaba deljene reference}
-	\label{lst:uporabadeljena}
-\end{listing}
-
-\begin{listing}[!ht]
-	\begin{minted}{rust}
-let mut a = 6;
-let b = &mut a;
-*b = 7; // lahko spremenimo pomnilniško lokacijo, ker je referenca spremenljiva
-\end{minted}
-	\caption{Uporaba spremenljive reference}
-	\label{lst:uporabaspremenljiva}
-\end{listing}
-
-Obratne operacije pri obeh primerih bi vrnile napako zaradi kršitve pravil referenc. Torej, če bi poskusili pisati
-v deljeno referenco kot v primeru \ref{lst:uporabadeljena} bi nam prevajalnik vrnil napako zaradi kršitve zagotovila o preprečitvi
-branja. Prav tako če bi poskusili izpisati spremenljivko a, ki je bila spremenljivo izposojena v primeru \ref{lst:uporabaspremenljiva},
-bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali lastnika vrednosti in njeno spremenljivo referenco.
-
-To razmerje med obema vrstama referenc – večkratne nespremenljive ali pa ena sama spremenljiva – lahko strnemo v načelo, ki ga imenujemo aliasing XOR mutability. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več aliasov), a potem jih samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da imamo v tistem trenutku do njih dostop le mi. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
-% intuicija glede 2015 verzije borrow checkerja pred NLL: https://youtu.be/uCN_LRcswts?si=S2Ii5VHYF4X7HDo-&t=515
-% tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa
-% prednosti in slabosti vsakega sistema
 
 \section{Poskusi formalizacije Rusta}
 % za vsak poskus povej iz katerega vidika so se ga lotili in kaj manjka
@@ -519,21 +432,111 @@ To razmerje med obema vrstama referenc – večkratne nespremenljive ali pa ena 
 % Stjernova formalizacija v Datalogu in Crichtonov borrow checker
 % omejitve trenutnih opisov
 
-\chapter{Formalizacija}
-% TODO: za popravit
-Zaradi Rustove uporabnosti se je skozi leta pojavilo veliko poskusov formalizacije jezika, ker jezik sam
-ni nikjer točno opisan. Ker so Rustova pravila posojanja del sistema tipov so jih klasično avtorji
-vključili kot del formaliziranega sistema tipov, ki so ga opisali v članku. Nekaj takih poskusov je Oxide \cite{weissOxideEssenceRust2019},
-Patina \cite{reedPatinaFormalizationRust}, RustBelt \cite{jungRustBeltSecuringFoundations2018}, ipd.
-Zaradi kompleksnosti jezika so vsi te članki predstavili samo formalizirano podmnožico vseh
-zmožnosti Rusta.
+\chapter{Rustov model upravljanja s pomnilnikom -- lastništvo}
 
-Vsi zgoraj našteti poskusi pa so uporabljali NLL kot osnovo za svoj opis preverjevalnika izposoj.
-\citeauthor{stjernaModellingRustsReference} pa je nadgradila sistem tipov avtorjev Oxide z opisom
-novejšega Poloniusa in ga tudi formalizirala v Datalogu. Od leta \citeyear{stjernaModellingRustsReference} se
-je Rustov prevajalnik bistveno razvil in so se relevantna pravila spremenila ter so bila implementirana
-v samem jeziku (Rust), ne pa v Datalogu \cite{RustCompilerRustc_borrowck}.
-% END
+V poglavju \ref{chap:motivacijski-primer} smo predstavili primer, ki je motiviral nadgradnjo prejšnjega preverjevalnika izposoj. Zraven smo podali intuitivno razlago zakaj je bil ta program pravilen, vendar smo se nanašali na pravila, ki so osnovana na lastništvu, Rustovem naboru pravil za zagotavljanja pomnilniško varnih programov.
+
+Knjiga \citetitle{klabnikRustProgrammingLanguage2023}, ki je smatrana kot neuradni priročnik za Rust, nam pove, da lastništvo obsega tri pravila \cite{klabnikRustProgrammingLanguage2023}:
+
+\begin{enumerate}
+	\item Vsaka vrednost v Rustu ima \textit{lastnika}.
+	\item Za vsako vrednost lahko obstaja samo en lastnik hkrati.
+	\item Ko lastnik izstopi iz dosega, je vrednost sproščena \angl{dropped}.
+\end{enumerate}
+
+Lastnik se tukaj nanaša na spremenljivko (bolj podrobno \textit{lvalue}) na katero je ta vrednost vezana. V spodnjem preprostem primeru opazimo, da vrednost \verb|hello| enkrat zamenja lastnika, torej njen prvotni lastnik \verb|a| potem ne vsebuje vrednosti. Če hočemo uporabiti \verb|a| potem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
+
+\begin{listing}[!ht]
+	\begin{minted}{rust}
+let a = "hello";
+let b = a;
+println!("{}", a); // vrne napako
+\end{minted}
+	\caption{Primer lastništva}
+	\label{listing:ownership1}
+\end{listing}
+
+Koncept dosega pa lahko preprosto prikažemo z leksičnim dosegom, tako da inicializiramo novo vrednost \verb|a|-ja znotraj gnezdenega bloka, ki ustvari nov scope.
+
+\begin{listing}[!ht]
+	\begin{minted}{rust}
+{
+    let a = "goodbye";
+}
+println!("{}", a); // vrne napako ker `a` ni več v dosegu
+\end{minted}
+	\caption{Primer scopa}
+	\label{listing:scope1}
+\end{listing}
+
+% obrazloži kako se lastništvo povezuje z življenjskimi dobami in referencami
+V zgornjih primerih nismo videli bistvene razlike med Rustom in sorodnimi jeziki. Razlika nastopi v tem kako se reference ustvarjajo in razdelitvi teh na dva različna tipa. Ko v Rustu govorimo o referencah, lahko rečemo, da so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da prevajalnik v Rustu poskrbi, da takšna referenca vedno kaže na veljavno vrednost pravega tipa – in to skozi celotno življenjsko dobo te reference \cite{klabnikRustProgrammingLanguage2023}. Ta varnostni mehanizem nam omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: gotovost, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
+
+Prevajalnik preverja pravilnost programov na t.i. \textbf{MIR} (\textit{Mid-level intermediate representation}), ki je bistveno poenostavljena oblika Rust-a in zadnji korak pred generiranjem kode za \textit{backend}. Temelji na grafu kontrole toka, ki ga opredelimo pozneje v nalogi. Ta oblika Rusta je pomembna, ker nam bistveno poenostavi preverjanje izposoj in nam omogoča lažjo analizo. Prav tako je tukaj točno definiran pojem \textbf{mesta} \angl{place}, ki je eden izmed ključnih izrazov pri analizi pravilnosti programa. Mesto je izraz, ki nam opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. \verb|_1|) ali pa njena projekcija (npr. polje strukture \verb|_1.polje|) \cite{MIRMidlevelIR}.
+
+Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust2019}. Prva vrsta so \textbf{deljene oz. nespremenljive reference} \angl{shared references}. Takih je lahko hkrati več in vse lahko kažejo na isto mesto v pomnilniku, vendar pravilo, ki zagotavlja da so take deljene reference varne, pravi, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so \textbf{spremenljive reference} \angl{mutable / unique references}. Pri teh se pravila ravno obrnejo; lahko jih imamo zgolj eno in lahko spreminjamo podatke na pomnilniškem mestu, ki ga referencira.
+
+Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo za vsako pokazali veljaven primer uporabe in nato še neveljaven.
+
+\begin{listing}[!ht]
+	\begin{minted}{rust}
+let a = 6;
+let b = &a; // ustvarimo deljeno referenco
+println("{}", a); // lahko jo uporabimo, ker za izpis na 
+                  // ekran potrebujemo samo branje
+\end{minted}
+	\caption{Pravilna uporaba deljene reference}
+	\label{lst:uporabadeljena}
+\end{listing}
+
+\begin{listing}[!ht]
+	\begin{minted}{rust}
+let mut a = 6;
+let b = &mut a;
+*b = 7; // lahko spremenimo pomnilniško lokacijo, ker je referenca spremenljiva
+\end{minted}
+	\caption{Pravilna uporaba spremenljive reference}
+	\label{lst:uporabaspremenljiva}
+\end{listing}
+
+Obratne operacije pri obeh primerih bi vrnile napako zaradi kršitve pravil referenc. Torej, če bi poskusili pisati
+v deljeno referenco kot v primeru \ref{lst:uporabadeljena} bi nam prevajalnik vrnil napako zaradi kršitve zagotovila o preprečitvi
+branja. Prav tako če bi poskusili izpisati spremenljivko \verb|a|, ki je bila spremenljivo izposojena v primeru \ref{lst:uporabaspremenljiva},
+bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali lastnika vrednosti in njeno spremenljivo referenco.
+
+\begin{listing}[!ht]
+	\begin{minted}{rust}
+let a = 6;
+let b = &a; // ustvarimo deljeno referenco
+*b = 7; // NAPAKA: poskus pisanja skozi deljeno referenco
+println!("{}", a);
+\end{minted}
+	\caption{Napačna uporaba deljene reference - poskus pisanja}
+	\label{lst:napacanapacnadeljena}
+\end{listing}
+
+\begin{listing}[!ht]
+	\begin{minted}{rust}
+let mut a = 6;
+let b = &mut a; // ustvarimo spremenljivo referenco
+println!("{}", a); // NAPAKA: hkratna uporaba lastnika in spremenljive reference
+*b = 7;
+\end{minted}
+	\caption{Napačna uporaba spremenljive reference - hkratna uporaba lastnika}
+	\label{lst:napacnaspremenljiva}
+\end{listing}
+
+To razmerje med obema vrstama referenc -- večkratne nespremenljive ali pa ena sama spremenljiva -- lahko strnemo v načelo, ki ga imenujemo \textit{aliasing XOR mutability}. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le en lastnik. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
+
+% intuicija glede 2015 verzije borrow checkerja pred NLL: https://youtu.be/uCN_LRcswts?si=S2Ii5VHYF4X7HDo-&t=515
+% tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa
+% prednosti in slabosti vsakega sistema
+
+\chapter{Formalizacija}
+
+Glavno delo na področju formalizacije Poloniusa je magistrsko delo Amande Stjerna, ki je nastalo leta 2020, dve leti po prvotni formulaciji \cite{stjernaModellingRustsReference,AliasbasedFormulationBorrow}. V delu Stjerna prvo formalizira Polonius kot del sistema tipov avtorjev \citeauthor{weissOxideEssenceRust2019} imenovan Oxide \cite{weissOxideEssenceRust2019}. Stjerna upraviči svojo izbiro izhodiščnega sistema tipov s tem, da si deli koncept t.i. \textit{provenance variables}. Delo se nato nadaljuje z implementacijo Poloniusa v jeziku Datalog (podmnožica Prologa), ki služi kot podlaga za prvo različico implementacije v Rustovem prevajalniku \cite{RustlangPolonius2025}.
+
+V temu poglavju bomo sprva predstavili intuitivni opis delovanja Poloniusa in temu sledili s formalnim opisom pravil Rustovega prevajalnika. Nazadnje bomo še predstavili delovanje Poloniusa iz vidika množic.
 
 \section{Formalizacija pravil}
 Da Rustov preverjevalnik izposoj zadosti zagotovilom o varnosti programa mora zavrniti programe,
@@ -767,10 +770,6 @@ fn take<T>(p: T) { .. }
 
 \section{Definicije pojmov}
 \begin{description}
-	\item[MIR] MIR je kratica za \textit{Mid-level intermediate representation} in je bistveno poenostavljena oblika Rust-a.
-	      Uporablja se za dele prevajalnika, ki zahtevajo informacijo o kontroli pretoka (toka?) \cite{MIRMidlevelIR}.
-	      \subitem \textbf{Mesto (\textit{place})} je izraz, ki nam opredeli (identify?) lokacijo v pomnilniku \cite{MIRMidlevelIR}.
-	      \citeauthor{weissOxideEssenceRust2019} primerjajo pojem mesta s pojmom \textit{lvalue} iz programskega jezika C.
 	\item[Referenca] v Rust-u je podobna kazalcu v ostalih programskih jezikih, vendar prevajalnik zagotavlja, da kaže
 	      na veljavno vrednost podanega tipa za celotno dobo aktivnosti reference (? pisalo je for the life of the reference) \cite{klabnikRustProgrammingLanguage2023}.
 	      Reference ločimo na dva tipa \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust2019}:

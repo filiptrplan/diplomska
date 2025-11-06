@@ -73,17 +73,6 @@
   file = {/home/filip/Zotero/storage/3J6BQDCN/Crichton et al. - 2023 - A Grounded Conceptual Model for Ownership Types in Rust.pdf}
 }
 
-@video{eurorustFirstSixYears2024,
-  entrysubtype = {video},
-  title = {The First Six Years in the Development of {{Polonius}} - {{Amanda Stjerna}} | {{EuroRust}} 2024},
-  editor = {{EuroRust}},
-  editortype = {director},
-  date = {2024-11-14},
-  url = {https://www.youtube.com/watch?v=uCN_LRcswts},
-  urldate = {2025-11-01},
-  abstract = {When the current borrow checker, non-lexical lifetimes (NLL), was developed, one of the patterns the Rust developers wanted to add support for had to be abandoned: Case 3, in which a reference is conditionally returned early from a function. This case is particularly tricky to support as it requires a high-resolution analysis of the conditional flow references beyond the means of the current borrow checker. Therefore, current Rust does not support this code pattern (and others like it), even though it is provably safe.}
-}
-
 @online{GettingStartedRust,
   title = {Getting {{Started}} - {{Rust Compiler Development Guide}}},
   url = {https://rustc-dev-guide.rust-lang.org/},
@@ -110,6 +99,29 @@
   file = {/home/filip/Zotero/storage/XS98GKF7/Grossman et al. - Region-Based Memory Management in Cyclone.pdf}
 }
 
+@article{hoAeneasRustVerification2022,
+  title = {Aeneas: {{Rust Verification}} by {{Functional Translation}}},
+  shorttitle = {Aeneas},
+  author = {Ho, Son and Protzenko, Jonathan},
+  date = {2022-08-29},
+  journaltitle = {Proceedings of the ACM on Programming Languages},
+  shortjournal = {Proc. ACM Program. Lang.},
+  volume = {6},
+  eprint = {2206.07185},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  pages = {711--741},
+  issn = {2475-1421},
+  doi = {10.1145/3547647},
+  url = {http://arxiv.org/abs/2206.07185},
+  urldate = {2025-11-06},
+  abstract = {SON HO, Inria, France JONATHAN PROTZENKO, Microsoft Research, USA We present Aeneas, a new verification toolchain for Rust programs based on a lightweight functional translation. We leverage Rust’s rich region-based type system to eliminate memory reasoning for a large class of Rust programs, as long as they do not rely on interior mutability or unsafe code. Doing so, we relieve the proof engineer of the burden of memory-based reasoning, allowing them to instead focus on functional properties of their code. The first contribution of Aeneas is a new approach to borrows and controlled aliasing. We propose a pure, functional semantics for LLBC, a Low-Level Borrow Calculus that captures a large subset of Rust programs. Our semantics is value-based, meaning there is no notion of memory, addresses or pointer arithmetic. Our semantics is also ownership-centric, meaning that we enforce soundness of borrows via a semantic criterion based on loans rather than through a syntactic type-based lifetime discipline. We claim that our semantics captures the essence of the borrow mechanism rather than its current implementation in the Rust compiler. The second contribution of Aeneas is a translation from LLBC to a pure lambda-calculus. This allows the user to reason about the original Rust program through the theorem prover of their choice, and fulfills our promise of enabling lightweight verification of Rust programs. To deal with the well-known technical difficulty of terminating a borrow, we rely on a novel approach, in which we approximate the borrow graph in the presence of function calls. This in turn allows us to perform the translation using a new technical device called backward functions. We implement our toolchain in a mixture of Rust and OCaml; our chief case study is a low-level, resizing hash table, for which we prove functional correctness, the first such result in Rust. Our evaluation shows significant gains of verification productivity for the programmer. This paper therefore establishes a new point in the design space of Rust verification toolchains, one that aims to verify Rust programs simply, and at scale. Rust goes to great lengths to enforce static control of aliasing; the proof engineer should not waste any time on memory reasoning when so much already comes “for free”! CCS Concepts: • Theory of computation → Programming logic; Logic and verification.},
+  issue = {ICFP},
+  langid = {english},
+  keywords = {Computer Science - Programming Languages},
+  file = {/home/filip/Zotero/storage/FD78LR8K/Ho and Protzenko - 2022 - Aeneas Rust Verification by Functional Translation.pdf}
+}
+
 @online{hoSoundBorrowCheckingRust2024,
   title = {Sound {{Borrow-Checking}} for {{Rust}} via {{Symbolic Semantics}} ({{Long Version}})},
   author = {Ho, Son and Fromherz, Aymeric and Protzenko, Jonathan},
@@ -124,6 +136,13 @@
   langid = {english},
   pubstate = {prepublished},
   file = {/home/filip/Zotero/storage/J8IEYLNZ/Ho et al. - 2024 - Sound Borrow-Checking for Rust via Symbolic Semantics (Long Version).pdf}
+}
+
+@article{huberAutomaticallyGeneratingMemory,
+  title = {Automatically {{Generating Memory Safety Certificates}} for {{Rust Programs}}},
+  author = {Huber, Pascal},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/QAUI2IVA/Huber - Automatically Generating Memory Safety Certificates for Rust Programs.pdf}
 }
 
 @online{IntroductionRustonomicon,
@@ -259,7 +278,7 @@
   file = {/home/filip/Zotero/storage/K5DKK7MH/polonius-and-region-errors.html}
 }
 
-@online{PoloniusRevisitedPart,
+@online{PoloniusRevisitedPartb,
   title = {Polonius Revisited, Part 2 · Baby Steps},
   url = {https://smallcultfollowing.com/babysteps/blog/2023/09/29/polonius-part-2/},
   urldate = {2025-08-20},
@@ -267,7 +286,7 @@
   file = {/home/filip/Zotero/storage/M4IQQNQ4/polonius-part-2.html}
 }
 
-@online{PoloniusRevisitedParta,
+@online{PoloniusRevisitedPartc,
   title = {Polonius Revisited, Part 1 · Baby Steps},
   url = {https://smallcultfollowing.com/babysteps/blog/2023/09/22/polonius-part-1/},
   urldate = {2025-03-01},
@@ -311,6 +330,16 @@
   file = {/home/filip/Zotero/storage/44PRU4AB/polonius.html}
 }
 
+@software{RustlangPolonius2025,
+  title = {Rust-Lang/Polonius},
+  date = {2025-11-05T15:07:39Z},
+  origdate = {2018-05-01T15:40:59Z},
+  url = {https://github.com/rust-lang/polonius},
+  urldate = {2025-11-06},
+  abstract = {Defines the Rust borrow checker.},
+  organization = {The Rust Programming Language}
+}
+
 @online{RustlangPoloniusDefines,
   title = {Rust-Lang/Polonius: {{Defines}} the {{Rust}} Borrow Checker.},
   url = {https://github.com/rust-lang/polonius/tree/master},
@@ -318,7 +347,7 @@
   file = {/home/filip/Zotero/storage/3BGA78CP/master.html}
 }
 
-@online{RvalueRustc_middleMir,
+@online{RvalueRustc_middleMira,
   title = {Rvalue in Rustc\_middle::Mir - {{Rust}}},
   url = {https://doc.rust-lang.org/nightly/nightly-rustc/rustc_middle/mir/enum.Rvalue.html},
   urldate = {2025-04-12},
