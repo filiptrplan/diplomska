@@ -526,7 +526,35 @@ println!("{}", a); // NAPAKA: hkratna uporaba lastnika in spremenljive reference
 	\label{lst:napacnaspremenljiva}
 \end{listing}
 
+
 To razmerje med obema vrstama referenc -- večkratne nespremenljive ali pa ena sama spremenljiva -- lahko strnemo v načelo, ki ga imenujemo \textit{aliasing XOR mutability}. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le en lastnik. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
+
+Pravila o referencah torej lahko povzamemo z dvemi pravili \cite{klabnikRustProgrammingLanguage2023}
+\begin{enumerate}
+	\item Hkrati je lahko ustvarjena \textit{ali} ena spremenljiva referenca \textit{ali} poljubno število deljenih referenc.
+	\item Reference morajo biti vedno veljavne (kazati na veljavno mesto).
+\end{enumerate}
+
+Še ena podrobnost, ki je pomembna za razumevanje lastništva so \textbf{življenjske dobe} \angl{lifetimes}, ki so sestavni del tipov, vendar so ponavadi izpeljane. Torej dejanski tip reference na niz ni \verb|&String| ampak \verb|&'a String|, kjer je \verb|'a| življenjska doba. Pomembno je tudi omeniti, da življenjske dobe so del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna \cite{klabnikRustProgrammingLanguage2023}. Najlažje si to ogledamo s primerom \ref{lst:lifetime-annotate}.
+
+\begin{listing}[!ht]
+	\begin{minted}{rust}
+fn main() {
+    let r;                // ---------+-- 'a
+                          //          |
+    {                     //          |
+        let x = 5;        // -+-- 'b  |
+        r = &x;           //  |       |
+    }                     // -+       |
+                          //          |
+    println!("r: {r}");   //          |
+}                         // ---------+ 
+    \end{minted}
+	\caption{Anotirane življenjske dobe na primeru}
+	\label{lst:lifetime-annotate}
+\end{listing}
+
+Ta program nam vrne napako, saj je spremenljivka \verb|x| veljavna samo za življenjsko dobo \verb|'b|, vendar program zahteva, da je veljavna za \verb|'a|. Izračun življenjskih dob je odvisen od implementacije preverjevalnika izposoj, vendar si jih lahko intuitivno predstavljamo kot najmanjšo množico vrstic, kjer bo ta spremenljivka oz. mesto še uporabljeno.
 
 % intuicija glede 2015 verzije borrow checkerja pred NLL: https://youtu.be/uCN_LRcswts?si=S2Ii5VHYF4X7HDo-&t=515
 % tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa
