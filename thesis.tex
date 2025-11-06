@@ -1,36 +1,79 @@
-\documentclass{article}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{listings, listings-rust}
-\usepackage{amsfonts} % For \mathcal
-\usepackage[utf8]{inputenc} % For Slovenian characters
-\usepackage[T1]{fontenc} % For Slovenian characters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% datoteka diploma-FRI-vzorec.tex
+%
+%POZOR: ta verzija ne producira pdf datoteke v pdf/A formatu!!!
+%namenjena je le za nalogo pri Diplomskem seminarju!
+%
+% vzorčna datoteka za pisanje diplomskega dela v formatu LaTeX
+% na UL Fakulteti za računalništvo in informatiko
+%
+% na osnovi starejših verzij vkup spravil Franc Solina, maj 2021
+% prvo verzijo je leta 2010 pripravil Gašper Fijavž
+%
+% za upravljanje z literaturo ta vezija uporablja BibLaTeX
+%
+% svetujemo uporabo Overleaf.com - na tej spletni implementaciji LaTeXa ta vzorec zagotovo pravilno deluje
+%
+\documentclass[a4paper,12pt,openright]{book}
+%\documentclass[a4paper, 12pt, openright, draft]{book}  Nalogo preverite tudi z opcijo draft, ki pokaže, katere vrstice so predolge! Pozor, v draft opciji, se slike ne pokažejo!
+ 
+\usepackage[utf8]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[main=slovenian, english]{babel}    % naloži, med drugim, slovenske delilne vzorce
+\usepackage[pdftex]{graphicx}  % omogoča vlaganje slik različnih formatov
+\usepackage{fancyhdr}          % poskrbi, na primer, za glave strani
+\usepackage{amssymb}           % dodatni matematični simboli
+\usepackage{amsmath}           % eqref, npr.
+\usepackage{amsfonts}          % For \mathcal
+\usepackage[hyphens]{url}
 \usepackage{csquotes}
+\usepackage{listings, listings-rust}
 \usepackage{float}
 \usepackage{tabularx}
 \usepackage{xcolor}
-\usepackage{listings}
 \usepackage{caption}
 \usepackage{array}
 \usepackage[normalem]{ulem}
 \usepackage{minted}
 \usepackage{booktabs}
-\usepackage[backend=biber]{biblatex}
+\usepackage[pdftex, colorlinks=true,
+                        citecolor=black, filecolor=black, 
+                        linkcolor=black, urlcolor=black,
+                        pdfproducer={LaTeX}, pdfcreator={LaTeX}]{hyperref}
+\usepackage{hyperxmp}
+\usepackage{color}
+\usepackage{soul}
+\usepackage[
+backend=biber,
+style=numeric,
+sorting=nty,
+]{biblatex}
 
-\addbibresource{thesis.bib}
+\addbibresource{thesis.bib} %Imports bibliography file
 
-\title{Formalizacija originalne formulacije Poloniusa}
-\author{Filip Trplan}
-\date{April 2025}
-\renewcommand{\refname}{Viri}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	DIPLOMA INFO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\ttitle}{Formalizacija originalne formulacije Poloniusa}
+\newcommand{\ttitleEn}{Formalization of the Original Formulation of Polonius}
+\newcommand{\tsubject}{\ttitle}
+\newcommand{\tsubjectEn}{\ttitleEn}
+\newcommand{\tauthor}{Filip Trplan}
+\newcommand{\tkeywords}{Rust, Polonius, preverjevalnik izposoj, formalizacija}
+\newcommand{\tkeywordsEn}{Rust, Polonius, borrow checker, formalization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	HYPERREF SETUP
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypersetup{pdftitle={\ttitle}}
+\hypersetup{pdfsubject=\ttitleEn}
+\hypersetup{pdfauthor={\tauthor}}
+\hypersetup{pdfkeywords=\tkeywordsEn}
 
+% Your custom commands
 \newcommand{\goodexample}[1]{\colorbox{green}{#1}}
 \newcommand{\badexample}[1]{\colorbox{red}{\sout{#1}}}
-
 \setminted[rust]{
     mathescape
 }
-
 \lstset{
     language=Rust,
     escapeinside={(*}{*)},
@@ -41,77 +84,351 @@
     extendedchars=true,
     literate={č}{{\v{c}}}1 {ž}{{\v{z}}}1 {š}{{\v{s}}}1
 }
+\renewcommand\listingscaption{Primer}
+\newcommand{\angl}[1]{(angl. \textit{#1})}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% postavitev strani
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+\addtolength{\marginparwidth}{-20pt} % robovi za tisk
+\addtolength{\oddsidemargin}{40pt}
+\addtolength{\evensidemargin}{-40pt}
+\renewcommand{\baselinestretch}{1.3} % ustrezen razmik med vrsticami
+\setlength{\headheight}{15pt}        % potreben prostor na vrhu
+\renewcommand{\chaptermark}[1]%
+{\markboth{\MakeUppercase{\thechapter.\ #1}}{}} \renewcommand{\sectionmark}[1]%
+{\markright{\MakeUppercase{\thesection.\ #1}}} \renewcommand{\headrulewidth}{0.5pt} \renewcommand{\footrulewidth}{0pt}
+\fancyhf{}
+\fancyhead[LE,RO]{\sl \thepage} 
+%\fancyhead[LO]{\sl \rightmark} \fancyhead[RE]{\sl \leftmark}
+\fancyhead[RE]{\sc \tauthor}              % dodal Solina
+\fancyhead[LO]{\sc Diplomska naloga}     % dodal Solina
+
+\newcommand{\BibLaTeX}{{\sc Bib}\LaTeX}
+\newcommand{\BibTeX}{{\sc Bib}\TeX}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% naslovi
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+\newcommand{\autfont}{\Large}
+\newcommand{\titfont}{\LARGE\bf}
+\newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
+\setcounter{tocdepth}{1}	      % globina kazala
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% konstrukti
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+\newtheorem{izrek}{Izrek}[chapter]
+\newtheorem{trditev}{Trditev}[izrek]
+\newenvironment{dokaz}{\emph{Dokaz.}\ }{\hspace{\fill}{$\Box$}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PDF-A
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% define medatata
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\def\Title{\ttitle}
+\def\Author{\tauthor, filip@trplan.si}
+\def\Subject{\ttitleEn}
+\def\Keywords{\tkeywordsEn}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% \convertDate converts D:20080419103507+02'00' to 2008-04-19T10:35:07+02:00
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\def\convertDate{%
+    \getYear
+}
+{\catcode`\D=12
+ \gdef\getYear D:#1#2#3#4{\edef\xYear{#1#2#3#4}\getMonth}
+}
+\def\getMonth#1#2{\edef\xMonth{#1#2}\getDay}
+\def\getDay#1#2{\edef\xDay{#1#2}\getHour}
+\def\getHour#1#2{\edef\xHour{#1#2}\getMin}
+\def\getMin#1#2{\edef\xMin{#1#2}\getSec}
+\def\getSec#1#2{\edef\xSec{#1#2}\getTZh}
+\def\getTZh +#1#2{\edef\xTZh{#1#2}\getTZm}
+\def\getTZm '#1#2'{%
+    \edef\xTZm{#1#2}%
+    \edef\convDate{\xYear-\xMonth-\xDay T\xHour:\xMin:\xSec+\xTZh:\xTZm}%
+}
+%\expandafter\convertDate\pdfcreationdate 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% get pdftex version string
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\newcount\countA
+\countA=\pdftexversion
+\advance \countA by -100
+\def\pdftexVersionStr{pdfTeX-1.\the\countA.\pdftexrevision}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% XMP data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+\usepackage{xmpincl}
+%\includexmp{pdfa-1b}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% pdfInfo
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+\pdfinfo{%
+    /Title    (\ttitle)
+    /Author   (\tauthor, filip.trplan@student.uni-lj.si)
+    /Subject  (\ttitleEn)
+    /Keywords (\tkeywordsEn)
+    /ModDate  (\pdfcreationdate)
+    /Trapped  /False
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% znaki za copyright stran
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+\newcommand{\CcImageCc}[1]{%
+    \includegraphics[scale=#1]{cc_cc_30.pdf}%
+}
+\newcommand{\CcImageBy}[1]{%
+    \includegraphics[scale=#1]{cc_by_30.pdf}%
+}
+\newcommand{\CcImageSa}[1]{%
+    \includegraphics[scale=#1]{cc_sa_30.pdf}%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
+\selectlanguage{slovene}
+\frontmatter
+\setcounter{page}{1} %
+\renewcommand{\thepage}{}       % preprečimo težave s številkami strani v kazalu
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%naslovnica
+\thispagestyle{empty}%
+\begin{center}
+	{\large\sc Univerza v Ljubljani\\%
+		%      Fakulteta za elektrotehniko\\% za študijski program Multimedija
+		%      Fakulteta za upravo\\% za študijski program Upravna informatika
+		Fakulteta za računalništvo in informatiko\\%
+		%      Fakulteta za matematiko in fiziko\\% za študijski program Računalništvo in matematika
+	}
+	\vskip 10em%
+		{\autfont \tauthor\par}%
+		{\titfont \ttitle \par}%
+		{\vskip 3em \textsc{DIPLOMSKO DELO\\[5mm]         % dodal Solina za ostale študijske programe
+				%    VISOKOŠOLSKI STROKOVNI ŠTUDIJSKI PROGRAM\\ PRVE STOPNJE\\ RAČUNALNIŠTVO IN INFORMATIKA}\par}%
+				% UNIVERZITETNI  ŠTUDIJSKI PROGRAM\\ PRVE STOPNJE\\ RAČUNALNIŠTVO IN MATEMATIKA}\par}%
+				%    INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ MULTIMEDIJA}\par}%
+				%    INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ UPRAVNA INFORMATIKA}\par}%
+				INTERDISCIPLINARNI UNIVERZITETNI\\ ŠTUDIJSKI PROGRAM PRVE STOPNJE\\ RAČUNALNIŠTVO IN MATEMATIKA}\par}
+	\vfill\null%
+	% izberite pravi habilitacijski naziv mentorja!
+	{\large \textsc{Mentor}: doc. dr. Boštjan Slivnik\par}%
+	{\vskip 2em \large Ljubljana, \the\year \par}%
+\end{center}
+% prazna stran
+%\clearemptydoublepage      
+% izjava o licencah itd. se izpiše na hrbtni strani naslovnice
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%copyright stran
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\thispagestyle{empty}
+\vspace*{5cm}
+{\small \noindent
+	To delo je ponujeno pod licenco \textit{Creative Commons Priznanje avtorstva-Deljenje pod enakimi pogoji 2.5 Slovenija} (ali novej\v so razli\v cico).
+	To pomeni, da se tako besedilo, slike, grafi in druge sestavine dela kot tudi rezultati diplomskega dela lahko prosto distribuirajo,
+	reproducirajo, uporabljajo, priobčujejo javnosti in predelujejo, pod pogojem, da se jasno in vidno navede avtorja in naslov tega
+	dela in da se v primeru spremembe, preoblikovanja ali uporabe tega dela v svojem delu, lahko distribuira predelava le pod
+	licenco, ki je enaka tej.
+	Podrobnosti licence so dostopne na spletni strani \href{http://creativecommons.si}{creativecommons.si} ali na Inštitutu za
+	intelektualno lastnino, Streliška 1, 1000 Ljubljana.
+	\vspace*{1cm}
+	\begin{center}% 0.66 / 0.89 = 0.741573033707865
+		\CcImageCc{0.741573033707865}\hspace*{1ex}\CcImageBy{1}\hspace*{1ex}\CcImageSa{1}%
+	\end{center}
+}
+\vspace*{1cm}
+{\small \noindent
+	Izvorna koda diplomskega dela, njeni rezultati in v ta namen razvita programska oprema je ponujena pod licenco GNU General Public License,
+	različica 3 (ali novejša). To pomeni, da se lahko prosto distribuira in/ali predeluje pod njenimi pogoji.
+	Podrobnosti licence so dostopne na spletni strani \url{http://www.gnu.org/licenses/}.
+}
+\vfill
+\begin{center}
+	\ \\ \vfill
+	{\em
+		Besedilo je oblikovano z urejevalnikom besedil \LaTeX.}
+\end{center}
+% prazna stran
+\clearemptydoublepage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% stran 3 med uvodnimi listi
+\thispagestyle{empty}
+\
+\vfill
+\bigskip
+\noindent\textbf{Kandidat:} Filip Trplan\\
+\noindent\textbf{Naslov:} Formalizacija originalne formulacije Poloniusa\\
+\noindent\textbf{Vrsta naloge:} Diplomska naloga na univerzitetnem programu prve stopnje Računalništvo in matematika \\
+\noindent\textbf{Mentor:} doc. dr. Boštjan Slivnik \\
 
-\maketitle
+\noindent\textbf{Opis:}\\
+Besedilo teme diplomskega dela študent prepiše iz študijskega informacijskega sistema, kamor ga je vnesel mentor.
+V nekaj stavkih bo opisal, kaj pričakuje od kandidatovega diplomskega dela.
+Kaj so cilji, kakšne metode naj uporabi, morda bo zapisal tudi ključno literaturo.
+\bigskip
 
-\section{Uvod}
+\noindent\textbf{Title:} Formalization of the Original Formulation of Polonius \\
+\noindent\textbf{Description:}\\
+opis diplome v angleščini
+\vfill
 
-Varnost na področju pisanja programske opreme je bila vedno relevantna tema. Napadalci lahko
-izkoristijo veliko različnih attack surfaces, vendar Microsoft je pokazal, da so ena izmed najbolj pogostih
-napake pri upravljanju s pomnilnikom \cite{Microsoft70Percent}. Pri projektu Chromium, ki je za enem
-izmed najbolj popularnih brskalnikov, so opazili, da okoli 70 procentov hroščev povzročiju tovrstne napake \cite{MemorySafetya}.
-Zato so se jih razvijalci različnih jezikov lotili na več načinov.
+\vspace{2cm}
+% prazna stran
+\clearemptydoublepage
+% kazalo
+\pagestyle{empty}
+\def\thepage{}% preprečimo težave s številkami strani v kazalu
+\tableofcontents{}
 
-Eden najbolj uporabljenih jezikov je C, kjer je programerju povsem prepuščeno kako upravlja s pomnilnikom.
-Tovrsten pristop, imenovan ročno upravljanje s pomnilnikom, lahko vodi do izredno
-hitre kode in časov prevajanja (v primerjavi z bolj kompleksnimi jeziki kot je Rust \cite{glazarCodingRustBad2023}),
-ampak je tud vir številnih napak \cite{MemorySafetya}.
+% prazna stran
+\clearemptydoublepage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% seznam kratic
+\chapter*{Seznam uporabljenih kratic NEDOKONCAN}
+\noindent\begin{tabular}{p{0.11\textwidth}|p{.39\textwidth}|p{.39\textwidth}}    % po potrebi razširi prvo kolono tabele na račun drugih dveh!
+	{\bf kratica} & {\bf angleško}                        & {\bf slovensko}                   \\ \hline
+	{\bf MIR}     & Mid-level Intermediate Representation & Vmesna predstavitev srednje ravni \\
+	{\bf NLL}     & Non-lexical lifetimes                 & Ne-leksikalne življenjske dobe    \\
+	{\bf CFG}     & Control Flow Graph                    & Graf poteka                       \\
+	%  \dots & \dots & \dots \\
+\end{tabular}
 
-Alternativni pristop pa je avtomatsko čiščenje pomnilnika (\textit{garbage collection}), kjer programski jezik
-prevzame vlogo upravljanja z alokacijami in sproščanjem pomnilnika ter s tem razbremeni programerja, da se lahko
-osredotoči na obnašanje samega programa. Vendar to ni brez kompromisa, saj imajo jeziki z avtomatskim čiščenjem
-pomnilnika večjo poraba zaradi zakasnjenega sproščanja in pavze med izvajanjem programa
-(ali pa zakasnitve med operacijami v primeru štetja referenc), da lahko jezik najde pomnilniške lokacije za
-sprositi \cite{bakerListProcessingReal1978}.
+% prazna stran
+\clearemptydoublepage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% povzetek
+\addcontentsline{toc}{chapter}{Povzetek}
+\chapter*{Povzetek}
+\noindent\textbf{Naslov:} \ttitle
+\bigskip
 
-Programski jezik Rust se tega problema loti na drugačen način. Varnost dostopanja do pomnilniških
-lokacij se preverja med časom prevajanja s pomočjo preverjevalnika izposoj (\textit{borrow checker}), ki je
-del Rustovega prevajalnika, ki se ukvarja s tokom podatkov in pomnilniškimi lokacijami.
-Rust pravi pravilom, ki opisujejo delovanje preverjevalnika izposoj lastništvo (\textit{ownership}).
-Tak pristop nam teoretično, da najbolje obeh svetov: zagotovilo, da je naš program varen, ki nam jih da
-avtomatično čiščenje pomnilnika in hitrost izvajanja programov jezikov z ročnim upravljanjem pomnilnika \cite{klabnikRustProgrammingLanguage2023}.
-Znana slabost Rusta je pa zato počasno prevajanje \cite{glazarCodingRustBad2023}, ki sicer ni samo odvisno od preverjevalnika izposoj,
-vendar zagotovo ni njegov prispevek zanemarljiv.
+\noindent\textbf{Avtor:} \tauthor
+\bigskip
 
-Preverjevalnik izposoj se je tekom razvoja Rusta bistveno spremenil od svoje prvotne implementacije.
-Na začetku je bila dokaj primitivna in ni sprejela veliko pravilnih programov zaradi svoje konzervativnosti
-pri zagotavljanju varnosti \cite{2094nllRustRFC}. Zato se je čez par let pojavila naslednja različica preverjevalnika,
-imenovana NLL (\textit{non-lexical lifetimes}), ki je rešila veliko pogostih problem s prvotno različico.
-Vendar vseeno še vedno ne sprejema vseh veljavnih programov. Da bi rešili probleme NLL-ja so Rustovi razvijalci
-predlagali najnovejšo verzijo preverjevalnika, Polonius, ki drugače zastavi problem lastništva in tako
-sprejme še večji delež pravilnih programov \cite{AliasbasedFormulationBorrow}.
+\noindent\textbf{Povzetek:}
+\noindent Ta diplomska naloga se ukvarja s formalizacijo Poloniusa, najnovejše različice preverjevalnika izposoj v programskem jeziku Rust. Rust implementira varnost pomnilnika s pomočjo sistema lastništva, ki preprečuje napake kot so viseči kazalci in uporaba že sproščenega pomnilnika. Medtem ko so bile prejšnje različice preverjevalnika dobro dokumentirane, Polonius obstaja predvsem v obliki spletnih objav in eksperimentalne implementacije. Ta naloga poskusi matematično opisati Polonius z definicijo osnovnih množic, relacij in pravil.
+\bigskip
 
-NLL je bil prvotno natančno opisan v RFC-ju z zelo točnim jezikom, kar je potem vodilo njegov razvoj, Polonius
-pa je prvotno nastal kot predlog na spletnem blogu in se počasi razvijal s pomočjo dodatnih objav
-\cite{PoloniusRevisitedParta,PoloniusRevisitedPartc,WhatPoloniusPolonius}. Do danes ne obstaja celovit centraliziran formalen opis
-Poloniusa, le nekaj spletnih objav, nedokončana knjiga(cite), ter trenutna implementacija v Rustovem prevajalniku (cite).
+\noindent\textbf{Ključne besede:} \tkeywords.
+% prazna stran
+\clearemptydoublepage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% abstract
+\selectlanguage{english}
+\addcontentsline{toc}{chapter}{Abstract}
+\chapter*{Abstract}
+\noindent\textbf{Title:} \ttitleEn
+\bigskip
 
-% Zgornje sicer ni res saj sem pred kratkim odkril objavo!! Pogovori se s Slivnikom
+\noindent\textbf{Author:} \tauthor
+\bigskip
 
-Cilj te naloge je potemtakem matematično formalizirati najnovejšo različico preverjevalnika izposoj in razčistiti
-podrobnosti, ki so se izgubile v bolj nenatančnem jeziku spletnih blogov in video posnetkov. Prvo bomo raziskali
-pretekle poskuse formalizacije Rusta in sorodne načine upravljanja s pomnilnikom. Nato sledi kratek pregled
-intuicije za Rustovimi pravili posojanja ter nato končali z formalizacijo Poloniusa.
+\noindent\textbf{Abstract:}
+\noindent This thesis deals with the formalization of Polonius, the latest version of the borrow checker in the Rust programming language. Rust implements memory safety through an ownership system that prevents errors such as dangling pointers and use-after-free. While previous versions of the checker have been well documented, Polonius exists primarily in the form of blog posts and an experimental implementation. This thesis attempts to mathematically describe Polonius by defining basic sets, relations, and rules.
+\bigskip
 
-\section{Pregled literature}
+\noindent\textbf{Keywords:} \tkeywordsEn.
+\selectlanguage{slovene}
+% prazna stran
+\clearemptydoublepage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mainmatter
+\setcounter{page}{1}
+\pagestyle{fancy}
 
-\subsection{Razvoj Rustovega preverjevalnika izposoj}
+\chapter{Uvod}
+Pomnilniška varnost \angl{memory safety} je na področju pisanja programske opreme vedno aktualna tema. Microsoft je pokazal, da so napake pri upravljanju s pomnilnikom najbolj pogost tip napak\cite{Microsoft70Percent}. Pri projektu Chromium, ki je osnova za Google Chrome, so opazili, da okoli 70 procentov hroščev povzročijo tovrstne napake \cite{MemorySafetya}. Očitno je, da če bi se znebili te kategorije napak, bi lahko rešili velik del hroščev. Posledično so se pomnilniške varnosti razvijalci jezikov lotili na različne načine.
 
+Eden najbolj uporabljenih jezikov je C, kjer je programerju povsem prepuščeno upravljanje s pomnilnikom.
+Tovrsten pristop, imenovan ročno upravljanje s pomnilnikom, lahko vodi do izredno hitrih programov in kratkih časov prevajanja (v primerjavi z bolj kompleksnimi jeziki, kot je Rust \cite{glazarCodingRustBad2023}), ampak je tudi vir številnih napak \cite{MemorySafetya}.
+
+Alternativni pristop ročnemu upravljanju je avtomatsko upravljanje s pomnilnikom \angl{garbage collection}, kjer programski jezik zagotavlja varno dodeljevanje in sproščanje pomnilnika ter s tem razbremeni programerja, da se lahko osredotoči na pisanje programa. Vendar ta način ni brez kompromisa, saj imajo jeziki z avtomatskim upravljanjem s pomnilnikom večjo porabo pomnilnika zaradi zakasnjenega sproščanja. Poleg tega se pojavijo premori med izvajanjem programa ali pa zakasnitve pred vsako operacijo, da lahko čistilec pomnilnika najde pomnilniške lokacije za sprostitev \cite{bakerListProcessingReal1978}.
+
+Rust se upravljanja s pomnilnikom loti na drugačen način. Veljavnost dostopanja do pomnilniških lokacij se preverja med časom prevajanja s pomočjo preverjevalnika izposoj \angl{borrow checker}. To je del Rustovega prevajalnika, ki se ukvarja s tokom podatkov in pomnilniškimi lokacijami. Rust imenuje zbirko pravil, ki opisuje delovanje preverjevalnika izposoj, lastništvo \angl{ownership}. Tak pristop nam teoretično, omogoči najboljše obeh svetov: zagotovilo, da je naš program pomnilniško varen, ki nam ga da avtomatično upravljanje s pomnilnikom ter hitrost izvajanja programov jezikov, ki ga lahko dosežemo z ročnim upravljanjem pomnilnika \cite{klabnikRustProgrammingLanguage2023}. Pogosto omenjena slabost Rusta je pa dolg čas prevajanja \cite{glazarCodingRustBad2023}, ki sicer ni samo odvisen od preverjevalnika izposoj, vendar zagotovo njegov prispevek ni zanemarljiv.
+
+V nadaljevanju bomo smatrali, da pojma \textit{varen program} in \textit{pravilen program} pomenita tak program, ki ne povzroča napak prip upravljanju s pomnilnikom ne glede na to, ali je prevajalnik zaradi težav z izračunljivostjo to sposoben ugotoviti ali pa ne.
+
+Preverjevalnik izposoj se je med razvojem Rusta bistveno spremenil od svoje prvotne implementacije. Na začetku je bil dokaj preprost in ni sprejel veliko pravilnih programov zaradi svoje konzervativnosti pri zagotavljanju varnosti \cite{2094nllRustRFC}. Zato se je čez par let pojavila naslednja različica preverjevalnika, imenovana NLL (\textit{non-lexical lifetimes}), ki je rešila veliko pogostih problemov s prvotno različico. Vendar NLL še vedno ne sprejema vseh veljavnih programov. Da bi rešili probleme NLL-ja, so Rustovi razvijalci predlagali najnovejšo različico preverjevalnika imenovano Polonius, ki drugače zastavi problem lastništva in tako sprejme še večji delež pravilnih programov \cite{AliasbasedFormulationBorrow}.
+
+NLL je bil prvotno natančno opisan v RFC-ju z zelo točnim jezikom, kar je potem vodilo njegov razvoj. Polonius pa je prvotno nastal kot predlog na spletnem blogu in se počasi razvijal s pomočjo dodatnih objav na blogu enega izmed Rustovih razvijalcev \cite{PoloniusRevisitedParta,PoloniusRevisitedPart,WhatPoloniusPolonius}. Do danes ne obstaja celovit centraliziran formalen opis Poloniusa, le nekaj spletnih objav, delni formalni opis v magisterskem delu enega izmed razvijalcev \cite{stjernaModellingRustsReference}, nedokončana knjiga \cite{WhatPoloniusPolonius} ter trenutna implementacija v Rustovem prevajalniku.
+
+Cilj te naloge je potemtakem na svoj način formalizirati inferenčna pravila, ki sestavljajo Polonius, in nadgraditi nekaj že vzpostavljenih formalizacij \cite{stjernaModellingRustsReference}. Najprej bomo raziskali pretekle poskuse formalizacije Rusta in sorodne načine upravljanja s pomnilnikom. Nato sledi intuitivni opis Rustovih pravili izposojanja ter bomo nato končali s formalizacijo Poloniusa ter pravil preverjevalnika izposoj.
+
+\section{Motivacijski primer}
+
+Za grajenje intuicije o razlikah med trenutno različico preverjevalnika izposoj (NLL) in med naslednjo (Polonius) bomo obravnavali motivacijski primer, ki ga NLL zavrne in Polonius sprejme. Primer je prilagojen iz prvotnega predloga NLL-ja \cite{2094nllRustRFC}.
+
+\begin{listing}[ht!]
+	\begin{minted}[linenos]{rust}
+fn process(val: &mut String) {
+    unimplemented!();
+}
+
+fn process_or_default<'a>(map: &'a mut HashMap<&str, String>) 
+        -> &'a mut String {
+    let key = "test";
+    match map.get_mut(&key) { // ------------------+ 'lifetime
+        Some(value) => value,                   // |
+        None => {                               // |
+            map.insert(key, String::default()); // |
+            //  ^~~~~~ ERROR.                   // |
+            map.get_mut(&key).unwrap()          // |
+        }                                       // |
+    } // <-----------------------------------------+
+}
+    \end{minted}
+	\caption{Motivacijski primer za Polonius}
+	\label{listing:mot_ex}
+\end{listing}
+
+\begin{listing}[ht!]
+	\begin{minted}{text}
+error[E0499]: cannot borrow `*map` as mutable more than once at a time
+  --> /tmp/IWXsFebCZD/main.rs:11:13
+   |
+5  |   fn process_or_default<'a>(map: &'a mut HashMap<&str, String>) 
+   |                         -- lifetime `'a` defined here
+...
+8  |       match map.get_mut(&key) { // ------------------+ 'lifetime
+   |       -     --- first mutable borrow occurs here
+   |  _____|
+   | |
+9  | |         Some(value) => value,                   // |
+10 | |         None => {                               // |
+11 | |             map.insert(key, String::default()); // |
+   | |             ^^^ second mutable borrow occurs here
+...  |
+14 | |         }                                       // |
+15 | |     } // <-----------------------------------------+
+   | |_____- returning this value requires that `*map` is borrowed for `'a`
+    \end{minted}
+	\caption{Napaka pri prevajanju primera \ref{listing:mot_ex}}
+	\label{listing:mot_ex_err}
+\end{listing}
+
+Če postopoma sledimo sporočilu o napaki na izpisu \ref{listing:mot_ex_err}, lahko vidimo kje NLL ni zmožen sprejeti pravilnega programa. Na vrstici 8 kličemo funkcijo \verb|get_mut|, ki vrne unijo z dvem možnostima. Lahko vrne spremenljivo referenco na vrednost, ki pripada ključu, ali pa ne vrne nič (\verb|None|). Če vrne vrednost, se šteje, kot da je spremenljivka \verb|map| začasno izsposojena (torej obstaja spremenljiva referenca na njene podatke), kar se zgodi v vrstici 9. Vendar Rust-ov prevajalnik smatra, da je \verb|map| še vedno izsposojena, tudi če ne vrnemo reference iz funkcije \verb|get_mut| (vrstice 11-13). Ko torej poskušamo vstaviti nov par, ki je sestavljen iz vrednosti in ključa, nam to Rustov prevajalnik konzervativno prepreči, saj operacija \verb|insert| zahteva spremenljivo referenco, dve spremenljivi referenci na isto mesto pa po pravilih preverjevalnika izposoj ne smeta obstajati.
+
+Pri primeru \ref{listing:mot_ex}, kjer se NLL ne sprejme pravilnega programa, pa ga Polonius pravilno prevede. Namreč ima večje zmožnosti sledenja kontrolnemu toku in lahko zgornjo analizo opravi bolje. NLL ima trenutno omejene zmožnosti obravnavanja kontrolnega toka, ki jih Polonius nadgradi v zameno za hitrost. Amanda Stjerna, ena izmed razvijalcev Poloniusa, je na predstavitvi na konferenci EuroRust omenila, da je plan v prihodnosti sestaviti dvoslojni preverjevalnik izposoj. Sprva bi se analiza opravila z NLL-jem, saj je bistveno hitrejši, Polonius pa bi obravnaval samo zahtevnejše primere, ki jih NLL zavrne \cite{eurorustFirstSixYears2024} (na 23:15).
+
+\chapter{Pregled literature}
+
+\section{Razvoj Rustovega preverjevalnika izposoj}
 Rustov v primerjavi z sorodnimi sistemskimi jeziki kot sta C in C++ implementira kot del procesa prevajanja
 preverjevalnik izposoj. Ta skrbi, da se nikoli ne uporabi neveljavna pomnilniška lokacija. S tem namenom
 enforca tri pravila:
 - Vsak vrednost v Rustu ima lastnika.
 - Vsaka vrednost ima lahko natanko enega lastnika hkrati.
 - Ko lastnik goes out of scope, se vrednost sprosti.
-Zaradi zgornjih pravil pravimo temu modelu \textbf{lastništvo} (\textit{ownership}) \cite{klabnikRustProgrammingLanguage2023}.
 
+Zaradi zgornjih pravil pravimo temu modelu \textbf{lastništvo} (\textit{ownership}) \cite{klabnikRustProgrammingLanguage2023}.
 Lastnik je spremenljivka oziroma binding na katerega je ta vrednost vezana. V spodnjem preprostem
 primeru opazimo, da je vrednost "hello" enkrat zamenja lastnika, torej njen prvotni lastnik a ni
 potem več veljaven. Če hočemo uporabiti a po tem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
-
 % preveri ali je to res
+
 \begin{listing}[!ht]
 	\begin{minted}{rust}
 let a = "hello";
@@ -124,8 +441,8 @@ println("{}", a); // vrne napako
 
 Koncept scopa pa lahko preprosto prikažemo z leksičnim scopom, tako da inicializiramo novo vrednost a-ja
 znotraj gnezdenega bloka, ki ustvari nov scope.
-
 % preveri ali je to res
+
 \begin{listing}[!ht]
 	\begin{minted}{rust}
 let mut a = "hello";
@@ -139,19 +456,18 @@ println("{}", a); // vrne napako ker vrednost "goodbye" ni več veljavna
 \end{listing}
 
 % obrazloži kako se lastništvo povezuje z življenjskimi dobami in referencami
-
 V zgornjih primerih nismo videli večje razlike med Rustom in sorodnimi jeziki. Vendar kjer se pa Rust razlikuje
 je pa v definicijah referenc in razdelitvi teh na tipe. Ko v Rustu govorimo o referencah, lahko rečemo, da so na
 prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. A ključna razlika je v tem, da prevajalnik
 v Rustu poskrbi, da takšna referenca vedno kaže na veljavno vrednost pravega tipa – in to skozi celotno življenjsko
 dobo te reference \cite{klabnikRustProgrammingLanguage2023}. Ta varnostni mehanizem nam omogoča nekaj, kar je v
-mnogih drugih jezikih bistveno težje doseči: gotovost, da reference “ne visijo v prazno” in da ne dostopamo do
+mnogih drugih jezikih bistveno težje doseči: gotovost, da reference "ne visijo v prazno" in da ne dostopamo do
 podatkov, ki morda sploh več ne obstajajo.
 
 Te reference pa niso vse enake. Ločimo jih v dve glavni skupini \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust2019}.
 Prva vrsta so deljene oziroma nespremenljive reference. Takih lahko imamo v istem trenutku več, vse lahko kažejo
 na isto mesto v pomnilniku, a skupno pravilo je, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so
-spremenljive reference (v literaturi jih pogosto poimenujejo unique, a izraz “spremenljiva” je verjetno bliže resničnemu
+spremenljive reference (v literaturi jih pogosto poimenujejo unique, a izraz "spremenljiva" je verjetno bliže resničnemu
 občutku, saj nam "edinstvena" v slovenščini ne zveni naravno). Pri teh je zgodba ravno obratna: lahko jih imamo zgolj eno,
 a ta nam daje možnost, da z vrednostjo, na katero kaže, tudi poljubno manipuliramo. Te refe
 
@@ -184,35 +500,27 @@ branja. Prav tako če bi poskusili izpisati spremenljivko a, ki je bila spremenl
 bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali lastnika vrednosti in njeno spremenljivo referenco.
 
 To razmerje med obema vrstama referenc – večkratne nespremenljive ali pa ena sama spremenljiva – lahko strnemo v načelo, ki ga imenujemo aliasing XOR mutability. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več aliasov), a potem jih samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da imamo v tistem trenutku do njih dostop le mi. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
-
 % intuicija glede 2015 verzije borrow checkerja pred NLL: https://youtu.be/uCN_LRcswts?si=S2Ii5VHYF4X7HDo-&t=515
-
 % tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa
 % prednosti in slabosti vsakega sistema
 
-\subsection{Poskusi formalizacije Rusta}
-
+\section{Poskusi formalizacije Rusta}
 % za vsak poskus povej iz katerega vidika so se ga lotili in kaj manjka
 
-\subsection{Sorodni modeli lastnistvu}
-
+\section{Sorodni modeli lastnistvu}
 % GhostCell 
 % permission calculus
 % kako se povezujejo z Rustom
 
-\subsection{Polonius v akademiji in praksi}
-
+\section{Polonius v akademiji in praksi}
 % Poglej si se ownership types in linear types!!!
-
 % kako je bil opisan z blog postom
 % integracija v rustc
 % Stjernova formalizacija v Datalogu in Crichtonov borrow checker
 % omejitve trenutnih opisov
 
-\section{Formalizacija}
-
+\chapter{Formalizacija}
 % TODO: za popravit
-
 Zaradi Rustove uporabnosti se je skozi leta pojavilo veliko poskusov formalizacije jezika, ker jezik sam
 ni nikjer točno opisan. Ker so Rustova pravila posojanja del sistema tipov so jih klasično avtorji
 vključili kot del formaliziranega sistema tipov, ki so ga opisali v članku. Nekaj takih poskusov je Oxide \cite{weissOxideEssenceRust2019},
@@ -225,14 +533,11 @@ Vsi zgoraj našteti poskusi pa so uporabljali NLL kot osnovo za svoj opis prever
 novejšega Poloniusa in ga tudi formalizirala v Datalogu. Od leta \citeyear{stjernaModellingRustsReference} se
 je Rustov prevajalnik bistveno razvil in so se relevantna pravila spremenila ter so bila implementirana
 v samem jeziku (Rust), ne pa v Datalogu \cite{RustCompilerRustc_borrowck}.
-
 % END
 
-\subsection{Formalizacija pravil}
-
+\section{Formalizacija pravil}
 Da Rustov preverjevalnik izposoj zadosti zagotovilom o varnosti programa mora zavrniti programe,
 ki se ne drzijo naslednjih pravil izvzetih iz \cite{stjernaModellingRustsReference}.
-
 % TODO: pravila tabel
 
 { \renewcommand{\arraystretch}{2.0}
@@ -243,24 +548,20 @@ ki se ne drzijo naslednjih pravil izvzetih iz \cite{stjernaModellingRustsReferen
 		\begin{minipage}[t]{0.41\textwidth}
 			\begin{minted}[escapeinside=||, autogobble]{rust}
      let x: u32;
-
      if random() {
          |\goodexample{x =}| 17;
      } else {
          |\goodexample{x =}| 18;
      }
-
      let y = |\goodexample{x}| + 1;
     \end{minted}
 		\end{minipage}           &                                                  % Negative example:
 		\begin{minipage}[t]{0.41\textwidth}
 			\begin{minted}[escapeinside=||, autogobble]{rust}
      let x: u32;
-
      if random() {
          |\goodexample{x =}| 17;
      }
-
      // ERROR: x not initialized:
      let y = |\badexample{x}| + 1;
     \end{minted}
@@ -269,9 +570,7 @@ ki se ne drzijo naslednjih pravil izvzetih iz \cite{stjernaModellingRustsReferen
 		\begin{minipage}[t]{0.41\textwidth}
 			\begin{minted}[escapeinside=||,autogobble]{rust}
     let tuple = (vec![1], vec![2]);
-
     moves_argument(|\goodexample{tuple.1}|);
-
     // Does not overlap tuple.1:
     let x = |\goodexample{tuple.0}|[0];
 \end{minted}
@@ -279,9 +578,7 @@ ki se ne drzijo naslednjih pravil izvzetih iz \cite{stjernaModellingRustsReferen
 		\begin{minipage}[t]{0.41\textwidth}
 			\begin{minted}[escapeinside=||, autogobble]{rust}
     let tuple = (vec![1], vec![2]);
-
     moves_argument(|\goodexample{tuple.0}|);
-
     // ERROR: use of moved value:
     let x = |\badexample{tuple.0}|[0];
 \end{minted}
@@ -291,10 +588,8 @@ ki se ne drzijo naslednjih pravil izvzetih iz \cite{stjernaModellingRustsReferen
 			\begin{minted}[escapeinside=||, autogobble]{rust}
 struct Point(u32, u32);
 let mut pt = Point(13, 17);
-
 let x = |\goodexample{\&pt}|;
 let y = |\goodexample{\&pt}|;
-
 dummy_use(|\goodexample{x}|); dummy_use(|\goodexample{y}|);
 \end{minted}
 		\end{minipage} &                                        % Negative example of shared-readonly
@@ -302,7 +597,6 @@ dummy_use(|\goodexample{x}|); dummy_use(|\goodexample{y}|);
 			\begin{minted}[escapeinside=||, autogobble]{rust}
 struct Point(u32, u32);
 let mut pt = Point(13, 17);
-
 let x = |\goodexample{\&pt}|;
 // ERROR: assigned to
 //   borrowed value:
@@ -315,10 +609,8 @@ dummy_use(|\goodexample{x}|);
 			\begin{minted}[escapeinside=||, autogobble]{rust}
 struct Point(u32, u32);
 let mut pt = Point(13, 17);
-
 let x = |\goodexample{\&mut pt}|;
 let y = |\goodexample{\&mut pt}|;
-
 //dummy_use(x);
 dummy_use(|\goodexample{y}|);
 \end{minted}
@@ -327,12 +619,10 @@ dummy_use(|\goodexample{y}|);
 			\begin{minted}[escapeinside=||, autogobble]{rust}
 struct Point(u32, u32);
 let mut pt = Point(13, 17);
-
 let x = |\badexample{\&mut pt}|;
 // ERROR: cannot borrow `pt`
 // as mutable more than once:
 let y = |\badexample{\&mut pt}|;
-
 dummy_use(|\badexample{x}|);
 dummy_use(|\goodexample{y}|);
 \end{minted}
@@ -346,7 +636,6 @@ let x = {
     |\goodexample{\&pt}|
 }; // pt still in scope
 
-
 let z = |\goodexample{x.0}|;
 \end{minted}
 		\end{minipage}           &                                                  % Negative example of ref-live
@@ -357,7 +646,6 @@ let x = {
     let pt = Point(6, 9);
     |\badexample{\&pt}|
 }; // pt goes out of scope
-
 // ERROR: pt does not live
 // long enough:
 let z = |\badexample{x.0}|;
@@ -381,13 +669,11 @@ Mogoče tole zgoraj ni tako relevantno, ker se ukvarjamo z implementacijo že. L
 $Poti(p)$, ki nam poda vse poti skozi graf poteka od začetka funkcije do začetka trenutne točke $p$
 v programu. Potem lahko definiramo še predikat $Init(\pi, x, p)$, ki velja natanko tedaj, ko je spremenljivka
 $x$ skozi pot $\pi$ definirana na točki $p$. Končno pravilo se nato glasi:
-
 \begin{equation}
 	\text{Use-Init}(x, p) \iff \forall \pi \in \text{Poti}(p): \text{Init}(\pi, x, p)
 \end{equation}
 
 % https://rustc-dev-guide.rust-lang.org/borrow_check/moves_and_initialization/move_paths.html za definicijo move path
-
 Opomba o mestih in poteh premika (\textit{move path}): pojem predpone (\textit{prefix}) je načeloma definiran za pot
 premika, vendar ga tukaj posplošimo na mesta iz MIR, ker se nam bolj sklada s terminologijo, ki jo uporabljamo.
 Rustov priročnik za prevajalnik tudi omeni, da sta ta pojma približno enaka. Uporabljamo ga namesto spremenljivk
@@ -402,7 +688,6 @@ Naslednji predikat, ki ga uvedemo je $Premaknjen(\pi, m, p)$, ki velja natanko t
 pred točko $p$ na poti $\pi$. Kaj točno je premik moram še malo pobrskati po dokumentaciji ampak konceptualno to pomeni,
 da lastnik ni več $m$ ampak nekdo drug. Torej pravilo velja ko:
 
-
 \begin{equation}
 	\begin{aligned}
 		 & \text{Move-Deinit}(m, p) \iff \\ &\nexists \pi \in \text{Poti}(p), m_{2}: \text{Prekrivanje}(m, m_{2}) \land \text{Premaknjen}(\pi, m_{2}, p)
@@ -413,7 +698,6 @@ Za naslednji pravili Shared-Readonly in Unique-Write moramo definirati še nekaj
 ukvarjamo s posojami, moramo razločevati met deljenimi in spremenljivimi (unikatnimi). V ta namen vpeljemo
 predikat $\text{VrstaPosoje}(L) \in \{shrd, uniq\}$. Da pa lahko razločimo med aktivnimi in preteklimi posojami
 pa ustvarimo predikat $\text{PosojaAktivna}(L,p)$, ki velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$.
-
 Mesto, ki je bilo sposojeno z posojo $L$ označimo z $O(L)$.
 
 Poleg predikatov za posoje pa nam še manjkajo predikati, ki opisujejo operacije, ki se izvajajo nad mesti.
@@ -424,9 +708,7 @@ pa ustvarjanje spremenljive posoje).
 
 Na podoben način definiramo $\text{RazveljaviSpremenljivo}(m,p)$, ki velja ko je operacija taka, ki razveljavi
 spremenljivo posojo (ustvarjanje kakršnekoli nove posoje, pisanje v mesto, branje iz mesta).
-
 Tako lahko sestavimo naši naslednji dve pravili:
-
 \begin{equation}
 	\begin{aligned}
 		\text{Shared-Readonly}(p)   & \iff  \nexists L,m:
@@ -434,7 +716,6 @@ Tako lahko sestavimo naši naslednji dve pravili:
 		\text{Prekrivanje}(m, O(L)) & \land \text{RazveljaviDeljeno}(m,p)
 	\end{aligned}
 \end{equation}
-
 \begin{equation}
 	\begin{aligned}
 		\text{Unique-Write}(p)      & \iff  \nexists L,m:
@@ -445,14 +726,12 @@ Tako lahko sestavimo naši naslednji dve pravili:
 
 Za zadnje pravilo potrebujemo še en predikat imenovan $\text{MestoAktivno}(m,p)$, ki velja natanko tedaj,
 ko je mesto $m$ še aktivno (torej ni bilo dropped) na točki $p$. Potem pravilo Ref-Live lahko zapišemo tako:
-
 \begin{equation}
 	\begin{aligned}
 		\text{Ref-Live}(p) & \iff \nexists L, m: \\ \text{PosojaAktivna}(L,p) &\land \text{Prekrivanje}(m, O(L)) \land
 		\neg \text{MestoAktivno}(m,p)
 	\end{aligned}
 \end{equation}
-
 
 % zgleda kot da je nekaj z var_partially_initialized
 %     // var_maybe_partly_initialized_on_exit(var, point): Upon leaving `point`,
@@ -462,9 +741,7 @@ ko je mesto $m$ še aktivno (torej ni bilo dropped) na točki $p$. Potem pravilo
 % https://github.com/rust-lang/polonius/blob/2ea65ee209e3e07412d1de9f90f23b9b901354e4/polonius-engine/src/output/initialization.rs#L120
 % torej za to ze poskrbi compute_move_errors zgleda da?
 
-
-\subsection{Primer}
-
+\section{Primer}
 Tekom članka bomo uporabljali naslednji primer izvorne kode anotiran z abstraktnimi regijami (te nimajo čiste bijektivne korespondence z
 dejanskimi Rustovimi življenjskimi dobami). Vsi primeri so izvzeti iz originalne spletne objave.
 
@@ -479,7 +756,6 @@ fn main() {
   x += 1;
   take::<Vec<&'6 i32>>(v);
 }
-
 fn take<T>(p: T) { .. }
 \end{minted}
 	\caption{Primer programa za Polonius}
@@ -487,11 +763,9 @@ fn take<T>(p: T) { .. }
 \end{listing}
 
 % TODO: Mogoce omeni delo na \cite{crichtonGroundedConceptualModel2023} kjer so tudi na hitro opisali polonius formalno.
-
 % TODO: Daljsi uvod v ownership pa borrowing? Mogoce to potem, ker bi bilo fajn malo daljsi uvod - to je za final verzijo.
 
-\subsection{Definicije pojmov}
-
+\section{Definicije pojmov}
 \begin{description}
 	\item[MIR] MIR je kratica za \textit{Mid-level intermediate representation} in je bistveno poenostavljena oblika Rust-a.
 	      Uporablja se za dele prevajalnika, ki zahtevajo informacijo o kontroli pretoka (toka?) \cite{MIRMidlevelIR}.
@@ -523,16 +797,13 @@ fn take<T>(p: T) { .. }
 		      An Rvalue is an expression that creates a value: in this case, the rvalue is a
 		      mutable borrow expression, which looks like \verb|&mut <Place>|
 	      \end{displayquote}
-
-	      Rvalue pa je definiran z enumeratorjem \verb|Rvalue| \cite{RvalueRustc_middleMir}. Nas pa zanima specifično
+	      Rvalue pa je definiran z enumeratorjem \verb|Rvalue| \cite{RvalueRustc_middleMira}. Nas pa zanima specifično
 	      varianta \verb|Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)|, ki ustvari referenco tipa \verb|BorrowKind|
 	      na mesto \verb|Place|.
-
 	      Pojem \textit{borrow expression} pogosto uporabljajo \citeauthor{weissOxideEssenceRust2019} v svojem članku o formalizaciji
 	      podmnožice Rust-a. Njihov način uporabe se sklada z našo definicijo.
-
 	      \textbf{Posoja} (\textit{loan}) je interni konstrukt prevajalnika, ki hrani stanje o referenci in njenemu izvoru
-	      \cite{weissOxideEssenceRust2019}. V trenutni implementaciji preverjevalnika izposoj je izposoja predstavljena kot
+	      \cite{weissOxideEssenceRust2019}. V trenutni implementaciji preverjalnika izposoj je izposoja predstavljena kot
 	      urejena trojica \cite{2094nllRustRFC} \verb=('a, shared|uniq|mut, lvalue)=, kjer je:
 	      \begin{itemize}
 		      \item \verb|'a|: življenjska doba za katero je vrednost izposojena. To se nanaša na življenjske dobe kot
@@ -543,10 +814,9 @@ fn take<T>(p: T) { .. }
 	\item[NLL] je trenutna implementacija preverjevalnika izposoj v Rust-ovem prevajalniku.
 \end{description}
 
-\subsection{Osnovne množice in elementi}
+\section{Osnovne množice in elementi}
 
-\subsubsection{Množica posoj $\mathcal{L}$}
-
+\subsection{Množica posoj $\mathcal{L}$}
 Množico vseh posoj (\textit{angl. loans}) označimo z $\mathcal{L}$. \textbf{Pogoji posoje} so lastnosti, ki morajo
 držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno.
 Pravimo, da \textbf{razveljavimo pogoje posoje}, če velja ena izmed naslednjih točk:
@@ -561,9 +831,8 @@ Pravimo, da \textbf{razveljavimo pogoje posoje}, če velja ena izmed naslednjih 
 
 Ta pravila načeloma sledijo NLLm, bolj formalno jih opisujejo pravila razveljavljanja posoje (\textit{loan killed}).
 Iz NLL RFC-ja \cite{2094nllRustRFC}:
-
 \begin{displayquote}
-	For a statement at point P in the graph, we define the “transfer function” – that is,
+	For a statement at point P in the graph, we define the "transfer function" – that is,
 	which loans it brings into or out of scope – as follows:
 	\begin{itemize}
 		\item ...
@@ -572,7 +841,6 @@ Iz NLL RFC-ja \cite{2094nllRustRFC}:
 \end{displayquote}
 
 kjer je pojem \textit{prefix} definiran tako:
-
 \begin{displayquote}
 	\textbf{Prefixes}. We say that the prefixes of an lvalue are all the lvalues you get by stripping away fields and derefs.
 	The prefixes of \verb|*a.b| would be \verb|*a.b|, \verb|a.b|, and \verb|a|.
@@ -592,28 +860,25 @@ fn main() {
   x += 1;
   take::<Vec<&'6 i32>>(v);
 }
-
 fn take<T>(p: T) { .. }
 \end{minted}
 	\caption{Posoje v programu}
 	\label{listing:loans}
 \end{listing}
 
-\subsubsection{Množica regij $\mathcal{R}$}
-
+\subsection{Množica regij $\mathcal{R}$}
 V trenutni implementaciji preverjevalnika izposoj NLL se posoje spremljajo s pomočjo življenjskih dob.
 V tej formulaciji pa je avtor življenjske dobe poimenoval regije (\textit{regions}).
 Množica regij je označena z $\mathcal{R} \subset 2^{\mathcal{L}}$.
-
 Na primeru so že označene z \verb|'1|, \verb|'2|, \verb|'3|, itd. Pripadnost posoj regijam bomo kasneje določili z relacijo.
 
-\subsubsection{Graf poteka izposoje}
-
+\subsection{Graf poteka izposoje}
 Graf poteka (\textit{angl. CFG - control flow graph}) je izračunan v prejšnjih fazah analize kode.
 Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
 ki nam bodo kasneje prišle prav. Te so izračunane tekom analize poteka podatkov
 (\textit{dataflow analysis})\cite{MIRDataflowRust}. Graf poteka označimo s $C = (C_{V}, C_{E})$, kjer
 je $C_{V}$ množica vozlišč in $C_{E}$ množica povezav.
+% TODO: Malo se preberi ali je res to pravilno. Kako dejansko
 
 % TODO: Malo se preberi ali je res to pravilno. Kako dejansko dobimo input za CFG in
 % kakšne informacije mu pripadajo?
@@ -945,7 +1210,8 @@ fn take<T>(p: T) { .. }
 	\label{listing:error}
 \end{listing}
 
-\printbibliography
-
+% \printbibliography[heading=bibintoc,type=article,title={Članki v revijah}]
+% \printbibliography[heading=bibintoc,type=inproceedings,title={Članki v zbornikih}]
+% \printbibliography[heading=bibintoc,type=incollection,title={Poglavja v knjigah}]
+\printbibliography[heading=bibintoc,title={Celotna literatura}]
 \end{document}
-
