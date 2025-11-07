@@ -166,6 +166,192 @@ Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc @crichtonGrounded
 
 Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo za vsako pokazali veljaven primer uporabe in nato še neveljaven.
 
+#figure(
+  ```rust
+  let a = 6;
+  let b = &a; // ustvarimo deljeno referenco
+  println("{}", a); // lahko jo uporabimo, ker za izpis na 
+                    // ekran potrebujemo samo branje
+  ```,
+  caption: [Pravilna uporaba deljene reference],
+) <lst:uporabadeljena>
+
+#figure(
+  ```rust
+  let mut a = 6;
+  let b = &mut a;
+  *b = 7; // lahko spremenimo podatke na pomnilniški lokaciji, 
+          // ker je referenca spremenljiva
+  ```,
+  caption: [Pravilna uporaba spremenljive reference],
+) <lst:uporabaspremenljiva>
+
+Obratne operacije pri obeh primerih bi vrnile napako zaradi kršitve pravil referenc. Torej, če bi poskusili pisati
+v deljeno referenco kot v primeru @lst:uporabadeljena bi nam prevajalnik vrnil napako zaradi kršitve zagotovila o preprečitvi
+branja. Prav tako če bi poskusili izpisati spremenljivko `a`, ki je bila spremenljivo izposojena v primeru @lst:uporabaspremenljiva,
+bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali lastnika vrednosti in njeno spremenljivo referenco.
+
+#figure(
+  ```rust
+  let a = 6;
+  let b = &a; // ustvarimo deljeno referenco
+  *b = 7; // NAPAKA: poskus pisanja skozi deljeno referenco
+  println!("{}", a);
+  ```,
+  caption: [Napačna uporaba deljene reference - poskus pisanja],
+) <lst:napacanapacnadeljena>
+
+#figure(
+  ```rust
+  let mut a = 6;
+  let b = &mut a; // ustvarimo spremenljivo referenco
+  println!("{}", a); // NAPAKA: hkratna uporaba lastnika in spremenljive reference
+  *b = 7;
+  ```,
+  caption: [Napačna uporaba spremenljive reference - hkratna uporaba lastnika],
+) <lst:napacnaspremenljiva>
+
+To razmerje med obema vrstama referenc -- večkratne nespremenljive ali pa ena sama spremenljiva -- lahko strnemo v načelo, ki ga imenujemo _aliasing XOR mutability_. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le ena referenca. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov @yanovskiGhostCellSeparatingPermissions2021.
+
+Pravila o referencah lahko povzamemo z dvemi pravili @klabnikRustProgrammingLanguage2023
++ Hkrati je lahko ustvarjena _ali_ ena spremenljiva referenca _ali_ poljubno število deljenih referenc.
++ Reference morajo biti vedno veljavne (kazati na veljavno mesto).
+
+Še ena podrobnost, ki je pomembna za razumevanje lastništva so *življenjske dobe* #angl[lifetimes], ki so sestavni del tipov. Kot sami tipi v Rustu, so ponavadi izpeljane, vendar se pogosto pri funkcijski zapisih (signatures?) zgodi, da jih moramo eksplicitno podati. Na primer, dejanski tip reference na niz ni `&String` ampak `&'a String`, kjer je `'a` življenjska doba. Pomembno je tudi omeniti, da so življenjske dobe del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna @klabnikRustProgrammingLanguage2023. Najlažje si to ogledamo s primerom @lst:lifetime-annotate.
+
+#figure(
+  ```rust
+  fn main() {
+      let r;                // ---------+-- 'a
+                            //          |
+      {                     //          |
+          let x = 5;        // -+-- 'b  |
+          r = &x;           //  |       |
+      }                     // -+       |
+                            //          |
+      println!("r: {r}");   //          |
+  }                         // ---------+ 
+  ```,
+  caption: [Anotirane življenjske dobe na primeru],
+) <lst:lifetime-annotate>
+
+Ta program nam vrne napako, saj je spremenljivka `x` veljavna samo za življenjsko dobo `'b`, vendar program zahteva, da je veljavna za `'a`. Izračun življenjskih dob je odvisen od implementacije preverjevalnika izposoj, vendar si jih lahko intuitivno predstavljamo kot najmanjšo množico vrstic, kjer bo ta spremenljivka oz. mesto še uporabljeno.
+
+// intuicija glede 2015 verzije borrow checkerja pred NLL: https://youtu.be/uCN_LRcswts?si=S2Ii5VHYF4X7HDo-&t=515
+// tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa
+// prednosti in slabosti vsakega sistema
+
+#chapter[Formalizacija]
+
+Glavno delo na področju formalizacije Poloniusa je magistrsko delo Amande Stjerna, ki je nastalo leta 2020, dve leti po prvotni formulaciji @stjernaModellingRustsReference @AliasbasedFormulationBorrow. V delu Stjerna prvo formalizira Polonius kot del sistema tipov avtorjev @weissOxideEssenceRust2019 imenovan Oxide @weissOxideEssenceRust2019. Stjerna upraviči svojo izbiro izhodiščnega sistema tipov s tem, da si deli koncept t.i. _provenance variables_. Delo se nato nadaljuje z implementacijo Poloniusa v jeziku Datalog (podmnožica Prologa), ki služi kot podlaga za prvo različico implementacije v Rustovem prevajalniku @RustlangPolonius2025.
+
+V temu poglavju bomo sprva predstavili intuitivni opis delovanja Poloniusa in temu sledili s formalnim opisom pravil Rustovega prevajalnika. Nazadnje bomo še predstavili delovanje Poloniusa iz vidika množic.
+
+== Formalizacija pravil
+Da Rustov preverjevalnik izposoj zadosti zagotovilom o varnosti programa mora zavrniti programe,
+ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
+
+#figure(
+  table(
+    columns: (auto, 1fr, 1fr),
+    align: (left, left, left),
+    [*Pravilo*], [*Pozitiven primer*], [*Negativen primer*],
+    
+    [Use-Init],
+    ```rust
+    let x: u32;
+    if random() {
+        x = 17;
+    } else {
+        x = 18;
+    }
+    let y = x + 1;
+    ```,
+    ```rust
+    let x: u32;
+    if random() {
+        x = 17;
+    }
+    // ERROR: x not initialized:
+    let y = x + 1;
+    ```,
+    
+    [Move-Deinit],
+    ```rust
+    let tuple = (vec![1], vec![2]);
+    moves_argument(tuple.1);
+    // Does not overlap tuple.1:
+    let x = tuple.0[0];
+    ```,
+    ```rust
+    let tuple = (vec![1], vec![2]);
+    moves_argument(tuple.0);
+    // ERROR: use of moved value:
+    let x = tuple.0[0];
+    ```,
+    
+    [Shared-Readonly],
+    ```rust
+    struct Point(u32, u32);
+    let mut pt = Point(13, 17);
+    let x = &pt;
+    let y = &pt;
+    dummy_use(x); dummy_use(y);
+    ```,
+    ```rust
+    struct Point(u32, u32);
+    let mut pt = Point(13, 17);
+    let x = &pt;
+    // ERROR: assigned to
+    //   borrowed value:
+    pt.0 += 1;
+    dummy_use(x);
+    ```,
+    
+    [Unique-Write],
+    ```rust
+    struct Point(u32, u32);
+    let mut pt = Point(13, 17);
+    let x = &mut pt;
+    let y = &mut pt;
+    //dummy_use(x);
+    dummy_use(y);
+    ```,
+    ```rust
+    struct Point(u32, u32);
+    let mut pt = Point(13, 17);
+    let x = &mut pt;
+    // ERROR: cannot borrow `pt`
+    // as mutable more than once:
+    let y = &mut pt;
+    dummy_use(x);
+    dummy_use(y);
+    ```,
+    
+    [Ref-Live],
+    ```rust
+    struct Point(u32, u32);
+    let pt = Point(6, 9);
+    let x = {
+        &pt
+    }; // pt still in scope
+
+    let z = x.0;
+    ```,
+    ```rust
+    struct Point(u32, u32);
+    let x = {
+        let pt = Point(6, 9);
+        &pt
+    }; // pt goes out of scope
+    // ERROR: pt does not live
+    // long enough:
+    let z = x.0;
+    ```,
+  ),
+  caption: [Pravila preverjevalnika izposoj iz @stjernaModellingRustsReference. Pozitivni primeri predstavljajo mesta, kjer preverjevalnik sprejme kodo, negativni pa kjer jo zavrne.],
+) <tab:borrow-check>
+
 #pagebreak()
 #bibliography("thesis.bib")
 
