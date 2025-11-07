@@ -36,6 +36,27 @@
   #show link: set text(font: "DejaVu Sans Mono", size: 0.9em)
   #set heading(numbering: "1.1")
 
+  #set page(
+    header: context {
+      let page = counter(page).get().first()
+      let page_text = text(style: "oblique")[#page]
+      let body = if calc.odd(page) [
+        #grid(
+          columns: (1fr, 1fr),
+          smallcaps[Diplomska naloga], align(right, page_text),
+        )
+      ] else [
+        #grid(
+          columns: (1fr, 1fr),
+          page_text, align(right)[#smallcaps[#author]],
+        )
+      ]
+      body
+      v(-0.9em)
+      line(length: 100%, stroke: 0.5pt)
+    },
+  )
+
 
   // typical latex sizes for chapters/section
   // we treat a level 1 heading as a chapter
@@ -159,6 +180,7 @@
   #pagebreak()
 
   #doc
+
 ]
 
 
