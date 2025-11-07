@@ -13,7 +13,7 @@
 #let CcImageSa(scale) = image("cc_sa_30.pdf", width: scale * 20pt)
 #let end_of_template = state("end_of_template", false)
 #let last_chapter_page = state("last_chapter_page", 0)
-#let chapter(title) = [
+#let chapter(title) = context [
   // we update the last chapter page
   #last_chapter_page.update(counter(page).get().first())
   // we treat a level 1 heading as a chapter
@@ -79,6 +79,13 @@
       body
       v(-0.9em)
       line(length: 100%, stroke: 0.5pt)
+    },
+    footer: context {
+      let page = counter(page).get().first()
+      // For chapter pages we want to display a footer with the page number
+      if last_chapter_page.get() == page {
+        align(center)[#page]
+      }
     },
   )
 
