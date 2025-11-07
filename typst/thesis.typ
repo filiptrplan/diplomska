@@ -257,6 +257,7 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
   #set block(breakable: true)
   #set raw(block: true)
   #show raw: set block(breakable: false)
+  #codly(display-name: false, display-icon: false)
   #figure(
     kind: table,
     table(
