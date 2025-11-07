@@ -78,7 +78,7 @@ error[E0499]: cannot borrow `*map` as mutable more than once at a time
 15 | | } // <-----------------------------------------+
 | |_____- returning this value requires that `*map` is borrowed for `'a`
 ```
-_Figure: Napaka pri prevajanju primera @listing:mot_ex_ <listing:mot_ex_err>
+_Figure: Napaka pri prevajanju primera @listing:mot_ex _ <listing:mot_ex_err>
 
 Če postopoma sledimo sporočilu o napaki na izpisu @listing:mot_ex_err, lahko vidimo kje NLL ni zmožen sprejeti pravilnega programa. Na vrstici 8 kličemo funkcijo `get_mut`, ki vrne unijo z dvem možnostima. Lahko vrne spremenljivo referenco na vrednost, ki pripada ključu, ali pa ne vrne nič (`None`). Če vrne vrednost, se šteje, kot da je spremenljivka `map` začasno izsposojena (torej obstaja spremenljiva referenca na njene podatke), kar se zgodi v vrstici 9. Vendar Rust-ov prevajalnik smatra, da je `map` še vedno izsposojena, tudi če ne vrnemo reference iz funkcije `get_mut` (vrstice 11-13). Ko torej poskušamo vstaviti nov par, ki je sestavljen iz vrednosti in ključa, nam to Rustov prevajalnik konzervativno prepreči, saj operacija `insert` zahteva spremenljivo referenco, dve spremenljivi referenci na isto mesto pa po pravilih preverjevalnika izposoj ne smeta obstajati.
 
