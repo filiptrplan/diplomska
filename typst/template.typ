@@ -11,6 +11,19 @@
 #let CcImageCc(scale) = image("cc_cc_30.pdf", width: scale * 20pt)
 #let CcImageBy(scale) = image("cc_by_30.pdf", width: scale * 20pt)
 #let CcImageSa(scale) = image("cc_sa_30.pdf", width: scale * 20pt)
+#let chapter(title) = [
+  // we treat a level 1 heading as a chapter
+  #show heading.where(level: 1): it => [
+    #set par(first-line-indent: (amount: 0pt))
+    #huge[
+      Poglavje #it.level
+      #v(1em)
+      #it.body
+      #v(1em)
+    ]
+  ]
+  = #title
+]
 
 #let thesis(
   title: none,
@@ -59,12 +72,9 @@
 
 
   // typical latex sizes for chapters/section
-  // we treat a level 1 heading as a chapter
   #show heading.where(level: 1): it => [
     #set par(first-line-indent: (amount: 0pt))
     #huge[
-      Poglavje #it.level
-      #v(1em)
       #it.body
       #v(1em)
     ]
