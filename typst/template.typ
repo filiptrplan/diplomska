@@ -11,7 +11,11 @@
 #let CcImageCc(scale) = image("cc_cc_30.pdf", width: scale * 20pt)
 #let CcImageBy(scale) = image("cc_by_30.pdf", width: scale * 20pt)
 #let CcImageSa(scale) = image("cc_sa_30.pdf", width: scale * 20pt)
+#let end_of_template = state("end_of_template", false)
+#let last_chapter_page = state("last_chapter_page", 0)
 #let chapter(title) = [
+  // we update the last chapter page
+  #last_chapter_page.update(counter(page).get().first())
   // we treat a level 1 heading as a chapter
   #show heading.where(level: 1): it => [
     #set par(first-line-indent: (amount: 0pt))
@@ -52,6 +56,14 @@
   #set page(
     header: context {
       let page = counter(page).get().first()
+      // We don't want to display header on pages with chapter headings
+      if last_chapter_page.get() == page {
+        return
+      }
+      // We also don't want to display a heading up until we end our template
+      if end_of_template.get() == false {
+        return
+      }
       let page_text = text(style: "oblique")[#page]
       let body = if calc.odd(page) [
         #grid(
@@ -158,9 +170,7 @@
   *Naslov:* #title \
   *Vrsta naloge:* Diplomska naloga na univerzitetnem programu prve stopnje Računalništvo in matematika \
   *Mentor:* #mentor \ \
-
   *Opis*: \ #description \ \
-
   *Title*: #title_en \
   *Description*: #description_en
 
@@ -188,6 +198,9 @@
   #outline(title: text(size: 25pt)[Kazalo #v(1em)])
 
   #pagebreak()
+
+  #counter(page).update(1)
+  #end_of_template.update(true)
 
   #doc
 
