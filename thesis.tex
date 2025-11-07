@@ -478,6 +478,81 @@ Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc \cite{crichtonGro
 
 Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo za vsako pokazali veljaven primer uporabe in nato še neveljaven.
 
+#figure(
+  ```rust
+  let a = 6;
+  let b = &a; // ustvarimo deljeno referenco
+  println("{}", a); // lahko jo uporabimo, ker za izpis na 
+                    // ekran potrebujemo samo branje
+  ```,
+  caption: [Pravilna uporaba deljene reference],
+) <lst:uporabadeljena>
+
+#figure(
+  ```rust
+  let mut a = 6;
+  let b = &mut a;
+  *b = 7; // lahko spremenimo podatke na pomnilniški lokaciji, 
+          // ker je referenca spremenljiva
+  ```,
+  caption: [Pravilna uporaba spremenljive reference],
+) <lst:uporabaspremenljiva>
+
+Obratne operacije pri obeh primerih bi vrnile napako zaradi kršitve pravil referenc. Torej, če bi poskusili pisati
+v deljeno referenco kot v primeru @lst:uporabadeljena bi nam prevajalnik vrnil napako zaradi kršitve zagotovila o preprečitvi
+branja. Prav tako če bi poskusili izpisati spremenljivko `a`, ki je bila spremenljivo izposojena v primeru @lst:uporabaspremenljiva,
+bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali lastnika vrednosti in njeno spremenljivo referenco.
+
+#figure(
+  ```rust
+  let a = 6;
+  let b = &a; // ustvarimo deljeno referenco
+  *b = 7; // NAPAKA: poskus pisanja skozi deljeno referenco
+  println!("{}", a);
+  ```,
+  caption: [Napačna uporaba deljene reference - poskus pisanja],
+) <lst:napacanapacnadeljena>
+
+#figure(
+  ```rust
+  let mut a = 6;
+  let b = &mut a; // ustvarimo spremenljivo referenco
+  println!("{}", a); // NAPAKA: hkratna uporaba lastnika in spremenljive reference
+  *b = 7;
+  ```,
+  caption: [Napačna uporaba spremenljive reference - hkratna uporaba lastnika],
+) <lst:napacnaspremenljiva>
+
+To razmerje med obema vrstama referenc -- večkratne nespremenljive ali pa ena sama spremenljiva -- lahko strnemo v načelo, ki ga imenujemo _aliasing XOR mutability_. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le ena referenca. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov @yanovskiGhostCellSeparatingPermissions2021.
+
+Pravila o referencah lahko povzamemo z dvemi pravili @klabnikRustProgrammingLanguage2023
++ Hkrati je lahko ustvarjena _ali_ ena spremenljiva referenca _ali_ poljubno število deljenih referenc.
++ Reference morajo biti vedno veljavne (kazati na veljavno mesto).
+
+Še ena podrobnost, ki je pomembna za razumevanje lastništva so *življenjske dobe* #angl[lifetimes], ki so sestavni del tipov. Kot sami tipi v Rustu, so ponavadi izpeljane, vendar se pogosto pri funkcijski zapisih (signatures?) zgodi, da jih moramo eksplicitno podati. Na primer, dejanski tip reference na niz ni `&String` ampak `&'a String`, kjer je `'a` življenjska doba. Pomembno je tudi omeniti, da so življenjske dobe del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna @klabnikRustProgrammingLanguage2023. Najlažje si to ogledamo s primerom @lst:lifetime-annotate.
+
+#figure(
+  ```rust
+  fn main() {
+      let r;                // ---------+-- 'a
+                            //          |
+      {                     //          |
+          let x = 5;        // -+-- 'b  |
+          r = &x;           //  |       |
+      }                     // -+       |
+                            //          |
+      println!("r: {r}");   //          |
+  }                         // ---------+ 
+  ```,
+  caption: [Anotirane življenjske dobe na primeru],
+) <lst:lifetime-annotate>
+
+Ta program nam vrne napako, saj je spremenljivka `x` veljavna samo za življenjsko dobo `'b`, vendar program zahteva, da je veljavna za `'a`. Izračun življenjskih dob je odvisen od implementacije preverjevalnika izposoj, vendar si jih lahko intuitivno predstavljamo kot najmanjšo množico vrstic, kjer bo ta spremenljivka oz. mesto še uporabljeno.
+
+// intuicija glede 2015 verzije borrow checkerja pred NLL: https://youtu.be/uCN_LRcswts?si=S2Ii5VHYF4X7HDo-&t=515
+// tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa
+// prednosti in slabosti vsakega sistema
+
 \begin{listing}[!ht]
 	\begin{minted}{rust}
 let a = 6;

@@ -107,6 +107,65 @@ Za grajenje intuicije o razlikah med trenutno različico preverjevalnika izposoj
 
 Pri primeru @listing:mot_ex, kjer se NLL ne sprejme pravilnega programa, pa ga Polonius pravilno prevede. Namreč ima večje zmožnosti sledenja kontrolnemu toku in lahko zgornjo analizo opravi bolje. NLL ima trenutno omejene zmožnosti obravnavanja kontrolnega toka, ki jih Polonius nadgradi v zameno za hitrost. Amanda Stjerna, ena izmed razvijalcev Poloniusa, je na predstavitvi na konferenci EuroRust omenila, da je plan v prihodnosti sestaviti dvoslojni preverjevalnik izposoj. Sprva bi se analiza opravila z NLL-jem, saj je bistveno hitrejši, Polonius pa bi obravnaval samo zahtevnejše primere, ki jih NLL zavrne @eurorustFirstSixYears2024 (na 23:15).
 
+#chapter[Pregled literature]
+
+== Poskusi formalizacije Rusta
+// za vsak poskus povej iz katerega vidika so se ga lotili in kaj manjka
+
+== Sorodni modeli lastnistvu
+// GhostCell 
+// permission calculus
+// kako se povezujejo z Rustom
+
+== Polonius v akademiji in praksi
+// Poglej si se ownership types in linear types!!!
+// kako je bil opisan z blog postom
+// integracija v rustc
+// Stjernova formalizacija v Datalogu in Crichtonov borrow checker
+// omejitve trenutnih opisov
+
+#chapter[Rustov model upravljanja s pomnilnikom -- lastništvo]
+
+V poglavju @chap:motivacijski-primer smo predstavili primer, ki je motiviral nadgradnjo prejšnjega preverjevalnika izposoj. Zraven smo podali intuitivno razlago, zakaj je bil ta program pravilen, vendar smo se nanašali na pravila, ki so osnovana na lastništvu -- Rustovem naboru pravil za zagotavljanja pomnilniško varnih programov.
+
+Knjiga _The Rust Programming Language_, neuradni priročnik za Rust, nam pove, da lastništvo obsega tri pravila @klabnikRustProgrammingLanguage2023:
+
++ Vsaka vrednost v Rustu ima _lastnika_.
++ Za vsako vrednost lahko obstaja samo en lastnik hkrati.
++ Ko lastnik izstopi iz dosega, je vrednost sproščena #angl[dropped].
+
+Lastnik tukaj se nanaša na spremenljivko (bolj podrobno _lvalue_) na katero je ta vrednost vezana. V spodnjem preprostem primeru opazimo, da vrednost `hello` enkrat zamenje lastnika, torej njen prvotni lastnik `a` potem ne vsebuje vrednosti. Če hočemo uporabiti `a` potem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
+
+#figure(
+  ```rust
+  let a = "hello";
+  let b = a;
+  println!("{}", a); // vrne napako
+  ```,
+  caption: [Primer lastništva],
+) <listing:ownership1>
+
+Lastništvo je pa tudi vezano na doseg. Koncept dosega pa lahko preprosto prikažemo z leksičnim dosegom, tako da inicializiramo novo vrednost `a`-ja znotraj gnezdenega bloka, ki ustvari nov scope.
+
+#figure(
+  ```rust
+  {
+      let a = "goodbye";
+  }
+  println!("{}", a); // vrne napako ker `a` ni več v dosegu
+  ```,
+  caption: [Primer leksičnega dosega],
+) <listing:scope1>
+
+// obrazloži kako se lastništvo povezuje z življenjskimi dobami in referencami
+V zgornjih primerih nismo videli bistvene razlike med Rustom in sorodnimi jeziki. Razlika nastopi v tem, kako se reference ustvarjajo in razdelitvi teh na dva različna tipa. Ko v Rustu govorimo o referencah, lahko rečemo, da so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da prevajalnik v Rustu poskrbi, da takšna referenca vedno kaže na veljavno vrednost pravega tipa -- in to skozi celotno življenjsko dobo te reference @klabnikRustProgrammingLanguage2023. Ta varnostni mehanizem nam omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: gotovost, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
+
+Prevajalnik preverja pomnilniško pravilnost programov s t.i. *MIR* (_Mid-level intermediate representation_), ki je bistveno poenostavljena oblika Rusta in zadnji korak pred generiranjem kode za _backend_ (? kako po slovensko). Temelji na grafu kontrole toka, ki ga bomo opisali pozneje v nalogi. Ta oblika Rusta je pomembna, ker nam bistveno poenostavi preverjanje izposoj in nam omogoča lažjo analizo. Prav tako je tukaj točno definiran pojem *mesta* #angl[place], ki je eden izmed ključnih izrazov pri analizi pravilnosti programa. Mesto je izraz, ki nam opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. `_1`) ali pa njena projekcija (npr. polje strukture `_1.polje`) @MIRMidlevelIR.
+
+Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc @crichtonGroundedConceptualModel2023 @yanovskiGhostCellSeparatingPermissions2021 @weissOxideEssenceRust2019. Prva vrsta so *deljene oz. nespremenljive reference* #angl[shared references]. Takih je lahko hkrati več in vse lahko kažejo na isto mesto v pomnilniku. Pravilo, ki zagotavlja da so take deljene reference varne, pravi, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so *spremenljive reference* #angl[mutable / unique references]. Pri teh se pravila ravno obrnejo; lahko jih imamo zgolj eno in lahko spreminjamo podatke na pomnilniškem mestu, ki ga referencira (preko spremenljive reference, ne preko prvotne spremenljivke).
+
+Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo za vsako pokazali veljaven primer uporabe in nato še neveljaven.
+
 #pagebreak()
 #bibliography("thesis.bib")
 
