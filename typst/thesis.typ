@@ -251,13 +251,12 @@ V temu poglavju bomo sprva predstavili intuitivni opis delovanja Poloniusa in te
 Da Rustov preverjevalnik izposoj zadosti zagotovilom o varnosti programa mora zavrniti programe,
 ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
 
-#pagebreak()
 #[
   #show figure: set block(breakable: true)
   #set block(breakable: true)
   #set raw(block: true)
   #show raw: set block(breakable: false)
-  #codly(display-name: false, display-icon: false)
+  #codly(display-name: false, display-icon: false, number-format: none)
   #figure(
     kind: table,
     table(
@@ -268,11 +267,13 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
 
       table.cell(colspan: 2, fill: gray.lighten(80%))[*Use-Init*],
       {
-        codly(highlights: (
-          (line: 2, start: 4, end: 9, fill: green.lighten(70%)),
-          (line: 4, start: 4, end: 9, fill: green.lighten(70%)),
-          (line: 6, start: 8, end: 9, fill: green.lighten(70%)),
-        ))
+        codly(
+          highlights: (
+            (line: 3, start: 5, end: 8, fill: green),
+            (line: 5, start: 5, end: 8, fill: green),
+            (line: 7, start: 9, end: 9, fill: green),
+          ),
+        )
         ```rust
         let x: u32;
         if random() {
@@ -284,10 +285,12 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
         ```
       },
       {
-        codly(highlights: (
-          (line: 2, start: 4, end: 9, fill: green.lighten(70%)),
-          (line: 5, start: 8, end: 9, fill: red.lighten(70%)),
-        ))
+        codly(
+          highlights: (
+            (line: 3, start: 5, end: 8, fill: green),
+            (line: 6, start: 9, end: 9, fill: red),
+          ),
+        )
         ```rust
         let x: u32;
         if random() {
@@ -299,10 +302,12 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
       },
       table.cell(colspan: 2, fill: gray.lighten(80%))[*Move-Deinit*],
       {
-        codly(highlights: (
-          (line: 2, start: 15, end: 23, fill: green.lighten(70%)),
-          (line: 4, start: 8, end: 16, fill: green.lighten(70%)),
-        ))
+        codly(
+          highlights: (
+            (line: 2, start: 16, end: 22, fill: green),
+            (line: 4, start: 9, end: 15, fill: green),
+          ),
+        )
         ```rust
         let tuple = (vec![1], vec![2]);
         moves_argument(tuple.1);
@@ -311,10 +316,12 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
         ```
       },
       {
-        codly(highlights: (
-          (line: 2, start: 15, end: 23, fill: green.lighten(70%)),
-          (line: 4, start: 8, end: 16, fill: red.lighten(70%)),
-        ))
+        codly(
+          highlights: (
+            (line: 2, start: 16, end: 22, fill: green),
+            (line: 4, start: 9, end: 15, fill: red),
+          ),
+        )
         ```rust
         let tuple = (vec![1], vec![2]);
         moves_argument(tuple.0);
@@ -324,12 +331,14 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
       },
       table.cell(colspan: 2, fill: gray.lighten(80%))[*Shared-Readonly*],
       {
-        codly(highlights: (
-          (line: 3, start: 11, end: 14, fill: green.lighten(70%)),
-          (line: 4, start: 11, end: 14, fill: green.lighten(70%)),
-          (line: 5, start: 10, end: 11, fill: green.lighten(70%)),
-          (line: 5, start: 24, end: 25, fill: green.lighten(70%)),
-        ))
+        codly(
+          highlights: (
+            (line: 3, start: 9, end: 13, fill: green),
+            (line: 4, start: 9, end: 13, fill: green),
+            (line: 5, start: 11, end: 11, fill: green),
+            (line: 5, start: 25, end: 25, fill: green),
+          ),
+        )
         ```rust
         struct Point(u32, u32);
         let mut pt = Point(13, 17);
@@ -339,11 +348,13 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
         ```
       },
       {
-        codly(highlights: (
-          (line: 3, start: 11, end: 14, fill: green.lighten(70%)),
-          (line: 6, start: 0, end: 9, fill: red.lighten(70%)),
-          (line: 7, start: 10, end: 11, fill: green.lighten(70%)),
-        ))
+        codly(
+          highlights: (
+            (line: 3, start: 9, end: 13, fill: green),
+            (line: 6, start: 0, end: 9, fill: red),
+            (line: 7, start: 11, end: 11, fill: green),
+          ),
+        )
         ```rust
         struct Point(u32, u32);
         let mut pt = Point(13, 17);
@@ -357,11 +368,13 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
 
       table.cell(colspan: 2, fill: gray.lighten(80%))[*Unique-Write*],
       {
-        codly(highlights: (
-          (line: 3, start: 11, end: 19, fill: green.lighten(70%)),
-          (line: 4, start: 11, end: 19, fill: green.lighten(70%)),
-          (line: 6, start: 10, end: 11, fill: green.lighten(70%)),
-        ))
+        codly(
+          highlights: (
+            (line: 3, start: 9, end: 18, fill: green),
+            (line: 4, start: 9, end: 18, fill: green),
+            (line: 6, start: 11, end: 11, fill: green),
+          ),
+        )
         ```rust
         struct Point(u32, u32);
         let mut pt = Point(13, 17);
@@ -372,12 +385,14 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
         ```
       },
       {
-        codly(highlights: (
-          (line: 3, start: 11, end: 19, fill: red.lighten(70%)),
-          (line: 6, start: 11, end: 19, fill: red.lighten(70%)),
-          (line: 7, start: 10, end: 11, fill: red.lighten(70%)),
-          (line: 8, start: 10, end: 11, fill: green.lighten(70%)),
-        ))
+        codly(
+          highlights: (
+            (line: 3, start: 9, end: 18, fill: red),
+            (line: 6, start: 9, end: 18, fill: red),
+            (line: 7, start: 11, end: 11, fill: red),
+            (line: 8, start: 11, end: 11, fill: green),
+          ),
+        )
         ```rust
         struct Point(u32, u32);
         let mut pt = Point(13, 17);
@@ -392,10 +407,12 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
 
       table.cell(colspan: 2, fill: gray.lighten(80%))[*Ref-Live*],
       {
-        codly(highlights: (
-          (line: 4, start: 4, end: 7, fill: green.lighten(70%)),
-          (line: 7, start: 8, end: 11, fill: green.lighten(70%)),
-        ))
+        codly(
+          highlights: (
+            (line: 4, start: 5, end: 7, fill: green),
+            (line: 7, start: 9, end: 11, fill: green),
+          ),
+        )
         ```rust
         struct Point(u32, u32);
         let pt = Point(6, 9);
@@ -407,10 +424,12 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
         ```
       },
       {
-        codly(highlights: (
-          (line: 4, start: 4, end: 7, fill: red.lighten(70%)),
-          (line: 8, start: 8, end: 11, fill: red.lighten(70%)),
-        ))
+        codly(
+          highlights: (
+            (line: 4, start: 5, end: 7, fill: red),
+            (line: 8, start: 9, end: 11, fill: red),
+          ),
+        )
         ```rust
         struct Point(u32, u32);
         let x = {
