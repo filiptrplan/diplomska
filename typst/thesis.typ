@@ -446,6 +446,502 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
   ) <tab:borrow-check>
 ]
 
+Pravilo `Use-Init` nam pove, da lahko uporabljamo samo spremenljivke, ki so zagotovo inicializirane
+na točki v programu, kjer jih uporabljamo. Glede na prvotno implementacije Poloniusa Rustove ekipe poleg
+osnovnih dejstev opisanih v spletni objavi dobimo še dejstva `var_defined_at`, `var_used_at` in
+`var_dropped_at` @RustlangPoloniusDefines.
+
+Mogoče tole zgoraj ni tako relevantno, ker se ukvarjamo z implementacijo že. Lahko definiramo množico
+$"Poti"(p)$, ki nam poda vse poti skozi graf poteka od začetka funkcije do začetka trenutne točke $p$
+v programu. Potem lahko definiramo še predikat $"Init"(pi, x, p)$, ki velja natanko tedaj, ko je spremenljivka
+$x$ skozi pot $pi$ definirana na točki $p$. Končno pravilo se nato glasi:
+
+$ "Use-Init"(x, p) <==> forall pi in "Poti"(p): "Init"(pi, x, p) $
+
+// https://rustc-dev-guide.rust-lang.org/borrow_check/moves_and_initialization/move_paths.html za definicijo move path
+Opomba o mestih in poteh premika (_move path_): pojem predpone (_prefix_) je načeloma definiran za pot
+premika, vendar ga tukaj posplošimo na mesta iz MIR, ker se nam bolj sklada s terminologijo, ki jo uporabljamo.
+Rustov priročnik za prevajalnik tudi omeni, da sta ta pojma približno enaka. Uporabljamo ga namesto spremenljivk
+zaradi tega, ker nam opiše lahko bolj fino dostopne podatke kot so polja struktov.
+
+Za pravilo Move-Deinit moramo vpeljati še dva predikata. Prvi nam bo povedal ali se mesti
+prekrivata t.j. ali je katero mesto predpona drugega (v Rustovem prevajalniku se temu reče _prefix_). Poimenovali
+ga bomo $"Prekrivanje"(m_1, m_2)$, ki velja natanko tedaj, ko je $m_1$ predpona $m_2$ ali obratno. Torej
+$"Prekrivanje"("tuple.0", "tuple.0.1")$ bi veljalo, $"Prekrivanje"("tuple.0", "tuple.1")$ pa ne.
+
+Naslednji predikat, ki ga uvedemo je $"Premaknjen"(pi, m, p)$, ki velja natanko tedaj, ko je bilo mesto $m$ premaknjeno
+pred točko $p$ na poti $pi$. Kaj točno je premik moram še malo pobrskati po dokumentaciji ampak konceptualno to pomeni,
+da lastnik ni več $m$ ampak nekdo drug. Torej pravilo velja ko:
+
+$ "Move-Deinit"(m, p) <==> \ & nexists pi in "Poti"(p), m_2: "Prekrivanje"(m, m_2) and "Premaknjen"(pi, m_2, p) $
+
+Za naslednji pravili Shared-Readonly in Unique-Write moramo definirati še nekaj predikatov. Ker se tokrat
+ukvarjamo s posojami, moramo razločevati met deljenimi in spremenljivimi (unikatnimi). V ta namen vpeljemo
+predikat $"VrstaPosoje"(L) in {"shrd", "uniq"}$. Da pa lahko razločimo med aktivnimi in preteklimi posojami
+pa ustvarimo predikat $"PosojaAktivna"(L,p)$, ki velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$.
+Mesto, ki je bilo sposojeno z posojo $L$ označimo z $O(L)$.
+
+Poleg predikatov za posoje pa nam še manjkajo predikati, ki opisujejo operacije, ki se izvajajo nad mesti.
+Intuitivno je to lahko več različnih operacij vendar nas zanimajo dve vrsti. Take, ki bi razveljavile deljeno
+posojo označimo z $"RazveljaviDeljeno"(m,p)$ in velja natanko tedaj, ko se v točki $p$ nad mestom $m$ izvede
+taka operacija, ki bi lahko razveljavila posojo, ki si sposoja iz mesta $m$ (to bi bilo ali pisanje v mesto $m$ ali
+pa ustvarjanje spremenljive posoje).
+
+Na podoben način definiramo $"RazveljaviSpremenljivo"(m,p)$, ki velja ko je operacija taka, ki razveljavi
+spremenljivo posojo (ustvarjanje kakršnekoli nove posoje, pisanje v mesto, branje iz mesta).
+Tako lahko sestavimo naši naslednji dve pravili:
+
+$ "Shared-Readonly"(p) &<==> nexists L,m: \
+"PosojaAktivna"(L,p) &and "VrstaPosoje" = "shrd" and \
+"Prekrivanje"(m, O(L)) &and "RazveljaviDeljeno"(m,p) $
+
+$ "Unique-Write"(p) &<==> nexists L,m: \
+"PosojaAktivna"(L,p) &and "VrstaPosoje" = "uniq" and \
+"Prekrivanje"(m, O(L)) &and "RazveljaviSpremenljivo"(m,p) $
+
+Za zadnje pravilo potrebujemo še en predikat imenovan $"MestoAktivno"(m,p)$, ki velja natanko tedaj,
+ko je mesto $m$ še aktivno (torej ni bilo dropped) na točki $p$. Potem pravilo Ref-Live lahko zapišemo tako:
+
+$ "Ref-Live"(p) &<==> nexists L, m: \
+"PosojaAktivna"(L,p) &and "Prekrivanje"(m, O(L)) and not "MestoAktivno"(m,p) $
+
+== Primer
+
+Tekom članka bomo uporabljali naslednji primer izvorne kode anotiran z abstraktnimi regijami (te nimajo čiste bijektivne korespondence z
+dejanskimi Rustovimi življenjskimi dobami). Vsi primeri so izvzeti iz originalne spletne objave.
+
+#figure(
+  ```rust
+  fn main() {
+    let mut x: i32 = 22;
+    let mut v: Vec<&'0 i32> = vec![];
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+    let p: &'5 i32 = &'4 x;
+    r.push(p);
+    x += 1;
+    take::<Vec<&'6 i32>>(v);
+  }
+  fn take<T>(p: T) { .. }
+  ```,
+  caption: [Primer programa za Polonius],
+) <listing:primerPolonius>
+
+== Definicije pojmov
+
+/ Referenca: v Rust-u je podobna kazalcu v ostalih programskih jezikih, vendar prevajalnik zagotavlja, da kaže
+  na veljavno vrednost podanega tipa za celotno dobo aktivnosti reference (? pisalo je for the life of the reference) @klabnikRustProgrammingLanguage2023.
+  Reference ločimo na dva tipa @crichtonGroundedConceptualModel2023 @yanovskiGhostCellSeparatingPermissions2021 @weissOxideEssenceRust2019:
+  - *Deljena referenca (_shared / immutable reference_)*: V programu lahko ustvarimo več deljenih referenc, ki
+    kažejo na isto mesto, vendar podatkov na tem mestu ne smemo spreminjati.
+  - *Spremenljiva referenca (_unique / mutable reference_)*: Da lahko mutiramo mesto na katerega kaže
+    referenca, ustvarimo spremenljivo referenco, ki je ena sama in nam omogoča spreminjanje vrednosti zapisane na posameznem mestu.
+    V literaturi jim večinoma pravijo _unique references_, vendar smo izbrali prevod _"spremenljiva"_, saj _"edinstvena"_ ne zveni ustrezno.
+  - Tovrsten tip omejevanja ustvarjanja referenc se imenuje _aliasing XOR mutability_. Ta model s pomočjo tipov
+    poveže podatke z dovoljenjimi operacijami, ki jih lahko izvajamo na teh podatkih @yanovskiGhostCellSeparatingPermissions2021.
+
+/ Življenska doba (_lifetime_): Vsaka referenca ima življenjsko dobo, ki nam opiše doseg v programu znotraj katerega je
+  referenca še vedno veljavna (torej kaže na veljavno mesto) @klabnikRustProgrammingLanguage2023.
+
+/ Posoja (_loan_): je tesno povezana s sorodnim pojmom *izraz izposoje* (_borrow expression_). Izraz izposoje
+  je jezikovni konstrukt, ki nam omogoča, da ustvarimo referenco (primer izraza izposoje bi bil `&mut x`).
+  Rustov priročnik za prevajlnik @MIRMidlevelIR pojma _borrow expression_ ne definira, ampak ga uporabi tako:
+  
+  #quote[An Rvalue is an expression that creates a value: in this case, the rvalue is a
+  mutable borrow expression, which looks like `&mut <Place>`]
+  
+  Rvalue pa je definiran z enumeratorjem `Rvalue` @RvalueRustc_middleMira. Nas pa zanima specifično
+  varianta `Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)`, ki ustvari referenco tipa `BorrowKind`
+  na mesto `Place`.
+  
+  Pojem _borrow expression_ pogosto uporabljajo @weissOxideEssenceRust2019 v svojem članku o formalizaciji
+  podmnožice Rust-a. Njihov način uporabe se sklada z našo definicijo.
+  
+  *Posoja* (_loan_) je interni konstrukt prevajalnika, ki hrani stanje o referenci in njenemu izvoru
+  @weissOxideEssenceRust2019. V trenutni implementaciji preverjalnika izposoj je izposoja predstavljena kot
+  urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer je:
+  - `'a`: življenjska doba za katero je vrednost izposojena. To se nanaša na življenjske dobe kot
+    del Rustovega sistema tipov, ne pa kot množico izposoj, kot jih bomo definirali kasneje.
+  - `shared|uniq|mut`: tip izposoje
+  - `lvalue`: vrednost, ki je bila izposojena
+
+/ NLL: je trenutna implementacija preverjevalnika izposoj v Rust-ovem prevajalniku.
+
+== Osnovne množice in elementi
+
+=== Množica posoj $cal(L)$
+
+Množico vseh posoj (_angl. loans_) označimo z $cal(L)$. *Pogoji posoje* so lastnosti, ki morajo
+držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno.
+Pravimo, da *razveljavimo pogoje posoje*, če velja ena izmed naslednjih točk:
+- Referenca je deljena (_shared_), torej je oblike `&x` in
+  - ustvarimo novo spremenljivo referenco
+  - pišemo v mesto, ki je bilo izposojeno
+- Referenca je spremenljiva in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
+
+Ta pravila načeloma sledijo NLLm, bolj formalno jih opisujejo pravila razveljavljanja posoje (_loan killed_).
+Iz NLL RFC-ja @2094nllRustRFC:
+
+#quote[For a statement at point P in the graph, we define the "transfer function" – that is,
+which loans it brings into or out of scope – as follows:
+- ...
+- if this is an assignment `lv = <rvalue>`, then any loan for some path P of which `lv` is a prefix is killed.]
+
+kjer je pojem _prefix_ definiran tako:
+
+#quote[*Prefixes*. We say that the prefixes of an lvalue are all the lvalues you get by stripping away fields and derefs.
+The prefixes of `*a.b` would be `*a.b`, `a.b`, and `a`.]
+
+V članku avtor pravi posojam tudi izrazi izposoje (_borrow expressions_). V našem primeru bi se posoje ustvarile na naslednjih
+mestih:
+
+#figure(
+  ```rust
+  fn main() {
+    let mut x: i32 = 22;
+    let mut v: Vec<&'0 i32> = vec![];
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v; // posoja $L_0$
+    let p: &'5 i32 = &'4 x; // posoja $L_1$
+    r.push(p);
+    x += 1;
+    take::<Vec<&'6 i32>>(v);
+  }
+  fn take<T>(p: T) { .. }
+  ```,
+  caption: [Posoje v programu],
+) <listing:loans>
+
+=== Množica regij $cal(R)$
+
+V trenutni implementaciji preverjevalnika izposoj NLL se posoje spremljajo s pomočjo življenjskih dob.
+V tej formulaciji pa je avtor življenjske dobe poimenoval regije (_regions_).
+Množica regij je označena z $cal(R) subset 2^cal(L)$.
+Na primeru so že označene z `'1`, `'2`, `'3`, itd. Pripadnost posoj regijam bomo kasneje določili z relacijo.
+
+=== Graf poteka izposoje
+
+Graf poteka (_angl. CFG - control flow graph_) je izračunan v prejšnjih fazah analize kode.
+Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
+ki nam bodo kasneje prišle prav. Te so izračunane tekom analize poteka podatkov
+(_dataflow analysis_) @MIRDataflowRust. Graf poteka označimo s $C = (C_V, C_E)$, kjer
+je $C_V$ množica vozlišč in $C_E$ množica povezav.
+
+Privzeto se ustvarijo naslednje povezave (to bi moral potrditi v kodi rustc, v članku tako piše):
+
+- Za vsak stavek se ustvari povezava med njegovim začetkom in sredino:
+  $forall "stmt" in cal(S): (S("stmt"), M("stmt")) in C_E$
+- Če $M("stmt")$ predstavlja _terminator_ (stavek na koncu bloka) potem dodamo povezavo iz njega v $S("stmt"')$
+  za vsak stavek $"stmt"'$, ki mu sledi.
+
+_Opomba:_ To je samo matematična formulacija predstavitve grafa poteka, v prevajalniku
+je njegova predstavitev precej bolj kompleksna.
+
+==== Množica stavkov in točk
+
+Množico vseh stavkov v MIR označimo s $cal(S)$. Točke v grafu poteka (_CFG - control flow graph_)
+označimo s $cal(P)$. Lahko so dveh tipov:
+- *na začetku stavka:* označuje trenutek preden se stavek izvede. Označimo s $S("stmt")$.
+- *med stavkom:* označuje trenutek tik preden ima stavek učinek (v članku napisano "just before the statement takes effect").
+  Označimo s $M("stmt")$.
+
+Avtor spletne objave ne opredeli pojmov _na začetku stavka_ in _med stavkom_ natančno,
+vendar lahko najdemo razlago v `legacy` implementaciji Polonius preverjevalnika izposoj.
+Komentar nad strukturo, ki opisuje množico stavkov, pravi naslednje @RustCompilerRustc_borrowcka:
+
+#quote[Ta struktura prevede MIR lokacijo, ki identificira stavek znotraj osnovnega bloka, v "obogateno lokacijo",
+kar nam omogoči večjo granularnost. Bolj podrobno, ločimo med začetkom in sredino stavka. Sredina stavka
+je točka _tik preden_ ima stavek učinek. Torej za prirejanje `A = B` bi bila sredina stavka
+točka trenutek ravno preden bi se `B` zapisal v `A` ...]
+
+=== Začetne relacije
+
+Relacijo označimo kot *začetno* (_input_), ko jo dobimo tako, da jo izpeljemo
+iz direktno analize poteka podatkov. Te relacije bodo predstavljale našo izhodiščno točko iz katere bomo izpeljali druge relacije.
+
+==== Začetna relacija vsebovanosti
+
+Začetno relacijo vsebovanosti (_base subset_) bomo označili z
+$beta subset cal(R) times cal(R) times cal(P)$. Torej to je relacija, ki povezuje dve regiji
+ob neki točki v programu.
+
+Bolj natančno, če velja $(R_1, R_2, P) in beta$ pomeni, da je $R_1$ podmnožica regije $R_2$ na točki $P$ v programu.
+To dejstvo mora veljati na sredini stavka ($M("stmt")$), ki inducira zahtevo.
+
+_Opomba:_ Oznaka `<:` nam predstavlja vsebovanost med tipi (_subtyping relation_).
+
+#figure(
+  ```rust
+  fn main() {
+    let mut x: i32 = 22;
+    let mut v: Vec<&'0 i32> = vec![];
+
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+    // tukaj zahtevamo naslednje: &'3 mut Vec<&'0 i32> <: &'1 mut Vec<&'2 i32>
+    // $('3, '1, P) in beta, ('0, '2, P) in beta, ('2, '0, P) in beta$
+
+    let p: &'5 i32 = &'4 x;
+    // zahtevamo: &'4 i32 <: &'5 i32
+    // $('4, '5, P) in beta$
+
+    r.push(p);
+    // zahtevamo: &'5 i32 <: &'2 i32
+    // $('5, '2, P) in beta$
+
+    x += 1;
+
+    take::<Vec<&'6 i32>>(v);
+    // zahtevamo Vec<&'0 i32> <: Vec<&'6 i32>
+    // $('0, '6, P) in beta$
+  }
+  ```,
+  caption: [Začetna relacija vsebovanosti],
+)
+
+==== Začetna relacija posoje regij
+
+Začetno relacijo posoje regij (_borrow region_) označimo s $psi subset.eq cal(R) times cal(L) times cal(P)$.
+
+Če velja $(R,L,P) in psi$ pomeni, da izraz izposoje na točki $P$ ustvari posojo $L$ in postane del
+regije $R$. Prav tako kot relacija vsebovanosti se ta zahteva vzpostavi na sredini stavka.
+
+#figure(
+  ```rust
+  fn main() {
+    let mut x: i32 = 22;
+    let mut v: Vec<&'0 i32> = vec![];
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+    // $('3, L_0, P) in psi$
+    let p: &'5 i32 = &'4 x;
+    // $('4, L_1, P) in psi$
+    r.push(p);
+    x += 1;
+    take::<Vec<&'6 i32>>(v);
+  }
+  ```,
+  caption: [Začetna relacija posoje regij],
+)
+
+==== Relacija aktivnosti regije
+
+Začetno relacijo aktivnosti regije (_region live at_) označimo z $nabla_R subset.eq cal(R) times cal(P)$.
+$(R, P) in nabla_R$ pomeni, da je regija $R$ aktivna na točki $P$. Torej spremenljivka, katere tip vključuje $R$ (recimo `&'a`),
+bo morda kasneje v programu uporabljena.
+
+To določi analiza aktivnosti, ki poteka isto kot v NLL RFC. Bolj specifično, s pomočjo raznih omejitev izračuna množico točk
+kjer mora biti regija (v RFC-ju poimenovana _lifetime_) aktivna @2094nllRustRFC.
+
+==== Relacija prekinitve posoje
+
+Začetno relacijo prekinitve posoje (_loan killed at_) označimo s $kappa subset.eq cal(L) times cal(P)$.
+$(L,P) in kappa$ pomeni, da je posoja $L$ prekinjena (_killed_) na točki $P$. Pojem prekinitve oziroma razveljavitve
+pogojev smo definirali že zgoraj. To se običajno zgodi na sredini prireditvenega stavka, ki prepiše pot (_path_) prej povezano s posojo $L$.
+
+V našem primeru nimamo nobenega primera prekinitve posoje, je pa relacija ključna v naslednjem primeru:
+
+#figure(
+  ```rust
+  let p = 22;
+  let q = 44;
+  let x: &mut i32 = &mut p; // `x` kaže na `p`
+  let y = &mut *x; // Posoja L0, `y` kaže tudi na `p`
+  // ...
+  x = &mut q; // `x` kaže na `q`; prekine L0
+  // Lahko uporabimo *x tukaj
+  ```,
+  caption: [Primer prekinitve posoje],
+) <listing:loanKilled>
+
+V tem primeru je `x` referenca na `p`, ki je prekopirana v `y`. Dostop do `*x` bi bil tukaj neveljaven,
+ker si ga je `y` izposodil. Ko pa `x` priredimo novo vrednost, pa razveljavimo posojo `L0` in s tem si že spet
+omogočimo dostop do `x`. Brez prekinitve bi Polonius mislil, da je mesto `*x` še vedno izposojeno, čeprav
+zdaj `y` kaže na `p` in `x` na `q`.
+
+==== Relacija razveljavitve posoje
+
+Začetno relacijo razveljavitve posoje (_invalidates loan_) označimo z $iota subset cal(P) times cal(L)$.
+To pomeni, da dejanje na točki $P$ (recimo mutacija izposojenega mesta) razveljavi pogoje posoje $L$, kar
+je že opisano v poglavju o definicije množice $cal(L)$.
+
+#figure(
+  ```rust
+  fn main() {
+    let mut x: i32 = 22;
+    let mut v: Vec<&'0 i32> = vec![];
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+    // $('3, L_0, P) in psi$
+    let p: &'5 i32 = &'4 x;
+    // $('4, L_1, P) in psi$
+    r.push(p);
+    x += 1; // tukaj razveljavimo $L_1$ z mutacijo deljenega referenta
+    take::<Vec<&'6 i32>>(v);
+  }
+  ```,
+  caption: [Primer razveljavitve posoje],
+) <listing:loanInvalidated>
+
+=== Izpeljane relacije
+
+V tem poglavju bomo opisali relacije, ki jih izpeljemo iz začetnih. Te relacije tvorijo najbolj pomembni del analize
+Polonius-a.
+
+V primerih ne bomo označevali točk v grafu poteka pri relacijah, ker bo koda anotirana na tistem mestu, kjer
+se posamezna relacija pojavi. V ozadju se to še vedno izvaja na nivoju MIR, vendar za naše poenostavljene
+primere to ni ključna informacija. (torej pisali bomo $(R_1, R_2) in beta$ namesto $(R_1, R_2, P) in beta$).
+
+==== Relacija vsebovanosti
+
+Razširimo začetno relacijo vsebovanosti z (raširjeno) relacijo vsebovanosti (_subset_), ki jo označimo z
+$Gamma subset.eq cal(R) times cal(R) times cal(P)$. Definirana je z zaprtjem naslednjih pravil:
+
++ *Začetna relacija:* Če $(R_1, R_2, P) in beta$, potem $(R_1, R_2, P) in Gamma$. Torej vse trojice
+  iz začetne relacije se pojavijo tudi v razširjeni.
++ *Tranzitivnost:* Če $(R_1, R_2, P) in Gamma$ in $(R_2, R_3, P) in Gamma$, potem $(R_1, R_3, P) in Gamma$.
+  Relacija vsebovanosti na isti točki v programu je tranzitivna.
++ *Propagacija:* Če veljajo vse izmed naštetega:
+  + $(R_1, R_2, P) in Gamma$
+  + $(P, Q) in C_E$: točki si sledita v grafu poteka
+  + $(R_1, Q) in nabla_R$: regija 1 je aktivna na naslednji točki
+  + $(R_2, Q) in nabla_R$: regija 2 je aktivna
+  
+  potem sledi $(R_1, R_2, Q) in Gamma$. To pomeni, da se relacija propagira čez graf poteka, če sta obe
+  regiji aktivni na naslednji točki v grafu. Pogoj za aktivnost nam pride prav kasneje.
+
+Na primeru ustvarimo naslednje relacije:
+
+#figure(
+  ```rust
+  fn main() {
+    let mut x: i32 = 22;
+    let mut v: Vec<&'0 i32> = vec![];
+
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+    // $('3, '1) in beta, ('0, '2) in beta, ('2, '0) in beta$
+
+    let p: &'5 i32 = &'4 x;
+    // $('3, '1) in beta, ('0, '2) in beta, ('2, '0) in beta$
+    // $('4, '5) in beta$
+
+    r.push(p);
+    // $('3, '1) in beta, ('0, '2) in beta, ('2, '0) in beta$
+    // $('4, '5) in beta$
+    // $('5, '2) in beta$
+
+    x += 1;
+
+    take::<Vec<&'6 i32>>(v);
+    // $('3, '1) in beta, ('0, '2) in beta, ('2, '0) in beta$
+    // $('4, '5) in beta$
+    // $('5, '2) in beta$
+    // $('0, '6) in beta$
+  }
+
+  fn take<T>(p: T) { .. }
+  ```,
+  caption: [Relacija vsebovanosti],
+) <listing:subsetRelations>
+
+==== Relacija zahteve
+
+Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Označimo jo s
+$zeta subset.eq cal(R) times cal(L) times cal(P)$ in definirana je z zaprtjem naslednjih pravil:
+
++ *Začetna relacija:* Če $(R, L, P) in psi$, potem $(R, L, P) in zeta$. To nam pove, da če se trojica
+  nahaja v relaciji posoje regij, se nahaja tudi v $zeta$.
++ *Vsebovanost:* Če velja $(R_1, L, P) in zeta$ in $(R_1, R_2, P) in Gamma$, potem sledi
+  $(R_2, L, P) in zeta$. To nam pove, da če neka regija $R_1$, ki je podmnožica večje regije $R_2$, na točki $P$
+  zahteva posojo $L$, potem tudi $R_2$ zahteva isto posojo.
++ *Propagacija:* Če veljajo vse:
+  + $(R,L,P) in zeta$: $R$ zahteva $L$ na $P$
+  + $(L, P) in.not kappa$: $L$ ni prekinjena na $P$
+  + $(P, Q) in C_E$: $Q$ sledi $P$ v grafu poteka
+  + $(R,Q) in nabla_R$: regija $R$ je aktivna na točki $Q$
+  
+  potem propagiramo relacijo v $(R,L,Q) in zeta$.
+
+Opazimo, da pri relaciji vsebovanosti $beta$ in pri relaciji zahteve $zeta$ mora biti regija pri pravilu
+za propagacijo aktivna na naslednji točki $Q$. Z naslednjim primerom ponazorimo zakaj je to ključna omejitev.
+
+#figure(
+  ```rust
+  let x = 22;
+  let y = 44;
+
+  let mut p: &'0 i32 = &'1 x; // posoja $L_0$
+  // $('1,'0) in beta$
+  // $('1, L_0) in zeta$
+
+  p = &'3 y; // posoja $L_1$
+  // $('3,'0) in beta$
+  // $('3, L_1) in zeta$
+  // '1 ni več aktivna, ker smo jo prepisali z '3
+
+  x += 1;
+  // razveljavi se posoja $L_0$ $(L_0) in iota$
+  // tukaj bi brez pravila o aktivnosti regij še vedno zahtevali
+  // $(L_0, '0) in zeta$ zaradi pravila o propagaciji
+
+  print( *p );
+  // ta izraz posledično ne bi bil veljaven
+  ```,
+  caption: [Primer relacije zahteve],
+) <listing:reqRelation>
+
+==== Relacija aktivnosti posoje
+
+Relacija aktivnosti posoje (_loan live at_) pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s
+$nabla_L subset.eq cal(L) times cal(P)$ in jo definiramo takrat, ko
+
+$ exists R in cal(R): (R,P) in nabla_R and (R,L,P) in zeta $
+
+To na kratko pomeni, da je posoja aktivna, če jo na isti točki zahteva neka aktivna regija.
+
+=== Javljanje napake
+
+S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu javimo napako (v obsegu preverjalnika posoj).
+Že spet si pomagamo z relacijo, ki jo tokrat poimenujemo *relacija napake* (_error_) in jo označimo z
+$epsilon subset cal(P)$. Ta relacija nam pove, da javimo napako na točki $P$ v programu.
+
+Definiramo jo, ko velja:
+
+$ exists L in cal(L): (P, L) in iota and (L,P) in nabla_L $
+
+Torej napaka se javi natanko tedaj, ko neko dejanje na točki $P$ razveljavi pogoje posoje $L$, ki je hkrati tudi
+aktivna na točki $P$.
+
+Poglejmo še kako se dokončno napaka javi na našem primeru:
+
+#figure(
+  ```rust
+  fn main() {
+    let mut x: i32 = 22;
+    let mut v: Vec<&'0 i32> = vec![];
+
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+    // relacije, ki so ustvarjene tukaj niso relevantne za napako
+
+    let p: &'5 i32 = &'4 x;
+    // $('4, L_1) in zeta$
+    // $('4, '5) in beta ==> ('5, L_1) in zeta$
+
+    r.push(p);
+    // $('5, '2) in beta ==> ('2, L_1 in zeta)$
+
+    x += 1;
+    // Tukaj se razveljavi posoja $L_1$: $(L_1) in iota$.
+    // Da se nam javi napaka mora biti ta posoja aktivna $(L_1) in nabla_L$.
+    // Torej jo mora zahtevati neka aktivna regija, na trenutni točki pa je
+    // aktivna regija '2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš
+    // vektor `v`. Elementi vektorja pa imajo regijo `'2`, ki pa je del posoje $L_1$.
+    // Torej, ker smo razveljavili posojo $L_1$, medtem ko je bila aktivna regija,
+    // ki jo ta posoja zahteva, javimo napako.
+
+    take::<Vec<&'6 i32>>(v);
+  }
+
+  fn take<T>(p: T) { .. }
+  ```,
+  caption: [Napaka v programu],
+) <listing:error>
+
 #pagebreak()
 #bibliography("thesis.bib")
 
