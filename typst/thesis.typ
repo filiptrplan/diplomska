@@ -446,6 +446,9 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
   ) <tab:borrow-check>
 ]
 
+// reset codly stuff
+#codly(display-name: true, display-icon: true, number-format: numbering.with("1"))
+
 Pravilo `Use-Init` nam pove, da lahko uporabljamo samo spremenljivke, ki so zagotovo inicializirane
 na točki v programu, kjer jih uporabljamo. Glede na prvotno implementacije Poloniusa Rustove ekipe poleg
 osnovnih dejstev opisanih v spletni objavi dobimo še dejstva `var_defined_at`, `var_used_at` in
@@ -473,7 +476,7 @@ Naslednji predikat, ki ga uvedemo je $"Premaknjen"(pi, m, p)$, ki velja natanko 
 pred točko $p$ na poti $pi$. Kaj točno je premik moram še malo pobrskati po dokumentaciji ampak konceptualno to pomeni,
 da lastnik ni več $m$ ampak nekdo drug. Torej pravilo velja ko:
 
-$ "Move-Deinit"(m, p) <==> \ & nexists pi in "Poti"(p), m_2: "Prekrivanje"(m, m_2) and "Premaknjen"(pi, m_2, p) $
+$ "Move-Deinit"(m, p) <==> \ exists.not pi in "Poti"(p), m_2: "Prekrivanje"(m, m_2) and "Premaknjen"(pi, m_2, p) $
 
 Za naslednji pravili Shared-Readonly in Unique-Write moramo definirati še nekaj predikatov. Ker se tokrat
 ukvarjamo s posojami, moramo razločevati met deljenimi in spremenljivimi (unikatnimi). V ta namen vpeljemo
@@ -491,19 +494,25 @@ Na podoben način definiramo $"RazveljaviSpremenljivo"(m,p)$, ki velja ko je ope
 spremenljivo posojo (ustvarjanje kakršnekoli nove posoje, pisanje v mesto, branje iz mesta).
 Tako lahko sestavimo naši naslednji dve pravili:
 
-$ "Shared-Readonly"(p) &<==> nexists L,m: \
-"PosojaAktivna"(L,p) &and "VrstaPosoje" = "shrd" and \
-"Prekrivanje"(m, O(L)) &and "RazveljaviDeljeno"(m,p) $
+$
+  "Shared-Readonly"(p) &<==> exists.not L,m: \
+  "PosojaAktivna"(L,p) &and "VrstaPosoje" = "shrd" and \
+  "Prekrivanje"(m, O(L)) &and "RazveljaviDeljeno"(m,p)
+$
 
-$ "Unique-Write"(p) &<==> nexists L,m: \
-"PosojaAktivna"(L,p) &and "VrstaPosoje" = "uniq" and \
-"Prekrivanje"(m, O(L)) &and "RazveljaviSpremenljivo"(m,p) $
+$
+  "Unique-Write"(p) &<==> exists.not L,m: \
+  "PosojaAktivna"(L,p) &and "VrstaPosoje" = "uniq" and \
+  "Prekrivanje"(m, O(L)) &and "RazveljaviSpremenljivo"(m,p)
+$
 
 Za zadnje pravilo potrebujemo še en predikat imenovan $"MestoAktivno"(m,p)$, ki velja natanko tedaj,
 ko je mesto $m$ še aktivno (torej ni bilo dropped) na točki $p$. Potem pravilo Ref-Live lahko zapišemo tako:
 
-$ "Ref-Live"(p) &<==> nexists L, m: \
-"PosojaAktivna"(L,p) &and "Prekrivanje"(m, O(L)) and not "MestoAktivno"(m,p) $
+$
+  "Ref-Live"(p) &<==> exists.not L, m: \
+  "PosojaAktivna"(L,p) &and "Prekrivanje"(m, O(L)) and not "MestoAktivno"(m,p)
+$
 
 == Primer
 
@@ -545,17 +554,17 @@ dejanskimi Rustovimi življenjskimi dobami). Vsi primeri so izvzeti iz originaln
 / Posoja (_loan_): je tesno povezana s sorodnim pojmom *izraz izposoje* (_borrow expression_). Izraz izposoje
   je jezikovni konstrukt, ki nam omogoča, da ustvarimo referenco (primer izraza izposoje bi bil `&mut x`).
   Rustov priročnik za prevajlnik @MIRMidlevelIR pojma _borrow expression_ ne definira, ampak ga uporabi tako:
-  
+
   #quote[An Rvalue is an expression that creates a value: in this case, the rvalue is a
-  mutable borrow expression, which looks like `&mut <Place>`]
-  
+    mutable borrow expression, which looks like `&mut <Place>`]
+
   Rvalue pa je definiran z enumeratorjem `Rvalue` @RvalueRustc_middleMira. Nas pa zanima specifično
   varianta `Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)`, ki ustvari referenco tipa `BorrowKind`
   na mesto `Place`.
-  
+
   Pojem _borrow expression_ pogosto uporabljajo @weissOxideEssenceRust2019 v svojem članku o formalizaciji
   podmnožice Rust-a. Njihov način uporabe se sklada z našo definicijo.
-  
+
   *Posoja* (_loan_) je interni konstrukt prevajalnika, ki hrani stanje o referenci in njenemu izvoru
   @weissOxideEssenceRust2019. V trenutni implementaciji preverjalnika izposoj je izposoja predstavljena kot
   urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer je:
@@ -582,14 +591,15 @@ Ta pravila načeloma sledijo NLLm, bolj formalno jih opisujejo pravila razveljav
 Iz NLL RFC-ja @2094nllRustRFC:
 
 #quote[For a statement at point P in the graph, we define the "transfer function" – that is,
-which loans it brings into or out of scope – as follows:
-- ...
-- if this is an assignment `lv = <rvalue>`, then any loan for some path P of which `lv` is a prefix is killed.]
+  which loans it brings into or out of scope – as follows:
+  - ...
+  - if this is an assignment `lv = <rvalue>`, then any loan for some path P of which `lv` is a prefix is killed.
+]
 
 kjer je pojem _prefix_ definiran tako:
 
 #quote[*Prefixes*. We say that the prefixes of an lvalue are all the lvalues you get by stripping away fields and derefs.
-The prefixes of `*a.b` would be `*a.b`, `a.b`, and `a`.]
+  The prefixes of `*a.b` would be `*a.b`, `a.b`, and `a`.]
 
 V članku avtor pravi posojam tudi izrazi izposoje (_borrow expressions_). V našem primeru bi se posoje ustvarile na naslednjih
 mestih:
@@ -648,9 +658,9 @@ vendar lahko najdemo razlago v `legacy` implementaciji Polonius preverjevalnika 
 Komentar nad strukturo, ki opisuje množico stavkov, pravi naslednje @RustCompilerRustc_borrowcka:
 
 #quote[Ta struktura prevede MIR lokacijo, ki identificira stavek znotraj osnovnega bloka, v "obogateno lokacijo",
-kar nam omogoči večjo granularnost. Bolj podrobno, ločimo med začetkom in sredino stavka. Sredina stavka
-je točka _tik preden_ ima stavek učinek. Torej za prirejanje `A = B` bi bila sredina stavka
-točka trenutek ravno preden bi se `B` zapisal v `A` ...]
+  kar nam omogoči večjo granularnost. Bolj podrobno, ločimo med začetkom in sredino stavka. Sredina stavka
+  je točka _tik preden_ ima stavek učinek. Torej za prirejanje `A = B` bi bila sredina stavka
+  točka trenutek ravno preden bi se `B` zapisal v `A` ...]
 
 === Začetne relacije
 
@@ -801,7 +811,7 @@ $Gamma subset.eq cal(R) times cal(R) times cal(P)$. Definirana je z zaprtjem nas
   + $(P, Q) in C_E$: točki si sledita v grafu poteka
   + $(R_1, Q) in nabla_R$: regija 1 je aktivna na naslednji točki
   + $(R_2, Q) in nabla_R$: regija 2 je aktivna
-  
+
   potem sledi $(R_1, R_2, Q) in Gamma$. To pomeni, da se relacija propagira čez graf poteka, če sta obe
   regiji aktivni na naslednji točki v grafu. Pogoj za aktivnost nam pride prav kasneje.
 
@@ -854,7 +864,7 @@ $zeta subset.eq cal(R) times cal(L) times cal(P)$ in definirana je z zaprtjem na
   + $(L, P) in.not kappa$: $L$ ni prekinjena na $P$
   + $(P, Q) in C_E$: $Q$ sledi $P$ v grafu poteka
   + $(R,Q) in nabla_R$: regija $R$ je aktivna na točki $Q$
-  
+
   potem propagiramo relacijo v $(R,L,Q) in zeta$.
 
 Opazimo, da pri relaciji vsebovanosti $beta$ in pri relaciji zahteve $zeta$ mora biti regija pri pravilu
