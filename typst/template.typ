@@ -211,35 +211,39 @@
 
   #pagebreak()
 
-  // Slovenian abstract
-  #heading(level: 1, numbering: none, outlined: false)[Povzetek]
-  #v(1em)
-  *Naslov:* #title \
-  #v(1em)
-  *Avtor:* #author \
-  #v(1em)
-  *Povzetek:* \
-  #abstract_sl \
-  #v(1em)
-  *Ključne besede:* #keywords_sl
+  #[
+    #set par(first-line-indent: 0pt)
+    // Slovenian abstract
+    #heading(level: 1, numbering: none, outlined: false)[Povzetek]
+    #v(1em)
+    *Naslov:* #title \
+    #v(1em)
+    *Avtor:* #author \
+    #v(1em)
+    *Povzetek:* \
+    #abstract_sl \
+    #v(1em)
+    *Ključne besede:* #keywords_sl
 
-  #pagebreak()
 
-  // English abstract
-  #set text(lang: "en")
-  #heading(level: 1, numbering: none, outlined: false)[Abstract]
-  #v(1em)
-  *Title:* #title_en \
-  #v(1em)
-  *Author:* #author \
-  #v(1em)
-  *Abstract:* \
-  #abstract_en \
-  #v(1em)
-  *Keywords:* #keywords_en
-  #set text(lang: "sl")
+    #pagebreak()
 
-  #pagebreak()
+    // English abstract
+    #set text(lang: "en")
+    #heading(level: 1, numbering: none, outlined: false)[Abstract]
+    #v(1em)
+    *Title:* #title_en \
+    #v(1em)
+    *Author:* #author \
+    #v(1em)
+    *Abstract:* \
+    #abstract_en \
+    #v(1em)
+    *Keywords:* #keywords_en
+    #set text(lang: "sl")
+
+    #pagebreak()
+  ]
 
   #counter(page).update(1)
   #end_of_template.update(true)
