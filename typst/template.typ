@@ -32,6 +32,7 @@
 #let thesis(
   title: none,
   author: none,
+  faculty: none,
   study_program: none,
   mentor: none,
   year: none,
@@ -106,7 +107,7 @@
 
   #align(center + horizon)[
     #v(3em)
-    #large[#smallcaps[Univerza v Ljubljani #parbreak() Fakulteta za računalništvo in informatiko]]
+    #large[#smallcaps[Univerza v Ljubljani #parbreak() #faculty]]
     #v(10em)
     #autfont(author) #parbreak()
     #titfont(title) #parbreak()

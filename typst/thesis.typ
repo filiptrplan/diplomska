@@ -14,6 +14,7 @@
   study_program: [INTERDISCIPLINARNI UNIVERZITETNI \ ŠTUDIJSKI PROGRAM PRVE STOPNJE \ RAČUNALNIŠTVO IN MATEMATIKA],
   mentor: "doc. dr. Boštjan Slivnik",
   year: "2025",
+  faculty: "Fakulteta za računalništvo in informatiko",
   description: [
     Besedilo teme diplomskega dela študent prepiše iz študijskega informacijskega
     sistema, kamor ga je vnesel mentor. V nekaj stavkih bo opisal, kaj pričakuje
