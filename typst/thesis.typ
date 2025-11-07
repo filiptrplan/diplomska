@@ -113,7 +113,7 @@ Pri primeru @listing:mot_ex, kjer se NLL ne sprejme pravilnega programa, pa ga P
 // za vsak poskus povej iz katerega vidika so se ga lotili in kaj manjka
 
 == Sorodni modeli lastnistvu
-// GhostCell 
+// GhostCell
 // permission calculus
 // kako se povezujejo z Rustom
 
@@ -170,7 +170,7 @@ Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo 
   ```rust
   let a = 6;
   let b = &a; // ustvarimo deljeno referenco
-  println("{}", a); // lahko jo uporabimo, ker za izpis na 
+  println("{}", a); // lahko jo uporabimo, ker za izpis na
                     // ekran potrebujemo samo branje
   ```,
   caption: [Pravilna uporaba deljene reference],
@@ -180,7 +180,7 @@ Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo 
   ```rust
   let mut a = 6;
   let b = &mut a;
-  *b = 7; // lahko spremenimo podatke na pomnilniški lokaciji, 
+  *b = 7; // lahko spremenimo podatke na pomnilniški lokaciji,
           // ker je referenca spremenljiva
   ```,
   caption: [Pravilna uporaba spremenljive reference],
@@ -230,7 +230,7 @@ Pravila o referencah lahko povzamemo z dvemi pravili @klabnikRustProgrammingLang
       }                     // -+       |
                             //          |
       println!("r: {r}");   //          |
-  }                         // ---------+ 
+  }                         // ---------+
   ```,
   caption: [Anotirane življenjske dobe na primeru],
 ) <lst:lifetime-annotate>
@@ -251,113 +251,113 @@ V temu poglavju bomo sprva predstavili intuitivni opis delovanja Poloniusa in te
 Da Rustov preverjevalnik izposoj zadosti zagotovilom o varnosti programa mora zavrniti programe,
 ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
 
-#figure(
-  kind: table,
-  table(
-    columns: (auto, 1fr, 1fr),
-    align: (left, left, left),
-    
-    table.header[*Pravilo*][*Pozitiven primer*][*Negativen primer*],
-    
-    table.cell(colspan: 3, fill: gray.lighten(80%))[*Use-Init*],
-    [],
-    ```rust
-    let x: u32;
-    if random() {
-        x = 17;
-    } else {
-        x = 18;
-    }
-    let y = x + 1;
-    ```,
-    ```rust
-    let x: u32;
-    if random() {
-        x = 17;
-    }
-    // ERROR: x not initialized:
-    let y = x + 1;
-    ```,
-    
-    table.cell(colspan: 3, fill: gray.lighten(80%))[*Move-Deinit*],
-    [],
-    ```rust
-    let tuple = (vec![1], vec![2]);
-    moves_argument(tuple.1);
-    // Does not overlap tuple.1:
-    let x = tuple.0[0];
-    ```,
-    ```rust
-    let tuple = (vec![1], vec![2]);
-    moves_argument(tuple.0);
-    // ERROR: use of moved value:
-    let x = tuple.0[0];
-    ```,
-    
-    table.cell(colspan: 3, fill: gray.lighten(80%))[*Shared-Readonly*],
-    [],
-    ```rust
-    struct Point(u32, u32);
-    let mut pt = Point(13, 17);
-    let x = &pt;
-    let y = &pt;
-    dummy_use(x); dummy_use(y);
-    ```,
-    ```rust
-    struct Point(u32, u32);
-    let mut pt = Point(13, 17);
-    let x = &pt;
-    // ERROR: assigned to
-    //   borrowed value:
-    pt.0 += 1;
-    dummy_use(x);
-    ```,
-    
-    table.cell(colspan: 3, fill: gray.lighten(80%))[*Unique-Write*],
-    [],
-    ```rust
-    struct Point(u32, u32);
-    let mut pt = Point(13, 17);
-    let x = &mut pt;
-    let y = &mut pt;
-    //dummy_use(x);
-    dummy_use(y);
-    ```,
-    ```rust
-    struct Point(u32, u32);
-    let mut pt = Point(13, 17);
-    let x = &mut pt;
-    // ERROR: cannot borrow `pt`
-    // as mutable more than once:
-    let y = &mut pt;
-    dummy_use(x);
-    dummy_use(y);
-    ```,
-    
-    table.cell(colspan: 3, fill: gray.lighten(80%))[*Ref-Live*],
-    [],
-    ```rust
-    struct Point(u32, u32);
-    let pt = Point(6, 9);
-    let x = {
-        &pt
-    }; // pt still in scope
+#pagebreak()
+#[
+  #show figure: set block(breakable: true)
+  #set block(breakable: true)
+  #set raw(block: true)
+  #show raw: set block(breakable: false)
+  #figure(
+    kind: table,
+    table(
+      columns: (1fr, 1fr),
+      align: (left, left),
 
-    let z = x.0;
-    ```,
-    ```rust
-    struct Point(u32, u32);
-    let x = {
-        let pt = Point(6, 9);
-        &pt
-    }; // pt goes out of scope
-    // ERROR: pt does not live
-    // long enough:
-    let z = x.0;
-    ```,
-  ),
-  caption: [Pravila preverjevalnika izposoj iz @stjernaModellingRustsReference. Pozitivni primeri predstavljajo mesta, kjer preverjevalnik sprejme kodo, negativni pa kjer jo zavrne.],
-) <tab:borrow-check>
+      table.header[*Pozitiven primer*][*Negativen primer*],
+
+      table.cell(colspan: 2, fill: gray.lighten(80%))[*Use-Init*],
+      ```rust
+      let x: u32;
+      if random() {
+          x = 17;
+      } else {
+          x = 18;
+      }
+      let y = x + 1;
+      ```,
+      ```rust
+      let x: u32;
+      if random() {
+          x = 17;
+      }
+      // ERROR: x not initialized:
+      let y = x + 1;
+      ```,
+      table.cell(colspan: 2, fill: gray.lighten(80%))[*Move-Deinit*],
+      ```rust
+      let tuple = (vec![1], vec![2]);
+      moves_argument(tuple.1);
+      // Does not overlap tuple.1:
+      let x = tuple.0[0];
+      ```,
+      ```rust
+      let tuple = (vec![1], vec![2]);
+      moves_argument(tuple.0);
+      // ERROR: use of moved value:
+      let x = tuple.0[0];
+      ```,
+      table.cell(colspan: 2, fill: gray.lighten(80%))[*Shared-Readonly*],
+      ```rust
+      struct Point(u32, u32);
+      let mut pt = Point(13, 17);
+      let x = &pt;
+      let y = &pt;
+      dummy_use(x); dummy_use(y);
+      ```,
+      ```rust
+      struct Point(u32, u32);
+      let mut pt = Point(13, 17);
+      let x = &pt;
+      // ERROR: assigned to
+      //   borrowed value:
+      pt.0 += 1;
+      dummy_use(x);
+      ```,
+
+      table.cell(colspan: 2, fill: gray.lighten(80%))[*Unique-Write*],
+      ```rust
+      struct Point(u32, u32);
+      let mut pt = Point(13, 17);
+      let x = &mut pt;
+      let y = &mut pt;
+      //dummy_use(x);
+      dummy_use(y);
+      ```,
+      ```rust
+      struct Point(u32, u32);
+      let mut pt = Point(13, 17);
+      let x = &mut pt;
+      // ERROR: cannot borrow `pt`
+      // as mutable more than once:
+      let y = &mut pt;
+      dummy_use(x);
+      dummy_use(y);
+      ```,
+
+      table.cell(colspan: 2, fill: gray.lighten(80%))[*Ref-Live*],
+      ```rust
+      struct Point(u32, u32);
+      let pt = Point(6, 9);
+      let x = {
+          &pt
+      }; // pt still in scope
+
+      let z = x.0;
+      ```,
+      ```rust
+      struct Point(u32, u32);
+      let x = {
+          let pt = Point(6, 9);
+          &pt
+      }; // pt goes out of scope
+      // ERROR: pt does not live
+      // long enough:
+      let z = x.0;
+      ```,
+    ),
+    caption: [Pravila preverjevalnika izposoj iz @stjernaModellingRustsReference. Pozitivni primeri predstavljajo mesta, kjer preverjevalnik sprejme kodo, negativni pa kjer jo zavrne.],
+  ) <tab:borrow-check>
+]
 
 #pagebreak()
 #bibliography("thesis.bib")
