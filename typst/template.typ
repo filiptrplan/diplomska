@@ -20,7 +20,7 @@
   #show heading.where(level: 1): it => [
     #set par(first-line-indent: (amount: 0pt))
     #huge[
-      Poglavje #it.level
+      Poglavje #counter(heading).display()
       #v(1em)
       #it.body
       #v(1em)
@@ -106,7 +106,7 @@
   #show heading.where(level: 2): it => [
     #v(1em)
     #set par(first-line-indent: (amount: 0pt))
-    #Large[#it.numbering #it.body]
+    #Large[#counter(heading).display() #it.body]
   ]
 
   #align(center + horizon)[
