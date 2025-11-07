@@ -21,6 +21,18 @@
     od kandidatovega diplomskega dela. Kaj so cilji, kakšne metode naj uporabi,
     morda bo zapisal tudi ključno literaturo
   ],
+  title_en: "Formalization of the Original Formulation of Polonius",
+  description_en: [
+    opis diplome v angleščini
+  ],
+  abstract_sl: [
+    Ta diplomska naloga se ukvarja s formalizacijo Poloniusa, najnovejše različice preverjevalnika izposoj v programskem jeziku Rust. Rust implementira varnost pomnilnika s pomočjo sistema lastništva, ki preprečuje napake kot so viseči kazalci in uporaba že sproščenega pomnilnika. Medtem ko so bile prejšnje različice preverjevalnika dobro dokumentirane, Polonius obstaja predvsem v obliki spletnih objav in eksperimentalne implementacije. Ta naloga poskusi matematično opisati Polonius z definicijo osnovnih množic, relacij in pravil.
+  ],
+  keywords_sl: "Rust, Polonius, preverjevalnik izposoj, formalizacija",
+  abstract_en: [
+    This thesis deals with the formalization of Polonius, the latest version of the borrow checker in the Rust programming language. Rust implements memory safety through an ownership system that prevents errors such as dangling pointers and use-after-free. While previous versions of the checker have been well documented, Polonius exists primarily in the form of blog posts and an experimental implementation. This thesis attempts to mathematically describe Polonius by defining basic sets, relations, and rules.
+  ],
+  keywords_en: "Rust, Polonius, borrow checker, formalization",
 )
 
 #chapter[Uvod]

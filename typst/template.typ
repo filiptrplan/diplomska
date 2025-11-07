@@ -39,6 +39,10 @@
   description: none,
   title_en: none,
   description_en: none,
+  abstract_sl: none,
+  keywords_sl: none,
+  abstract_en: none,
+  keywords_en: none,
   doc,
 ) = [
   #set text(size: 12pt, font: "New Computer Modern", lang: "sl")
@@ -204,6 +208,36 @@
     ),
   )
   #outline(title: text(size: 25pt)[Kazalo #v(1em)])
+
+  #pagebreak()
+
+  // Slovenian abstract
+  #heading(level: 1, numbering: none, outlined: false)[Povzetek]
+  #v(1em)
+  *Naslov:* #title \
+  #v(1em)
+  *Avtor:* #author \
+  #v(1em)
+  *Povzetek:* \
+  #abstract_sl \
+  #v(1em)
+  *Ključne besede:* #keywords_sl
+
+  #pagebreak()
+
+  // English abstract
+  #set text(lang: "en")
+  #heading(level: 1, numbering: none, outlined: false)[Abstract]
+  #v(1em)
+  *Title:* #title_en \
+  #v(1em)
+  *Author:* #author \
+  #v(1em)
+  *Abstract:* \
+  #abstract_en \
+  #v(1em)
+  *Keywords:* #keywords_en
+  #set text(lang: "sl")
 
   #pagebreak()
 
