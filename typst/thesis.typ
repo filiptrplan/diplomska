@@ -38,49 +38,53 @@ Cilj te naloge je potemtakem na svoj način formalizirati inferenčna pravila, k
 
 Za grajenje intuicije o razlikah med trenutno različico preverjevalnika izposoj (NLL) in med naslednjo (Polonius) bomo obravnavali motivacijski primer, ki ga NLL zavrne in Polonius sprejme. Primer je prilagojen iz prvotnega predloga NLL-ja @2094nllRustRFC.
 
-```rust
-fn process(val: &mut String) {
-unimplemented!();
-}
+#figure(
+  ```rust
+  fn process(val: &mut String) {
+  unimplemented!();
+  }
 
-fn process_or_default<'a>(map: &'a mut HashMap<&str, String>)
--> &'a mut String {
-let key = "test";
-match map.get_mut(&key) { // ------------------+ 'lifetime
-Some(value) => value, // |
-None => { // |
-map.insert(key, String::default()); // |
-//  ^~~~~~ ERROR.                   // |
-map.get_mut(&key).unwrap() // |
-} // |
-} // <-----------------------------------------+
-}
-```
-_Figure: Motivacijski primer za Polonius_ <listing:mot_ex>
+  fn process_or_default<'a>(map: &'a mut HashMap<&str, String>)
+  -> &'a mut String {
+  let key = "test";
+  match map.get_mut(&key) { // ------------------+ 'lifetime
+  Some(value) => value, // |
+  None => { // |
+  map.insert(key, String::default()); // |
+  //  ^~~~~~ ERROR.                   // |
+  map.get_mut(&key).unwrap() // |
+  } // |
+  } // <-----------------------------------------+
+  }
+  ```,
+  caption: [Motivacijski primer za Polonius],
+) <listing:mot_ex>
 
-```text
-error[E0499]: cannot borrow `*map` as mutable more than once at a time
---> /tmp/IWXsFebCZD/main.rs:11:13
-|
-5 | fn process_or_default<'a>(map: &'a mut HashMap<&str, String>)
-| -- lifetime `'a` defined here
-...
-8 | match map.get_mut(&key) { // ------------------+ 'lifetime
-| - --- first mutable borrow occurs here
-| _____|
-| |
-9 | | Some(value) => value, // |
-10 | | None => { // |
-11 | | map.insert(key, String::default()); // |
-| | ^^^ second mutable borrow occurs here
-... |
-14 | | } // |
-15 | | } // <-----------------------------------------+
-| |_____- returning this value requires that `*map` is borrowed for `'a`
-```
-_Figure: Napaka pri prevajanju primera @listing:mot_ex _ <listing:mot_ex_err>
+#figure(
+  ```text
+  error[E0499]: cannot borrow `*map` as mutable more than once at a time
+  --> /tmp/IWXsFebCZD/main.rs:11:13
+  |
+  5 | fn process_or_default<'a>(map: &'a mut HashMap<&str, String>)
+  | -- lifetime `'a` defined here
+  ...
+  8 | match map.get_mut(&key) { // ------------------+ 'lifetime
+  | - --- first mutable borrow occurs here
+  | _____|
+  | |
+  9 | | Some(value) => value, // |
+  10 | | None => { // |
+  11 | | map.insert(key, String::default()); // |
+  | | ^^^ second mutable borrow occurs here
+  ... |
+  14 | | } // |
+  15 | | } // <-----------------------------------------+
+  | |_____- returning this value requires that `*map` is borrowed for `'a`
+  ```,
+  caption: [Napaka pri prevajanju primera @listing:mot_ex],
+) <listing:mot_ex_err>
 
-Če postopoma sledimo sporočilu o napaki na izpisu @listing:mot_ex_err, lahko vidimo kje NLL ni zmožen sprejeti pravilnega programa. Na vrstici 8 kličemo funkcijo `get_mut`, ki vrne unijo z dvem možnostima. Lahko vrne spremenljivo referenco na vrednost, ki pripada ključu, ali pa ne vrne nič (`None`). Če vrne vrednost, se šteje, kot da je spremenljivka `map` začasno izsposojena (torej obstaja spremenljiva referenca na njene podatke), kar se zgodi v vrstici 9. Vendar Rust-ov prevajalnik smatra, da je `map` še vedno izsposojena, tudi če ne vrnemo reference iz funkcije `get_mut` (vrstice 11-13). Ko torej poskušamo vstaviti nov par, ki je sestavljen iz vrednosti in ključa, nam to Rustov prevajalnik konzervativno prepreči, saj operacija `insert` zahteva spremenljivo referenco, dve spremenljivi referenci na isto mesto pa po pravilih preverjevalnika izposoj ne smeta obstajati.
+Če postopoma sledimo sporočilu o napaki na @listing:mot_ex_err, lahko vidimo kje NLL ni zmožen sprejeti pravilnega programa. Na vrstici 8 kličemo funkcijo `get_mut`, ki vrne unijo z dvem možnostima. Lahko vrne spremenljivo referenco na vrednost, ki pripada ključu, ali pa ne vrne nič (`None`). Če vrne vrednost, se šteje, kot da je spremenljivka `map` začasno izsposojena (torej obstaja spremenljiva referenca na njene podatke), kar se zgodi v vrstici 9. Vendar Rust-ov prevajalnik smatra, da je `map` še vedno izsposojena, tudi če ne vrnemo reference iz funkcije `get_mut` (vrstice 11-13). Ko torej poskušamo vstaviti nov par, ki je sestavljen iz vrednosti in ključa, nam to Rustov prevajalnik konzervativno prepreči, saj operacija `insert` zahteva spremenljivo referenco, dve spremenljivi referenci na isto mesto pa po pravilih preverjevalnika izposoj ne smeta obstajati.
 
 Pri primeru @listing:mot_ex, kjer se NLL ne sprejme pravilnega programa, pa ga Polonius pravilno prevede. Namreč ima večje zmožnosti sledenja kontrolnemu toku in lahko zgornjo analizo opravi bolje. NLL ima trenutno omejene zmožnosti obravnavanja kontrolnega toka, ki jih Polonius nadgradi v zameno za hitrost. Amanda Stjerna, ena izmed razvijalcev Poloniusa, je na predstavitvi na konferenci EuroRust omenila, da je plan v prihodnosti sestaviti dvoslojni preverjevalnik izposoj. Sprva bi se analiza opravila z NLL-jem, saj je bistveno hitrejši, Polonius pa bi obravnaval samo zahtevnejše primere, ki jih NLL zavrne @eurorustFirstSixYears2024 (na 23:15).
 
