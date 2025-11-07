@@ -108,6 +108,16 @@
     #set par(first-line-indent: (amount: 0pt))
     #Large[#counter(heading).display() #it.body]
   ]
+  #show heading.where(level: 3): it => [
+    #v(0.8em)
+    #set par(first-line-indent: (amount: 0pt))
+    #large[#counter(heading).display() #it.body]
+  ]
+  #show heading.where(level: 4): it => [
+    #v(0.6em)
+    #set par(first-line-indent: (amount: 0pt))
+    #text(size: 12pt)[#counter(heading).display() #it.body]
+  ]
 
   #align(center + horizon)[
     #v(3em)
