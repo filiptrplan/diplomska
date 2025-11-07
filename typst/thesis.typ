@@ -251,13 +251,14 @@ V temu poglavju bomo sprva predstavili intuitivni opis delovanja Poloniusa in te
 Da Rustov preverjevalnik izposoj zadosti zagotovilom o varnosti programa mora zavrniti programe,
 ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
 
+=== Use-Init
+
 #figure(
   table(
-    columns: (auto, 1fr, 1fr),
-    align: (left, left, left),
-    [*Pravilo*], [*Pozitiven primer*], [*Negativen primer*],
+    columns: (1fr, 1fr),
+    align: (left, left),
+    [*Pozitiven primer*], [*Negativen primer*],
     
-    [Use-Init],
     ```rust
     let x: u32;
     if random() {
@@ -275,8 +276,18 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
     // ERROR: x not initialized:
     let y = x + 1;
     ```,
+  ),
+  caption: [Pravilo Use-Init],
+) <tab:use-init>
+
+=== Move-Deinit
+
+#figure(
+  table(
+    columns: (1fr, 1fr),
+    align: (left, left),
+    [*Pozitiven primer*], [*Negativen primer*],
     
-    [Move-Deinit],
     ```rust
     let tuple = (vec![1], vec![2]);
     moves_argument(tuple.1);
@@ -289,8 +300,18 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
     // ERROR: use of moved value:
     let x = tuple.0[0];
     ```,
+  ),
+  caption: [Pravilo Move-Deinit],
+) <tab:move-deinit>
+
+=== Shared-Readonly
+
+#figure(
+  table(
+    columns: (1fr, 1fr),
+    align: (left, left),
+    [*Pozitiven primer*], [*Negativen primer*],
     
-    [Shared-Readonly],
     ```rust
     struct Point(u32, u32);
     let mut pt = Point(13, 17);
@@ -307,8 +328,18 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
     pt.0 += 1;
     dummy_use(x);
     ```,
+  ),
+  caption: [Pravilo Shared-Readonly],
+) <tab:shared-readonly>
+
+=== Unique-Write
+
+#figure(
+  table(
+    columns: (1fr, 1fr),
+    align: (left, left),
+    [*Pozitiven primer*], [*Negativen primer*],
     
-    [Unique-Write],
     ```rust
     struct Point(u32, u32);
     let mut pt = Point(13, 17);
@@ -327,8 +358,18 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
     dummy_use(x);
     dummy_use(y);
     ```,
+  ),
+  caption: [Pravilo Unique-Write],
+) <tab:unique-write>
+
+=== Ref-Live
+
+#figure(
+  table(
+    columns: (1fr, 1fr),
+    align: (left, left),
+    [*Pozitiven primer*], [*Negativen primer*],
     
-    [Ref-Live],
     ```rust
     struct Point(u32, u32);
     let pt = Point(6, 9);
@@ -349,8 +390,8 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
     let z = x.0;
     ```,
   ),
-  caption: [Pravila preverjevalnika izposoj iz @stjernaModellingRustsReference. Pozitivni primeri predstavljajo mesta, kjer preverjevalnik sprejme kodo, negativni pa kjer jo zavrne.],
-) <tab:borrow-check>
+  caption: [Pravilo Ref-Live],
+) <tab:ref-live>
 
 #pagebreak()
 #bibliography("thesis.bib")
