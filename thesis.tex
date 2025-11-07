@@ -434,9 +434,9 @@ Pri primeru \ref{listing:mot_ex}, kjer se NLL ne sprejme pravilnega programa, pa
 
 \chapter{Rustov model upravljanja s pomnilnikom -- lastništvo}
 
-V poglavju \ref{chap:motivacijski-primer} smo predstavili primer, ki je motiviral nadgradnjo prejšnjega preverjevalnika izposoj. Zraven smo podali intuitivno razlago zakaj je bil ta program pravilen, vendar smo se nanašali na pravila, ki so osnovana na lastništvu, Rustovem naboru pravil za zagotavljanja pomnilniško varnih programov.
+V poglavju \ref{chap:motivacijski-primer} smo predstavili primer, ki je motiviral nadgradnjo prejšnjega preverjevalnika izposoj. Zraven smo podali intuitivno razlago, zakaj je bil ta program pravilen, vendar smo se nanašali na pravila, ki so osnovana na lastništvu -- Rustovem naboru pravil za zagotavljanja pomnilniško varnih programov.
 
-Knjiga \citetitle{klabnikRustProgrammingLanguage2023}, ki je smatrana kot neuradni priročnik za Rust, nam pove, da lastništvo obsega tri pravila \cite{klabnikRustProgrammingLanguage2023}:
+Knjiga \citetitle{klabnikRustProgrammingLanguage2023}, neuradni priročnik za Rust, nam pove, da lastništvo obsega tri pravila \cite{klabnikRustProgrammingLanguage2023}:
 
 \begin{enumerate}
 	\item Vsaka vrednost v Rustu ima \textit{lastnika}.
@@ -444,7 +444,7 @@ Knjiga \citetitle{klabnikRustProgrammingLanguage2023}, ki je smatrana kot neurad
 	\item Ko lastnik izstopi iz dosega, je vrednost sproščena \angl{dropped}.
 \end{enumerate}
 
-Lastnik se tukaj nanaša na spremenljivko (bolj podrobno \textit{lvalue}) na katero je ta vrednost vezana. V spodnjem preprostem primeru opazimo, da vrednost \verb|hello| enkrat zamenja lastnika, torej njen prvotni lastnik \verb|a| potem ne vsebuje vrednosti. Če hočemo uporabiti \verb|a| potem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
+Lastnik tukaj se nanaša na spremenljivko (bolj podrobno \textit{lvalue}) na katero je ta vrednost vezana. V spodnjem preprostem primeru opazimo, da vrednost \verb|hello| enkrat zamenja lastnika, torej njen prvotni lastnik \verb|a| potem ne vsebuje vrednosti. Če hočemo uporabiti \verb|a| potem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
 
 \begin{listing}[!ht]
 	\begin{minted}{rust}
@@ -456,7 +456,7 @@ println!("{}", a); // vrne napako
 	\label{listing:ownership1}
 \end{listing}
 
-Koncept dosega pa lahko preprosto prikažemo z leksičnim dosegom, tako da inicializiramo novo vrednost \verb|a|-ja znotraj gnezdenega bloka, ki ustvari nov scope.
+Lastništvo je pa tudi vezano na doseg. Koncept dosega pa lahko preprosto prikažemo z leksičnim dosegom, tako da inicializiramo novo vrednost \verb|a|-ja znotraj gnezdenega bloka, ki ustvari nov scope.
 
 \begin{listing}[!ht]
 	\begin{minted}{rust}
@@ -465,16 +465,16 @@ Koncept dosega pa lahko preprosto prikažemo z leksičnim dosegom, tako da inici
 }
 println!("{}", a); // vrne napako ker `a` ni več v dosegu
 \end{minted}
-	\caption{Primer scopa}
+	\caption{Primer leksičnega dosega}
 	\label{listing:scope1}
 \end{listing}
 
 % obrazloži kako se lastništvo povezuje z življenjskimi dobami in referencami
-V zgornjih primerih nismo videli bistvene razlike med Rustom in sorodnimi jeziki. Razlika nastopi v tem kako se reference ustvarjajo in razdelitvi teh na dva različna tipa. Ko v Rustu govorimo o referencah, lahko rečemo, da so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da prevajalnik v Rustu poskrbi, da takšna referenca vedno kaže na veljavno vrednost pravega tipa – in to skozi celotno življenjsko dobo te reference \cite{klabnikRustProgrammingLanguage2023}. Ta varnostni mehanizem nam omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: gotovost, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
+V zgornjih primerih nismo videli bistvene razlike med Rustom in sorodnimi jeziki. Razlika nastopi v tem, kako se reference ustvarjajo in razdelitvi teh na dva različna tipa. Ko v Rustu govorimo o referencah, lahko rečemo, da so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da prevajalnik v Rustu poskrbi, da takšna referenca vedno kaže na veljavno vrednost pravega tipa -- in to skozi celotno življenjsko dobo te reference \cite{klabnikRustProgrammingLanguage2023}. Ta varnostni mehanizem nam omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: gotovost, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
 
-Prevajalnik preverja pravilnost programov na t.i. \textbf{MIR} (\textit{Mid-level intermediate representation}), ki je bistveno poenostavljena oblika Rust-a in zadnji korak pred generiranjem kode za \textit{backend}. Temelji na grafu kontrole toka, ki ga opredelimo pozneje v nalogi. Ta oblika Rusta je pomembna, ker nam bistveno poenostavi preverjanje izposoj in nam omogoča lažjo analizo. Prav tako je tukaj točno definiran pojem \textbf{mesta} \angl{place}, ki je eden izmed ključnih izrazov pri analizi pravilnosti programa. Mesto je izraz, ki nam opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. \verb|_1|) ali pa njena projekcija (npr. polje strukture \verb|_1.polje|) \cite{MIRMidlevelIR}.
+Prevajalnik preverja pomnilniško pravilnost programov s t.i. \textbf{MIR} (\textit{Mid-level intermediate representation}), ki je bistveno poenostavljena oblika Rusta in zadnji korak pred generiranjem kode za \textit{backend} (? kako po slovensko). Temelji na grafu kontrole toka, ki ga bomo opisali pozneje v nalogi. Ta oblika Rusta je pomembna, ker nam bistveno poenostavi preverjanje izposoj in nam omogoča lažjo analizo. Prav tako je tukaj točno definiran pojem \textbf{mesta} \angl{place}, ki je eden izmed ključnih izrazov pri analizi pravilnosti programa. Mesto je izraz, ki nam opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. \verb|_1|) ali pa njena projekcija (npr. polje strukture \verb|_1.polje|) \cite{MIRMidlevelIR}.
 
-Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust2019}. Prva vrsta so \textbf{deljene oz. nespremenljive reference} \angl{shared references}. Takih je lahko hkrati več in vse lahko kažejo na isto mesto v pomnilniku, vendar pravilo, ki zagotavlja da so take deljene reference varne, pravi, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so \textbf{spremenljive reference} \angl{mutable / unique references}. Pri teh se pravila ravno obrnejo; lahko jih imamo zgolj eno in lahko spreminjamo podatke na pomnilniškem mestu, ki ga referencira.
+Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc \cite{crichtonGroundedConceptualModel2023,yanovskiGhostCellSeparatingPermissions2021,weissOxideEssenceRust2019}. Prva vrsta so \textbf{deljene oz. nespremenljive reference} \angl{shared references}. Takih je lahko hkrati več in vse lahko kažejo na isto mesto v pomnilniku. Pravilo, ki zagotavlja da so take deljene reference varne, pravi, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so \textbf{spremenljive reference} \angl{mutable / unique references}. Pri teh se pravila ravno obrnejo; lahko jih imamo zgolj eno in lahko spreminjamo podatke na pomnilniškem mestu, ki ga referencira (preko spremenljive reference, ne preko prvotne spremenljivke).
 
 Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo za vsako pokazali veljaven primer uporabe in nato še neveljaven.
 
@@ -493,7 +493,8 @@ println("{}", a); // lahko jo uporabimo, ker za izpis na
 	\begin{minted}{rust}
 let mut a = 6;
 let b = &mut a;
-*b = 7; // lahko spremenimo pomnilniško lokacijo, ker je referenca spremenljiva
+*b = 7; // lahko spremenimo podatke na pomnilniški lokaciji, 
+        // ker je referenca spremenljiva
 \end{minted}
 	\caption{Pravilna uporaba spremenljive reference}
 	\label{lst:uporabaspremenljiva}
@@ -527,15 +528,15 @@ println!("{}", a); // NAPAKA: hkratna uporaba lastnika in spremenljive reference
 \end{listing}
 
 
-To razmerje med obema vrstama referenc -- večkratne nespremenljive ali pa ena sama spremenljiva -- lahko strnemo v načelo, ki ga imenujemo \textit{aliasing XOR mutability}. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le en lastnik. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
+To razmerje med obema vrstama referenc -- večkratne nespremenljive ali pa ena sama spremenljiva -- lahko strnemo v načelo, ki ga imenujemo \textit{aliasing XOR mutability}. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le ena referenca. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov \cite{yanovskiGhostCellSeparatingPermissions2021}.
 
-Pravila o referencah torej lahko povzamemo z dvemi pravili \cite{klabnikRustProgrammingLanguage2023}
+Pravila o referencah lahko povzamemo z dvemi pravili \cite{klabnikRustProgrammingLanguage2023}
 \begin{enumerate}
 	\item Hkrati je lahko ustvarjena \textit{ali} ena spremenljiva referenca \textit{ali} poljubno število deljenih referenc.
 	\item Reference morajo biti vedno veljavne (kazati na veljavno mesto).
 \end{enumerate}
 
-Še ena podrobnost, ki je pomembna za razumevanje lastništva so \textbf{življenjske dobe} \angl{lifetimes}, ki so sestavni del tipov, vendar so ponavadi izpeljane. Torej dejanski tip reference na niz ni \verb|&String| ampak \verb|&'a String|, kjer je \verb|'a| življenjska doba. Pomembno je tudi omeniti, da življenjske dobe so del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna \cite{klabnikRustProgrammingLanguage2023}. Najlažje si to ogledamo s primerom \ref{lst:lifetime-annotate}.
+Še ena podrobnost, ki je pomembna za razumevanje lastništva so \textbf{življenjske dobe} \angl{lifetimes}, ki so sestavni del tipov. Kot sami tipi v Rustu, so ponavadi izpeljane, vendar se pogosto pri funkcijski zapisih (signatures?) zgodi, da jih moramo eksplicitno podati. Na primer, dejanski tip reference na niz ni \verb|&String| ampak \verb|&'a String|, kjer je \verb|'a| življenjska doba. Pomembno je tudi omeniti, da so življenjske dobe del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna \cite{klabnikRustProgrammingLanguage2023}. Najlažje si to ogledamo s primerom \ref{lst:lifetime-annotate}.
 
 \begin{listing}[!ht]
 	\begin{minted}{rust}
