@@ -267,94 +267,161 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
       table.header[*Pozitiven primer*][*Negativen primer*],
 
       table.cell(colspan: 2, fill: gray.lighten(80%))[*Use-Init*],
-      ```rust
-      let x: u32;
-      if random() {
-          x = 17;
-      } else {
-          x = 18;
-      }
-      let y = x + 1;
-      ```,
-      ```rust
-      let x: u32;
-      if random() {
-          x = 17;
-      }
-      // ERROR: x not initialized:
-      let y = x + 1;
-      ```,
+      {
+        codly(highlights: (
+          (line: 2, start: 4, end: 9, fill: green.lighten(70%)),
+          (line: 4, start: 4, end: 9, fill: green.lighten(70%)),
+          (line: 6, start: 8, end: 9, fill: green.lighten(70%)),
+        ))
+        ```rust
+        let x: u32;
+        if random() {
+            x = 17;
+        } else {
+            x = 18;
+        }
+        let y = x + 1;
+        ```
+      },
+      {
+        codly(highlights: (
+          (line: 2, start: 4, end: 9, fill: green.lighten(70%)),
+          (line: 5, start: 8, end: 9, fill: red.lighten(70%)),
+        ))
+        ```rust
+        let x: u32;
+        if random() {
+            x = 17;
+        }
+        // ERROR: x not initialized:
+        let y = x + 1;
+        ```
+      },
       table.cell(colspan: 2, fill: gray.lighten(80%))[*Move-Deinit*],
-      ```rust
-      let tuple = (vec![1], vec![2]);
-      moves_argument(tuple.1);
-      // Does not overlap tuple.1:
-      let x = tuple.0[0];
-      ```,
-      ```rust
-      let tuple = (vec![1], vec![2]);
-      moves_argument(tuple.0);
-      // ERROR: use of moved value:
-      let x = tuple.0[0];
-      ```,
+      {
+        codly(highlights: (
+          (line: 2, start: 15, end: 23, fill: green.lighten(70%)),
+          (line: 4, start: 8, end: 16, fill: green.lighten(70%)),
+        ))
+        ```rust
+        let tuple = (vec![1], vec![2]);
+        moves_argument(tuple.1);
+        // Does not overlap tuple.1:
+        let x = tuple.0[0];
+        ```
+      },
+      {
+        codly(highlights: (
+          (line: 2, start: 15, end: 23, fill: green.lighten(70%)),
+          (line: 4, start: 8, end: 16, fill: red.lighten(70%)),
+        ))
+        ```rust
+        let tuple = (vec![1], vec![2]);
+        moves_argument(tuple.0);
+        // ERROR: use of moved value:
+        let x = tuple.0[0];
+        ```
+      },
       table.cell(colspan: 2, fill: gray.lighten(80%))[*Shared-Readonly*],
-      ```rust
-      struct Point(u32, u32);
-      let mut pt = Point(13, 17);
-      let x = &pt;
-      let y = &pt;
-      dummy_use(x); dummy_use(y);
-      ```,
-      ```rust
-      struct Point(u32, u32);
-      let mut pt = Point(13, 17);
-      let x = &pt;
-      // ERROR: assigned to
-      //   borrowed value:
-      pt.0 += 1;
-      dummy_use(x);
-      ```,
+      {
+        codly(highlights: (
+          (line: 3, start: 11, end: 14, fill: green.lighten(70%)),
+          (line: 4, start: 11, end: 14, fill: green.lighten(70%)),
+          (line: 5, start: 10, end: 11, fill: green.lighten(70%)),
+          (line: 5, start: 24, end: 25, fill: green.lighten(70%)),
+        ))
+        ```rust
+        struct Point(u32, u32);
+        let mut pt = Point(13, 17);
+        let x = &pt;
+        let y = &pt;
+        dummy_use(x); dummy_use(y);
+        ```
+      },
+      {
+        codly(highlights: (
+          (line: 3, start: 11, end: 14, fill: green.lighten(70%)),
+          (line: 6, start: 0, end: 9, fill: red.lighten(70%)),
+          (line: 7, start: 10, end: 11, fill: green.lighten(70%)),
+        ))
+        ```rust
+        struct Point(u32, u32);
+        let mut pt = Point(13, 17);
+        let x = &pt;
+        // ERROR: assigned to
+        //   borrowed value:
+        pt.0 += 1;
+        dummy_use(x);
+        ```
+      },
 
       table.cell(colspan: 2, fill: gray.lighten(80%))[*Unique-Write*],
-      ```rust
-      struct Point(u32, u32);
-      let mut pt = Point(13, 17);
-      let x = &mut pt;
-      let y = &mut pt;
-      //dummy_use(x);
-      dummy_use(y);
-      ```,
-      ```rust
-      struct Point(u32, u32);
-      let mut pt = Point(13, 17);
-      let x = &mut pt;
-      // ERROR: cannot borrow `pt`
-      // as mutable more than once:
-      let y = &mut pt;
-      dummy_use(x);
-      dummy_use(y);
-      ```,
+      {
+        codly(highlights: (
+          (line: 3, start: 11, end: 19, fill: green.lighten(70%)),
+          (line: 4, start: 11, end: 19, fill: green.lighten(70%)),
+          (line: 6, start: 10, end: 11, fill: green.lighten(70%)),
+        ))
+        ```rust
+        struct Point(u32, u32);
+        let mut pt = Point(13, 17);
+        let x = &mut pt;
+        let y = &mut pt;
+        //dummy_use(x);
+        dummy_use(y);
+        ```
+      },
+      {
+        codly(highlights: (
+          (line: 3, start: 11, end: 19, fill: red.lighten(70%)),
+          (line: 6, start: 11, end: 19, fill: red.lighten(70%)),
+          (line: 7, start: 10, end: 11, fill: red.lighten(70%)),
+          (line: 8, start: 10, end: 11, fill: green.lighten(70%)),
+        ))
+        ```rust
+        struct Point(u32, u32);
+        let mut pt = Point(13, 17);
+        let x = &mut pt;
+        // ERROR: cannot borrow `pt`
+        // as mutable more than once:
+        let y = &mut pt;
+        dummy_use(x);
+        dummy_use(y);
+        ```
+      },
 
       table.cell(colspan: 2, fill: gray.lighten(80%))[*Ref-Live*],
-      ```rust
-      struct Point(u32, u32);
-      let pt = Point(6, 9);
-      let x = {
-          &pt
-      }; // pt still in scope
+      {
+        codly(highlights: (
+          (line: 4, start: 4, end: 7, fill: green.lighten(70%)),
+          (line: 7, start: 8, end: 11, fill: green.lighten(70%)),
+        ))
+        ```rust
+        struct Point(u32, u32);
+        let pt = Point(6, 9);
+        let x = {
+            &pt
+        }; // pt still in scope
 
-      let z = x.0;
-      ```,
-      ```rust
-      struct Point(u32, u32);
-      let x = {
-          let pt = Point(6, 9);
-          &pt
-      }; // pt goes out of scope
-      // ERROR: pt does not live
-      // long enough:
-      let z = x.0;
-      ```,
+        let z = x.0;
+        ```
+      },
+      {
+        codly(highlights: (
+          (line: 4, start: 4, end: 7, fill: red.lighten(70%)),
+          (line: 8, start: 8, end: 11, fill: red.lighten(70%)),
+        ))
+        ```rust
+        struct Point(u32, u32);
+        let x = {
+            let pt = Point(6, 9);
+            &pt
+        }; // pt goes out of scope
+        // ERROR: pt does not live
+        // long enough:
+        let z = x.0;
+        ```
+      },
     ),
     caption: [Pravila preverjevalnika izposoj iz @stjernaModellingRustsReference. Pozitivni primeri predstavljajo mesta, kjer preverjevalnik sprejme kodo, negativni pa kjer jo zavrne.],
   ) <tab:borrow-check>
