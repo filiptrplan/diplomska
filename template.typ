@@ -54,7 +54,7 @@
   #set text(size: 12pt, font: "New Computer Modern", lang: "sl")
   #set page(
     paper: "a4",
-    margin: 1in,
+    margin: 30mm,
   )
   #set par(
     leading: 0.9em,
@@ -126,7 +126,7 @@
     #text(size: 12pt)[#counter(heading).display() #it.body]
   ]
 
-  #align(center + horizon)[
+  #align(center)[
     #v(3em)
     #large[#smallcaps[Univerza v Ljubljani #parbreak() #faculty]]
     #v(10em)
@@ -140,7 +140,6 @@
     #large[#smallcaps[Mentor:] #mentor]#parbreak()
     #v(2em)
     #large[Ljubljana, #year]#parbreak()
-    #v(5.5em)
   ]
 
   #set page(

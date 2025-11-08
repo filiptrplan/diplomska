@@ -953,5 +953,5 @@ Poglejmo še kako se dokončno napaka javi na našem primeru:
 ) <listing:error>
 
 #pagebreak()
-#bibliography("thesis.bib")
+#bibliography("thesis.bib", style: "institute-of-electrical-and-electronics-engineers")
 
