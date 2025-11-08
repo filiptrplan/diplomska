@@ -619,6 +619,20 @@ mestih:
 #show: subst-env((
   L0: $"L"_0$,
   L1: $"L"_1$,
+  r0: $'0$,
+  r1: $'1$,
+  r2: $'2$,
+  r3: $'3$,
+  r4: $'4$,
+  r5: $'5$,
+  r6: $'6$,
+  beta: $beta$,
+  psi: $psi$,
+  zeta: $zeta$,
+  iota: $iota$,
+  nablaL: $nabla_L$,
+  "in": $in$,
+  "implies": $arrow.r.double$,
 ))
 
 #figure(
@@ -703,21 +717,21 @@ _Opomba:_ Oznaka `<:` nam predstavlja vsebovanost med tipi (_subtyping relation_
 
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
     // tukaj zahtevamo naslednje: &'3 mut Vec<&'0 i32> <: &'1 mut Vec<&'2 i32>
-    // ('3, '1, P) ∈ β, ('0, '2, P) ∈ β, ('2, '0, P) ∈ β
+    // (r3, r1, P) in beta, (r0, r2, P) in beta, (r2, r0, P) in beta
 
     let p: &'5 i32 = &'4 x;
     // zahtevamo: &'4 i32 <: &'5 i32
-    // ('4, '5, P) ∈ β
+    // (r4, r5, P) in beta
 
     r.push(p);
     // zahtevamo: &'5 i32 <: &'2 i32
-    // ('5, '2, P) ∈ β
+    // (r5, r2, P) in beta
 
     x += 1;
 
     take::<Vec<&'6 i32>>(v);
     // zahtevamo Vec<&'0 i32> <: Vec<&'6 i32>
-    // ('0, '6, P) ∈ β
+    // (r0, r6, P) in beta
   }
   ```,
   caption: [Začetna relacija vsebovanosti],
@@ -736,9 +750,9 @@ regije $R$. Prav tako kot relacija vsebovanosti se ta zahteva vzpostavi na sredi
     let mut x: i32 = 22;
     let mut v: Vec<&'0 i32> = vec![];
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // ('3, L₀, P) ∈ ψ
+    // (r3, L0, P) in psi
     let p: &'5 i32 = &'4 x;
-    // ('4, L₁, P) ∈ ψ
+    // (r4, L1, P) in psi
     r.push(p);
     x += 1;
     take::<Vec<&'6 i32>>(v);
@@ -794,9 +808,9 @@ je že opisano v poglavju o definicije množice $cal(L)$.
     let mut x: i32 = 22;
     let mut v: Vec<&'0 i32> = vec![];
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // ('3, L₀, P) ∈ ψ
+    // (r3, L0, P) in psi
     let p: &'5 i32 = &'4 x;
-    // ('4, L₁, P) ∈ ψ
+    // (r4, L1, P) in psi
     r.push(p);
     x += 1; // tukaj razveljavimo L₁ z mutacijo deljenega referenta
     take::<Vec<&'6 i32>>(v);
@@ -841,24 +855,24 @@ Na primeru ustvarimo naslednje relacije:
     let mut v: Vec<&'0 i32> = vec![];
 
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // ('3, '1) ∈ β, ('0, '2) ∈ β, ('2, '0) ∈ β
+    // (r3, r1) in beta, (r0, r2) in beta, (r2, r0) in beta
 
     let p: &'5 i32 = &'4 x;
-    // ('3, '1) ∈ β, ('0, '2) ∈ β, ('2, '0) ∈ β
-    // ('4, '5) ∈ β
+    // (r3, r1) in beta, (r0, r2) in beta, (r2, r0) in beta
+    // (r4, r5) in beta
 
     r.push(p);
-    // ('3, '1) ∈ β, ('0, '2) ∈ β, ('2, '0) ∈ β
-    // ('4, '5) ∈ β
-    // ('5, '2) ∈ β
+    // (r3, r1) in beta, (r0, r2) in beta, (r2, r0) in beta
+    // (r4, r5) in beta
+    // (r5, r2) in beta
 
     x += 1;
 
     take::<Vec<&'6 i32>>(v);
-    // ('3, '1) ∈ β, ('0, '2) ∈ β, ('2, '0) ∈ β
-    // ('4, '5) ∈ β
-    // ('5, '2) ∈ β
-    // ('0, '6) ∈ β
+    // (r3, r1) in beta, (r0, r2) in beta, (r2, r0) in beta
+    // (r4, r5) in beta
+    // (r5, r2) in beta
+    // (r0, r6) in beta
   }
 
   fn take<T>(p: T) { .. }
@@ -893,18 +907,18 @@ za propagacijo aktivna na naslednji točki $Q$. Z naslednjim primerom ponazorimo
   let y = 44;
 
   let mut p: &'0 i32 = &'1 x; // posoja L₀
-  // ('1,'0) ∈ β
-  // ('1, L₀) ∈ ζ
+  // (r1,r0) in beta
+  // (r1, L0) in zeta
 
   p = &'3 y; // posoja L₁
-  // ('3,'0) ∈ β
-  // ('3, L₁) ∈ ζ
-  // '1 ni več aktivna, ker smo jo prepisali z '3
+  // (r3,r0) in beta
+  // (r3, L1) in zeta
+  // r1 ni več aktivna, ker smo jo prepisali z r3
 
   x += 1;
-  // razveljavi se posoja L₀: (L₀) ∈ ι
+  // razveljavi se posoja L0: (L0) in iota
   // tukaj bi brez pravila o aktivnosti regij še vedno zahtevali
-  // (L₀, '0) ∈ ζ zaradi pravila o propagaciji
+  // (L0, r0) in zeta zaradi pravila o propagaciji
 
   print( *p );
   // ta izraz posledično ne bi bil veljaven
@@ -946,19 +960,19 @@ Poglejmo še kako se dokončno napaka javi na našem primeru:
     // relacije, ki so ustvarjene tukaj niso relevantne za napako
 
     let p: &'5 i32 = &'4 x;
-    // ('4, L₁) ∈ ζ
-    // ('4, '5) ∈ β ⟹ ('5, L₁) ∈ ζ
+    // (r4, L1) in zeta
+    // (r4, r5) in beta implies (r5, L1) in zeta
 
     r.push(p);
-    // ('5, '2) ∈ β ⟹ ('2, L₁) ∈ ζ
+    // (r5, r2) in beta implies (r2, L1) in zeta
 
     x += 1;
-    // Tukaj se razveljavi posoja L₁: (L₁) ∈ ι.
-    // Da se nam javi napaka mora biti ta posoja aktivna (L₁) ∈ ∇_L.
+    // Tukaj se razveljavi posoja L1: (L1) in iota.
+    // Da se nam javi napaka mora biti ta posoja aktivna (L1) in nablaL.
     // Torej jo mora zahtevati neka aktivna regija, na trenutni točki pa je
-    // aktivna regija '2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš
-    // vektor `v`. Elementi vektorja pa imajo regijo '2, ki pa je del posoje L₁.
-    // Torej, ker smo razveljavili posojo L₁, medtem ko je bila aktivna regija,
+    // aktivna regija r2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš
+    // vektor `v`. Elementi vektorja pa imajo regijo r2, ki pa je del posoje L1.
+    // Torej, ker smo razveljavili posojo L1, medtem ko je bila aktivna regija,
     // ki jo ta posoja zahteva, javimo napako.
 
     take::<Vec<&'6 i32>>(v);
