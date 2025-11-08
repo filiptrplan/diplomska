@@ -13,19 +13,25 @@
 #let CcImageSa(scale) = image("cc_sa_30.pdf", width: scale * 20pt)
 #let end_of_template = state("end_of_template", false)
 #let last_chapter_page = state("last_chapter_page", 0)
-#let chapter(title) = context [
+#let chapter(breakpage: true, title) = context [
   // we update the last chapter page
-  #last_chapter_page.update(counter(page).get().first())
   // we treat a level 1 heading as a chapter
   #show heading.where(level: 1): it => [
     #set par(first-line-indent: (amount: 0pt))
-    #huge[
-      Poglavje #counter(heading).display()
-      #v(1em)
-      #it.body
-      #v(1em)
+    #set block(breakable: false)
+    #block[
+      #huge[
+        Poglavje #counter(heading).display()
+        #v(0.5em)
+        #it.body
+        #v(1em)
+      ]
     ]
   ]
+  #last_chapter_page.update(counter(page).get().first())
+  #if breakpage {
+    pagebreak()
+  }
   = #title
 ]
 
@@ -52,7 +58,7 @@
   )
   #set par(
     leading: 0.9em,
-    spacing: 1.2em,
+    spacing: 1.3em,
     first-line-indent: 1em,
   )
   #show link: set text(font: "DejaVu Sans Mono", size: 0.9em)
@@ -61,8 +67,9 @@
   #set page(
     header: context {
       let page = counter(page).get().first()
+      let is_chapter_page = last_chapter_page.get() == page
       // We don't want to display header on pages with chapter headings
-      if last_chapter_page.get() == page {
+      if is_chapter_page {
         return
       }
       // We also don't want to display a heading up until we end our template
