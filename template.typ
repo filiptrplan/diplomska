@@ -139,10 +139,10 @@
   #set page(
     paper: "a4",
     margin: (
-      inside: 1.5in, // oddsidemargin adjustment
-      outside: 1in, // marginparwidth adjustment
-      top: 2in, // headheight adjustment
-      bottom: 2in,
+      inside: 30mm, // oddsidemargin adjustment
+      outside: 20mm, // marginparwidth adjustment
+      top: 20mm, // headheight adjustment
+      bottom: 30mm,
     ),
   )
 
