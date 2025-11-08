@@ -8,6 +8,18 @@
 
 #let angl(cont) = [(angl. #emph(cont))]
 
+#let subst-env(scope) = it => (
+  scope
+    .pairs()
+    .fold(
+      it,
+      (it, (k, v)) => {
+        show k: v
+        it
+      },
+    )
+)
+
 #show: thesis.with(
   title: "Formalizacija originalne formulacije Poloniusa",
   author: "Filip Trplan",
@@ -604,13 +616,18 @@ kjer je pojem _prefix_ definiran tako:
 V članku avtor pravi posojam tudi izrazi izposoje (_borrow expressions_). V našem primeru bi se posoje ustvarile na naslednjih
 mestih:
 
+#show: subst-env((
+  L0: $"L"_0$,
+  L1: $"L"_1$,
+))
+
 #figure(
   ```rust
   fn main() {
     let mut x: i32 = 22;
     let mut v: Vec<&'0 i32> = vec![];
-    let r: &'1 mut Vec<&'2 i32> = &'3 mut v; // posoja L₀
-    let p: &'5 i32 = &'4 x; // posoja L₁
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v; // posoja L0
+    let p: &'5 i32 = &'4 x; // posoja L1
     r.push(p);
     x += 1;
     take::<Vec<&'6 i32>>(v);
