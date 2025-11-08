@@ -812,7 +812,7 @@ je že opisano v poglavju o definicije množice $cal(L)$.
     let p: &'5 i32 = &'4 x;
     // (r4, L1, P) in psi
     r.push(p);
-    x += 1; // tukaj razveljavimo L₁ z mutacijo deljenega referenta
+    x += 1; // tukaj razveljavimo L1 z mutacijo deljenega referenta
     take::<Vec<&'6 i32>>(v);
   }
   ```,
@@ -906,11 +906,11 @@ za propagacijo aktivna na naslednji točki $Q$. Z naslednjim primerom ponazorimo
   let x = 22;
   let y = 44;
 
-  let mut p: &'0 i32 = &'1 x; // posoja L₀
+  let mut p: &'0 i32 = &'1 x; // posoja L0
   // (r1,r0) in beta
   // (r1, L0) in zeta
 
-  p = &'3 y; // posoja L₁
+  p = &'3 y; // posoja L1
   // (r3,r0) in beta
   // (r3, L1) in zeta
   // r1 ni več aktivna, ker smo jo prepisali z r3
