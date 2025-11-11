@@ -51,6 +51,12 @@
   keywords_en: none,
   doc,
 ) = [
+  #set document(
+    author: author,
+    title: title,
+    description: description,
+    keywords: keywords_sl,
+  )
   #set text(size: 12pt, font: "New Computer Modern", lang: "sl")
   #set page(
     paper: "a4",
