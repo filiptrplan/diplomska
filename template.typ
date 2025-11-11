@@ -82,7 +82,7 @@
       if end_of_template.get() == false {
         return
       }
-      let page_text = text(style: "oblique")[#page]
+      let page_text = [#page]
       let body = if calc.odd(page) [
         #grid(
           columns: (1fr, 1fr),
