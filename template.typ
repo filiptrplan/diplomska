@@ -271,7 +271,6 @@
   #end_of_template.update(true)
 
   #doc
-
 ]
 
 

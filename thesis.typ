@@ -1,4 +1,4 @@
-#import "template.typ": thesis, chapter
+#import "template.typ": chapter, thesis
 
 #import "@preview/codly:1.3.0": *
 #import "@preview/codly-languages:0.1.1": *
@@ -19,7 +19,6 @@
       },
     )
 )
-
 #show: thesis.with(
   title: "Formalizacija originalne formulacije Poloniusa",
   author: "Filip Trplan",
@@ -255,206 +254,86 @@ Prevajalnik nam pri primeru @lst:lifetime-annotate vrne napako, saj je spremenlj
 
 Glavno delo na področju formalizacije Poloniusa je magistrsko delo Amande Stjerna, ki je nastalo leta 2020, dve leti po prvotni formulaciji @stjernaModellingRustsReference @AliasbasedFormulationBorrow. V delu Stjerna prvo formalizira Polonius kot del sistema tipov avtorjev @weissOxideEssenceRust2019 imenovan Oxide @weissOxideEssenceRust2019. Stjerna upraviči svojo izbiro izhodiščnega sistema tipov s tem, da si deli koncept t.i. _provenance variables_. Delo se nato nadaljuje z implementacijo Poloniusa v jeziku Datalog (podmnožica Prologa), ki služi kot podlaga za prvo različico implementacije v Rustovem prevajalniku @RustlangPolonius2025.
 
-V temu poglavju bomo sprva predstavili intuitivni opis delovanja Poloniusa in temu sledili s formalnim opisom pravil Rustovega prevajalnika. Nazadnje bomo še predstavili delovanje Poloniusa iz vidika množic.
+V temu poglavju bomo prvo predstavili intuitivni opis delovanja Poloniusa in temu sledili s formalnim opisom pravil Rustovega prevajalnika. Nazadnje bomo še predstavili delovanje Poloniusa iz vidika množic.
+
+== Intuitivna razlaga Poloniusa
+
+Naslednja razlaga je prilagojena iz originalne spletne objave @AliasbasedFormulationBorrow. Predstavili ga bomo na @lst:intuition[primeru] iz objave, vendar brez natančnih opisov relacij, ki jih uporablja Polonius.
+
+
+#figure(
+  ```rust
+  fn main() {
+    let mut x: i32 = 22;
+    let mut v: Vec<&'0 i32> = vec![];
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+    let p: &'5 i32 = &'4 x;
+    r.push(p);
+    x += 1;
+    take::<Vec<&'6 i32>>(v);
+  }
+  fn take<T>(p: T) { .. }
+  ```,
+  caption: [Primer programa za Polonius iz @AliasbasedFormulationBorrow],
+) <lst:intuition>
+
+@lst:intuition[Program] ima poleg tipov anotirane še *regije*, kot jih imenuje Polonius, ki si jih lahko predstavljamo kot življenjske dobe. Označene so s številkami `'0`, `'1`, `'2`, itd. Če postopoma pogledamo kaj vsaka vrstica naredi, lahko vidimo zakaj bi ga moral prevajalnik zavrniti.
+
+- Vrstica 3: Usvarimo vektor deljenih referenc `v`.
+- Vrstica 4: Ustvarimo spremenljivo referenco `r`, ki kaže na vektor `v`.
+- Vrstici 5 in 6: Deljeno referenco na `x` vstavimo v vektor `v` preko `r`.
+- Vrstici 7 in 8: Poskušamo spremeniti vrednost `x`. Vendar v tem trenutku še vedno obstaja aktivna referenca na `x` v vektorju `v`, ki smo jo vstavili na vrstici 6. Vektor `v` pa še vedno potrebujemo v vrstici 8, orej javimo napako.
+
+#show "'a": `'a`
+#show "'b": `'b`
+
+Zdaj pa si lahko ogledamo kako ta intuitivni razmislek izračuna Polonius. Lahko si predstavljamo, kot da algoritem 3-krat obhodi kodo. Prvi obhod izračuna dva glavna elementa: vsebovanost regij in pripadnost posoj regijam.
+
+Vsebovanost dveh regij se izračuna glede na inferenčna pravila Rustovega sistema tipov(subtyping relations?) in jo zapišemo kot `'a: 'b`, kar pomeni da mora regija 'b vsebovati vse vrstice iz regije 'a (oziroma referenca z življenjsko dobo 'b mora živeti vsaj toliko dolgo kot 'a).
+
+Pripadnost posoj regijam pa se določi ob ustvaritvi omenjenih posoj. V tem kontekstu pripadnost ne pomeni pripadnost množici vrstic, ki sestavljajo regijo, vendar kot dodaten metapodatek regije. Posoje si lahko predstavljamo kot interne strukture v Rustovem prevajalniku, ki hranijo podatke o ustvarjeni referenci. Ko ustvarimo posojo z `&` ali `&mut`, se tej določi pripadnost glede na regijo, ki je del tipa.
+
+Za boljše razumevanje teh dveh korakov se obrnemo na @lst:intuition2[primer], kjer sta v komentarjih anotirana ta dva koraka.
+
+#figure(
+  ```rust
+  fn main() {
+    let mut x: i32 = 22;
+    let mut v: Vec<&'0 i32> = vec![];
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+    // V zgornji vrstici se ustvari posoja L0, ki pripada regiji '3.
+    // Vsebovanost - '3: '1
+    let p: &'5 i32 = &'4 x;
+    // Ustvarimo L1, ki pripada regiji '4
+    // Vsebovanost - '4: '5
+    r.push(p);
+    // Vsebovanost -  '5: '2
+    x += 1;
+    take::<Vec<&'6 i32>>(v);
+    // Vsebovanost - '0: '6
+  }
+  fn take<T>(p: T) { .. }
+  ```,
+  caption: [Primer programa za Polonius iz @AliasbasedFormulationBorrow],
+) <lst:intuition2>
+
+Drugi obhod pa vsebovanosti iz prvega obhoda propagira (saj lahko nanje mislimo kot relacijo matematične vsebovanosti, ki je tranzitivna), ter s tem tudi propagira pripadnost posoj. Če sledimo tranzitivnemu zaprtju vsebovanosti lahko opazimo dve verigi:
+
+- Za posojo `L0`: `'3: '1`
+- Za posojo `L1`: `'4: '5: '2`
+
+Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regiji `'2`. Še ena pomembna stvar, ki jo drug obhod naredi je določitev živih regij in posoj, ki pa je ne bomo tukaj opisali. Povedali bomo samo, da Polonius izračuna, da sta regija `'2` in posledično posoja `L1` aktivni na vrstici 12 v @lst:intuition2[programu]. Pojma aktivnosti regij in posoj sta tukaj analogna pojmu aktivnosti spremenljivk pri prevajalnikih.
+
+V tretjem obhodu nato javimo napako, ker operacija mutiranja spremenljivke `x` na vrstici 12 v @lst:intuition2[primeru] razveljavi posojo `L1`, ki je pa na tisti točki v programu še vedno živa.
+
+V intuitivni razlagi smo izpustili več podrobnosti kot je izračun aktivnosti regij in posoj, podrobnosti propagacije različnih vsebovanosti skozi program in pogoje za ustvarjanje raznih omejitev (constraints?). Prav tako analiza deluje na MIR, ki je osnovan na podatkovni strukturi grafa, ne pa na samih vrsticah v programu.
 
 == Formalizacija pravil
 Da Rustov preverjevalnik izposoj zadosti zagotovilom o varnosti programa mora zavrniti programe,
 ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
 
-#[
-  #show figure: set block(breakable: true)
-  #set block(breakable: true)
-  #set raw(block: true)
-  #show raw: set block(breakable: false)
-  #codly(display-name: false, display-icon: false, number-format: none)
-  #figure(
-    kind: table,
-    table(
-      columns: (1fr, 1fr),
-      align: (left, left),
-
-      table.header[*Pozitiven primer*][*Negativen primer*],
-
-      table.cell(colspan: 2, fill: gray.lighten(80%))[*Use-Init*],
-      {
-        codly(
-          highlights: (
-            (line: 3, start: 5, end: 8, fill: green),
-            (line: 5, start: 5, end: 8, fill: green),
-            (line: 7, start: 9, end: 9, fill: green),
-          ),
-        )
-        ```rust
-        let x: u32;
-        if random() {
-            x = 17;
-        } else {
-            x = 18;
-        }
-        let y = x + 1;
-        ```
-      },
-      {
-        codly(
-          highlights: (
-            (line: 3, start: 5, end: 8, fill: green),
-            (line: 6, start: 9, end: 9, fill: red),
-          ),
-        )
-        ```rust
-        let x: u32;
-        if random() {
-            x = 17;
-        }
-        // ERROR: x not initialized:
-        let y = x + 1;
-        ```
-      },
-      table.cell(colspan: 2, fill: gray.lighten(80%))[*Move-Deinit*],
-      {
-        codly(
-          highlights: (
-            (line: 2, start: 16, end: 22, fill: green),
-            (line: 4, start: 9, end: 15, fill: green),
-          ),
-        )
-        ```rust
-        let tuple = (vec![1], vec![2]);
-        moves_argument(tuple.1);
-        // Does not overlap tuple.1:
-        let x = tuple.0[0];
-        ```
-      },
-      {
-        codly(
-          highlights: (
-            (line: 2, start: 16, end: 22, fill: green),
-            (line: 4, start: 9, end: 15, fill: red),
-          ),
-        )
-        ```rust
-        let tuple = (vec![1], vec![2]);
-        moves_argument(tuple.0);
-        // ERROR: use of moved value:
-        let x = tuple.0[0];
-        ```
-      },
-      table.cell(colspan: 2, fill: gray.lighten(80%))[*Shared-Readonly*],
-      {
-        codly(
-          highlights: (
-            (line: 3, start: 9, end: 13, fill: green),
-            (line: 4, start: 9, end: 13, fill: green),
-            (line: 5, start: 11, end: 11, fill: green),
-            (line: 5, start: 25, end: 25, fill: green),
-          ),
-        )
-        ```rust
-        struct Point(u32, u32);
-        let mut pt = Point(13, 17);
-        let x = &pt;
-        let y = &pt;
-        dummy_use(x); dummy_use(y);
-        ```
-      },
-      {
-        codly(
-          highlights: (
-            (line: 3, start: 9, end: 13, fill: green),
-            (line: 6, start: 0, end: 9, fill: red),
-            (line: 7, start: 11, end: 11, fill: green),
-          ),
-        )
-        ```rust
-        struct Point(u32, u32);
-        let mut pt = Point(13, 17);
-        let x = &pt;
-        // ERROR: assigned to
-        //   borrowed value:
-        pt.0 += 1;
-        dummy_use(x);
-        ```
-      },
-
-      table.cell(colspan: 2, fill: gray.lighten(80%))[*Unique-Write*],
-      {
-        codly(
-          highlights: (
-            (line: 3, start: 9, end: 18, fill: green),
-            (line: 4, start: 9, end: 18, fill: green),
-            (line: 6, start: 11, end: 11, fill: green),
-          ),
-        )
-        ```rust
-        struct Point(u32, u32);
-        let mut pt = Point(13, 17);
-        let x = &mut pt;
-        let y = &mut pt;
-        //dummy_use(x);
-        dummy_use(y);
-        ```
-      },
-      {
-        codly(
-          highlights: (
-            (line: 3, start: 9, end: 18, fill: red),
-            (line: 6, start: 9, end: 18, fill: red),
-            (line: 7, start: 11, end: 11, fill: red),
-            (line: 8, start: 11, end: 11, fill: green),
-          ),
-        )
-        ```rust
-        struct Point(u32, u32);
-        let mut pt = Point(13, 17);
-        let x = &mut pt;
-        // ERROR: cannot borrow `pt`
-        // as mutable more than once:
-        let y = &mut pt;
-        dummy_use(x);
-        dummy_use(y);
-        ```
-      },
-
-      table.cell(colspan: 2, fill: gray.lighten(80%))[*Ref-Live*],
-      {
-        codly(
-          highlights: (
-            (line: 4, start: 5, end: 7, fill: green),
-            (line: 7, start: 9, end: 11, fill: green),
-          ),
-        )
-        ```rust
-        struct Point(u32, u32);
-        let pt = Point(6, 9);
-        let x = {
-            &pt
-        }; // pt still in scope
-
-        let z = x.0;
-        ```
-      },
-      {
-        codly(
-          highlights: (
-            (line: 4, start: 5, end: 7, fill: red),
-            (line: 8, start: 9, end: 11, fill: red),
-          ),
-        )
-        ```rust
-        struct Point(u32, u32);
-        let x = {
-            let pt = Point(6, 9);
-            &pt
-        }; // pt goes out of scope
-        // ERROR: pt does not live
-        // long enough:
-        let z = x.0;
-        ```
-      },
-    ),
-    caption: [Pravila preverjevalnika izposoj iz @stjernaModellingRustsReference. Pozitivni primeri predstavljajo mesta, kjer preverjevalnik sprejme kodo, negativni pa kjer jo zavrne.],
-  ) <tab:borrow-check>
-]
+#import "rule_table.typ": rule_table
+#rule_table
 
 // reset codly stuff
 #codly(display-name: true, display-icon: true, number-format: numbering.with("1"))
@@ -505,23 +384,23 @@ spremenljivo posojo (ustvarjanje kakršnekoli nove posoje, pisanje v mesto, bran
 Tako lahko sestavimo naši naslednji dve pravili:
 
 $
-  "Shared-Readonly"(p) &<==> exists.not L,m: \
-  "PosojaAktivna"(L,p) &and "VrstaPosoje" = "shrd" and \
-  "Prekrivanje"(m, O(L)) &and "RazveljaviDeljeno"(m,p)
+    "Shared-Readonly"(p) & <==> exists.not L,m: \
+    "PosojaAktivna"(L,p) & and "VrstaPosoje" = "shrd" and \
+  "Prekrivanje"(m, O(L)) & and "RazveljaviDeljeno"(m,p)
 $
 
 $
-  "Unique-Write"(p) &<==> exists.not L,m: \
-  "PosojaAktivna"(L,p) &and "VrstaPosoje" = "uniq" and \
-  "Prekrivanje"(m, O(L)) &and "RazveljaviSpremenljivo"(m,p)
+       "Unique-Write"(p) & <==> exists.not L,m: \
+    "PosojaAktivna"(L,p) & and "VrstaPosoje" = "uniq" and \
+  "Prekrivanje"(m, O(L)) & and "RazveljaviSpremenljivo"(m,p)
 $
 
 Za zadnje pravilo potrebujemo še en predikat imenovan $"MestoAktivno"(m,p)$, ki velja natanko tedaj,
 ko je mesto $m$ še aktivno (torej ni bilo dropped) na točki $p$. Potem pravilo Ref-Live lahko zapišemo tako:
 
 $
-  "Ref-Live"(p) &<==> exists.not L, m: \
-  "PosojaAktivna"(L,p) &and "Prekrivanje"(m, O(L)) and not "MestoAktivno"(m,p)
+         "Ref-Live"(p) & <==> exists.not L, m: \
+  "PosojaAktivna"(L,p) & and "Prekrivanje"(m, O(L)) and not "MestoAktivno"(m,p)
 $
 
 == Primer
