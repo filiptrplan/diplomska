@@ -250,15 +250,15 @@ Prevajalnik nam pri primeru @lst:lifetime-annotate vrne napako, saj je spremenlj
 // tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa
 // prednosti in slabosti vsakega sistema
 
-#chapter[Formalizacija]
+#chapter[Formalizacija Poloniusa]
 
-Glavno delo na področju formalizacije Poloniusa je magistrsko delo Amande Stjerna, ki je nastalo leta 2020, dve leti po prvotni formulaciji @stjernaModellingRustsReference @AliasbasedFormulationBorrow. V delu Stjerna prvo formalizira Polonius kot del sistema tipov avtorjev @weissOxideEssenceRust2019 imenovan Oxide @weissOxideEssenceRust2019. Stjerna upraviči svojo izbiro izhodiščnega sistema tipov s tem, da si deli koncept t.i. _provenance variables_. Delo se nato nadaljuje z implementacijo Poloniusa v jeziku Datalog (podmnožica Prologa), ki služi kot podlaga za prvo različico implementacije v Rustovem prevajalniku @RustlangPolonius2025.
+// Glavno delo na področju formalizacije Poloniusa je magistrsko delo Amande Stjerna, ki je nastalo leta 2020, dve leti po prvotni formulaciji @stjernaModellingRustsReference @AliasbasedFormulationBorrow. V delu Stjerna prvo formalizira Polonius kot del sistema tipov avtorjev @weissOxideEssenceRust2019 imenovan Oxide @weissOxideEssenceRust2019. Stjerna upraviči svojo izbiro izhodiščnega sistema tipov s tem, da si deli koncept t.i. _provenance variables_. Delo se nato nadaljuje z implementacijo Poloniusa v jeziku Datalog (podmnožica Prologa), ki služi kot podlaga za prvo različico implementacije v Rustovem prevajalniku @RustlangPolonius2025.
 
-V temu poglavju bomo prvo predstavili intuitivni opis delovanja Poloniusa in temu sledili s formalnim opisom pravil Rustovega prevajalnika. Nazadnje bomo še predstavili delovanje Poloniusa iz vidika množic.
+V temu poglavju bomo prvo predstavili intuitivni opis delovanja Poloniusa in temu sledili s formalnim opisom pravil Rustovega preverjevalnika izposoj. Nazadnje bomo še predstavili delovanje Poloniusa iz vidika množic in relacij.
 
 == Intuitivna razlaga Poloniusa
 
-Naslednja razlaga smo prilagodili iz originalne spletne objave @AliasbasedFormulationBorrow. Predstavili jo bomo na @lst:intuition[primeru] iz objave, vendar brez natančnih opisov relacij, ki jih uporablja Polonius.
+Preden formalno predstavimo vse točne podrobnosti Poloniusa, je pomembno dobiti nekaj intuicije o njegovem delovanju, saj nam bo olajšala razumevanje zapletenih relacij in njihovih pravil na katerih algoritem temelji. Naslednjo razlago smo prilagodili iz originalne spletne objave, ki je zastavila Polonius @AliasbasedFormulationBorrow. Delovanje bomo predstavili na @lst:intuition[primeru], vendar brez natančnih opisov relacij in množic, ki nastopajo pri dejanski analizi.
 
 #figure(
   ```rust
