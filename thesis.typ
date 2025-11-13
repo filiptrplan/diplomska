@@ -560,7 +560,7 @@ mestih:
   zeta: $zeta$,
   iota: $iota$,
   nablaL: $nabla_L$,
-  "in": $in$,
+  "inn": $in$,
   "implies": $arrow.r.double$,
 ))
 
@@ -646,21 +646,21 @@ _Opomba:_ Oznaka `<:` nam predstavlja vsebovanost med tipi (_subtyping relation_
 
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
     // tukaj zahtevamo naslednje: &'3 mut Vec<&'0 i32> <: &'1 mut Vec<&'2 i32>
-    // (r3, r1, P) in beta, (r0, r2, P) in beta, (r2, r0, P) in beta
+    // (r3, r1, P) inn beta, (r0, r2, P) inn beta, (r2, r0, P) inn beta
 
     let p: &'5 i32 = &'4 x;
     // zahtevamo: &'4 i32 <: &'5 i32
-    // (r4, r5, P) in beta
+    // (r4, r5, P) inn beta
 
     r.push(p);
     // zahtevamo: &'5 i32 <: &'2 i32
-    // (r5, r2, P) in beta
+    // (r5, r2, P) inn beta
 
     x += 1;
 
     take::<Vec<&'6 i32>>(v);
     // zahtevamo Vec<&'0 i32> <: Vec<&'6 i32>
-    // (r0, r6, P) in beta
+    // (r0, r6, P) inn beta
   }
   ```,
   caption: [Začetna relacija vsebovanosti],
@@ -679,9 +679,9 @@ regije $R$. Prav tako kot relacija vsebovanosti se ta zahteva vzpostavi na sredi
     let mut x: i32 = 22;
     let mut v: Vec<&'0 i32> = vec![];
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // (r3, L0, P) in psi
+    // (r3, L0, P) inn psi
     let p: &'5 i32 = &'4 x;
-    // (r4, L1, P) in psi
+    // (r4, L1, P) inn psi
     r.push(p);
     x += 1;
     take::<Vec<&'6 i32>>(v);
@@ -737,9 +737,9 @@ je že opisano v poglavju o definicije množice $cal(L)$.
     let mut x: i32 = 22;
     let mut v: Vec<&'0 i32> = vec![];
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // (r3, L0, P) in psi
+    // (r3, L0, P) inn psi
     let p: &'5 i32 = &'4 x;
-    // (r4, L1, P) in psi
+    // (r4, L1, P) inn psi
     r.push(p);
     x += 1; // tukaj razveljavimo L1 z mutacijo deljenega referenta
     take::<Vec<&'6 i32>>(v);
@@ -784,24 +784,24 @@ Na primeru ustvarimo naslednje relacije:
     let mut v: Vec<&'0 i32> = vec![];
 
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // (r3, r1) in beta, (r0, r2) in beta, (r2, r0) in beta
+    // (r3, r1) in beta, (r0, r2) inn beta, (r2, r0) inn beta
 
     let p: &'5 i32 = &'4 x;
-    // (r3, r1) in beta, (r0, r2) in beta, (r2, r0) in beta
-    // (r4, r5) in beta
+    // (r3, r1) inn beta, (r0, r2) inn beta, (r2, r0) inn beta
+    // (r4, r5) inn beta
 
     r.push(p);
-    // (r3, r1) in beta, (r0, r2) in beta, (r2, r0) in beta
-    // (r4, r5) in beta
-    // (r5, r2) in beta
+    // (r3, r1) inn beta, (r0, r2) inn beta, (r2, r0) inn beta
+    // (r4, r5) inn beta
+    // (r5, r2) inn beta
 
     x += 1;
 
     take::<Vec<&'6 i32>>(v);
-    // (r3, r1) in beta, (r0, r2) in beta, (r2, r0) in beta
-    // (r4, r5) in beta
-    // (r5, r2) in beta
-    // (r0, r6) in beta
+    // (r3, r1) inn beta, (r0, r2) inn beta, (r2, r0) inn beta
+    // (r4, r5) inn beta
+    // (r5, r2) inn beta
+    // (r0, r6) inn beta
   }
 
   fn take<T>(p: T) { .. }
@@ -836,18 +836,18 @@ za propagacijo aktivna na naslednji točki $Q$. Z naslednjim primerom ponazorimo
   let y = 44;
 
   let mut p: &'0 i32 = &'1 x; // posoja L0
-  // (r1,r0) in beta
-  // (r1, L0) in zeta
+  // (r1,r0) inn beta
+  // (r1, L0) inn zeta
 
   p = &'3 y; // posoja L1
-  // (r3,r0) in beta
-  // (r3, L1) in zeta
+  // (r3,r0) inn beta
+  // (r3, L1) inn zeta
   // r1 ni več aktivna, ker smo jo prepisali z r3
 
   x += 1;
-  // razveljavi se posoja L0: (L0) in iota
+  // razveljavi se posoja L0: (L0) inn iota
   // tukaj bi brez pravila o aktivnosti regij še vedno zahtevali
-  // (L0, r0) in zeta zaradi pravila o propagaciji
+  // (L0, r0) inn zeta zaradi pravila o propagaciji
 
   print( *p );
   // ta izraz posledično ne bi bil veljaven
@@ -889,15 +889,15 @@ Poglejmo še kako se dokončno napaka javi na našem primeru:
     // relacije, ki so ustvarjene tukaj niso relevantne za napako
 
     let p: &'5 i32 = &'4 x;
-    // (r4, L1) in zeta
-    // (r4, r5) in beta implies (r5, L1) in zeta
+    // (r4, L1) inn zeta
+    // (r4, r5) inn beta implies (r5, L1) inn zeta
 
     r.push(p);
-    // (r5, r2) in beta implies (r2, L1) in zeta
+    // (r5, r2) inn beta implies (r2, L1) inn zeta
 
     x += 1;
-    // Tukaj se razveljavi posoja L1: (L1) in iota.
-    // Da se nam javi napaka mora biti ta posoja aktivna (L1) in nablaL.
+    // Tukaj se razveljavi posoja L1: (L1) inn iota.
+    // Da se nam javi napaka mora biti ta posoja aktivna (L1) inn nablaL.
     // Torej jo mora zahtevati neka aktivna regija, na trenutni točki pa je
     // aktivna regija r2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš
     // vektor `v`. Elementi vektorja pa imajo regijo r2, ki pa je del posoje L1.
