@@ -140,13 +140,13 @@ V nasprotju z NLL-om Polonius prevede primer @listing:mot_ex kot veljaven, saj i
 
 V poglavju @chap:motivacijski-primer smo predstavili primer, ki je motiviral nadgradnjo prejšnjega preverjevalnika izposoj. Zraven smo podali intuitivno razlago, zakaj je bil ta program pravilen, vendar smo se nanašali na pravila, ki so osnovana na lastništvu -- Rustovem naboru pravil za zagotavljanja pomnilniško varnih programov.
 
-Knjiga _The Rust Programming Language_, neuradni priročnik za Rust, nam pove, da lastništvo obsega tri pravila @klabnikRustProgrammingLanguage2023:
+Knjiga _The Rust Programming Language_, neuradni priročnik za Rust, nam pove, da lastništvo obsega tri pravila @klabnikRustProgrammingLanguage2023: #footnote[Vprasanje: temelji na treh pravilih? Odgovor: imenujejo se "ownership rules"]
 
 + Vsaka vrednost v Rustu ima _lastnika_.
 + Za vsako vrednost lahko obstaja samo en lastnik hkrati.
-+ Ko lastnik izstopi iz dosega, je vrednost sproščena #angl[dropped].
++ Ko lastnik izstopi#footnote[napisano je _goes out of scope_] iz dosega, je vrednost sproščena #angl[dropped].
 
-Lastnik tukaj se nanaša na spremenljivko (bolj podrobno _lvalue_) na katero je ta vrednost vezana. V spodnjem preprostem primeru opazimo, da vrednost `hello` enkrat zamenje lastnika, torej njen prvotni lastnik `a` potem ne vsebuje vrednosti. Če hočemo uporabiti `a` potem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
+Lastnik se tukaj nanaša na spremenljivko (bolj natančno _lvalue_), na katero je ta vrednost vezana. V primeru @listing:ownership1 opazimo, da vrednost `hello` enkrat zamenje lastnika, torej njen prvotni lastnik `a` potem ne vsebuje vrednosti. Če hočemo uporabiti `a` potem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
 
 #figure(
   ```rust
@@ -157,7 +157,7 @@ Lastnik tukaj se nanaša na spremenljivko (bolj podrobno _lvalue_) na katero je 
   caption: [Primer lastništva],
 ) <listing:ownership1>
 
-Lastništvo je pa tudi vezano na doseg. Koncept dosega pa lahko preprosto prikažemo z leksičnim dosegom, tako da inicializiramo novo vrednost `a`-ja znotraj gnezdenega bloka, ki ustvari nov scope.
+Lastništvo je vezano na doseg. Koncept dosega lahko preprosto prikažemo z leksikalnim dosegom, tako da inicializiramo novo vrednost `a`-ja znotraj gnezdenega bloka, ki ustvari nov scope. To je prikazano v primeru @listing:scope1
 
 #figure(
   ```rust
@@ -169,14 +169,13 @@ Lastništvo je pa tudi vezano na doseg. Koncept dosega pa lahko preprosto prika�
   caption: [Primer leksičnega dosega],
 ) <listing:scope1>
 
-// obrazloži kako se lastništvo povezuje z življenjskimi dobami in referencami
-V zgornjih primerih nismo videli bistvene razlike med Rustom in sorodnimi jeziki. Razlika nastopi v tem, kako se reference ustvarjajo in razdelitvi teh na dva različna tipa. Ko v Rustu govorimo o referencah, lahko rečemo, da so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da prevajalnik v Rustu poskrbi, da takšna referenca vedno kaže na veljavno vrednost pravega tipa -- in to skozi celotno življenjsko dobo te reference @klabnikRustProgrammingLanguage2023. Ta varnostni mehanizem nam omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: gotovost, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
+V zgornjih primerih nismo videli bistvene razlike med Rustom in sorodnimi jeziki. Razlika je v tem, kako se reference ustvarjajo in kako so razdeljene na dva različna tipa. Ko v Rustu govorimo o referencah, lahko rečemo, da so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da prevajalnik v Rustu poskrbi, da referenca v Rustu vedno kaže na veljavno vrednost pravega tipa -- in to skozi celotno življenjsko dobo te reference @klabnikRustProgrammingLanguage2023. Ta varnostni mehanizem nam omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: gotovost, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
 
-Prevajalnik preverja pomnilniško pravilnost programov s t.i. *MIR* (_Mid-level intermediate representation_), ki je bistveno poenostavljena oblika Rusta in zadnji korak pred generiranjem kode za _backend_ (? kako po slovensko). Temelji na grafu kontrole toka, ki ga bomo opisali pozneje v nalogi. Ta oblika Rusta je pomembna, ker nam bistveno poenostavi preverjanje izposoj in nam omogoča lažjo analizo. Prav tako je tukaj točno definiran pojem *mesta* #angl[place], ki je eden izmed ključnih izrazov pri analizi pravilnosti programa. Mesto je izraz, ki nam opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. `_1`) ali pa njena projekcija (npr. polje strukture `_1.polje`) @MIRMidlevelIR.
+Prevajalnik preverja pomnilniško pravilnost programov, ko so ti pretvorjeni v vmesno kodo *MIR* (_Mid-level intermediate representation_), ki je bistveno poenostavljena oblika Rusta in zadnji korak pred generiranjem strojne kode v zadnjem delu prevajalnika (v Rustovem primeru LLVM). MIR temelji na grafu kontrole toka, ki ga bomo opisali pozneje v nalogi. Ta oblika Rusta je pomembna, ker nam bistveno poenostavi preverjanje izposoj in nam omogoča lažjo analizo. Prav tako je tukaj točno definiran pojem *mesta* #angl[place], ki je eden izmed ključnih izrazov pri analizi pravilnosti programa. Mesto je izraz, ki nam opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. `_1`) ali pa njena projekcija (npr. polje strukture `_1.polje`) @MIRMidlevelIR.
 
-Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc @crichtonGroundedConceptualModel2023 @yanovskiGhostCellSeparatingPermissions2021 @weissOxideEssenceRust2019. Prva vrsta so *deljene oz. nespremenljive reference* #angl[shared references]. Takih je lahko hkrati več in vse lahko kažejo na isto mesto v pomnilniku. Pravilo, ki zagotavlja da so take deljene reference varne, pravi, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so *spremenljive reference* #angl[mutable / unique references]. Pri teh se pravila ravno obrnejo; lahko jih imamo zgolj eno in lahko spreminjamo podatke na pomnilniškem mestu, ki ga referencira (preko spremenljive reference, ne preko prvotne spremenljivke).
+Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc @crichtonGroundedConceptualModel2023 @yanovskiGhostCellSeparatingPermissions2021 @weissOxideEssenceRust2019. Prva vrsta so *deljene in zato nespremenljive reference* #angl[shared references]. Takih je lahko hkrati več in vse lahko kažejo na isto mesto v pomnilniku. Pravilo, ki zagotavlja, da so take deljene reference varne, pravi, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so *spremenljive reference* #angl[mutable / unique references]. Pri teh se pravila ravno obrnejo: lahko imamo zgolj eno tako referenco, zato pa lahko spreminjamo podatke na pomnilniškem mestu, ki ga referencira (preko spremenljive reference, ne preko prvotne spremenljivke).
 
-Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo za vsako pokazali veljaven primer uporabe in nato še neveljaven.
+Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo pokazali pravilno in nepravilno uporabo deljene reference nato pa še spremenljive.
 
 #figure(
   ```rust
@@ -187,21 +186,6 @@ Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo 
   ```,
   caption: [Pravilna uporaba deljene reference],
 ) <lst:uporabadeljena>
-
-#figure(
-  ```rust
-  let mut a = 6;
-  let b = &mut a;
-  *b = 7; // lahko spremenimo podatke na pomnilniški lokaciji,
-          // ker je referenca spremenljiva
-  ```,
-  caption: [Pravilna uporaba spremenljive reference],
-) <lst:uporabaspremenljiva>
-
-Obratne operacije pri obeh primerih bi vrnile napako zaradi kršitve pravil referenc. Torej, če bi poskusili pisati
-v deljeno referenco kot v primeru @lst:uporabadeljena bi nam prevajalnik vrnil napako zaradi kršitve zagotovila o preprečitvi
-branja. Prav tako če bi poskusili izpisati spremenljivko `a`, ki je bila spremenljivo izposojena v primeru @lst:uporabaspremenljiva,
-bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali lastnika vrednosti in njeno spremenljivo referenco.
 
 #figure(
   ```rust
@@ -216,6 +200,16 @@ bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali las
 #figure(
   ```rust
   let mut a = 6;
+  let b = &mut a;
+  *b = 7; // lahko spremenimo podatke na pomnilniški lokaciji,
+          // ker je referenca spremenljiva
+  ```,
+  caption: [Pravilna uporaba spremenljive reference],
+) <lst:uporabaspremenljiva>
+
+#figure(
+  ```rust
+  let mut a = 6;
   let b = &mut a; // ustvarimo spremenljivo referenco
   println!("{}", a); // NAPAKA: hkratna uporaba lastnika in spremenljive reference
   *b = 7;
@@ -223,13 +217,17 @@ bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali las
   caption: [Napačna uporaba spremenljive reference - hkratna uporaba lastnika],
 ) <lst:napacnaspremenljiva>
 
-To razmerje med obema vrstama referenc -- večkratne nespremenljive ali pa ena sama spremenljiva -- lahko strnemo v načelo, ki ga imenujemo _aliasing XOR mutability_. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le ena referenca. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov @yanovskiGhostCellSeparatingPermissions2021.
+Obratne operacije pri obeh primerih bi vrnile napako zaradi kršitve pravil referenc. Torej, če bi v primeru @lst:uporabadeljena po izpisu dodali še vrstico `*b = 7;` (pisanje preko reference), bi nam prevajalnik vrnil napako zaradi kršitve zagotovila o preprečitvi branja. Prav tako če bi poskusili izpisati spremenljivko `a`, ki je bila spremenljivo izposojena v primeru @lst:uporabaspremenljiva, bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali lastnika vrednosti in njeno spremenljivo referenco.
 
-Pravila o referencah lahko povzamemo z dvemi pravili @klabnikRustProgrammingLanguage2023
+
+
+To razmerje med obema vrstama referenc -- večkratne nespremenljive ali pa ena sama spremenljiva -- lahko strnemo v načelo, ki ga imenujemo _aliasing XOR mutability_ #footnote[slo. prevod?]. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več načinov hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le ena referenca. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov @yanovskiGhostCellSeparatingPermissions2021.
+
+Pravila o referencah lahko povzamemo z dvema praviloma @klabnikRustProgrammingLanguage2023
 + Hkrati je lahko ustvarjena _ali_ ena spremenljiva referenca _ali_ poljubno število deljenih referenc.
 + Reference morajo biti vedno veljavne (kazati na veljavno mesto).
 
-Še ena podrobnost, ki je pomembna za razumevanje lastništva so *življenjske dobe* #angl[lifetimes], ki so sestavni del tipov. Kot sami tipi v Rustu, so ponavadi izpeljane, vendar se pogosto pri funkcijski zapisih (signatures?) zgodi, da jih moramo eksplicitno podati. Na primer, dejanski tip reference na niz ni `&String` ampak `&'a String`, kjer je `'a` življenjska doba. Pomembno je tudi omeniti, da so življenjske dobe del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna @klabnikRustProgrammingLanguage2023. Najlažje si to ogledamo s primerom @lst:lifetime-annotate.
+Še ena podrobnost, ki je pomembna za razumevanje lastništva, so *življenjske dobe* #angl[lifetimes]. Te so v Rustu sestavni del tipov. Kot sami tipi v Rustu so ponavadi izpeljane, vendar se pogosto pri funkcijski zapisih #footnote[prevod signatures?] zgodi, da jih moramo eksplicitno podati. Na primer, dejanski tip reference na niz ni `&String` ampak `&'a String`, kjer je `'a` življenjska doba. Pomembno je tudi omeniti, da so življenjske dobe del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna @klabnikRustProgrammingLanguage2023. Najlažje to predstavimo s primerom @lst:lifetime-annotate.
 
 #figure(
   ```rust
@@ -247,7 +245,7 @@ Pravila o referencah lahko povzamemo z dvemi pravili @klabnikRustProgrammingLang
   caption: [Anotirane življenjske dobe na primeru],
 ) <lst:lifetime-annotate>
 
-Ta program nam vrne napako, saj je spremenljivka `x` veljavna samo za življenjsko dobo `'b`, vendar program zahteva, da je veljavna za `'a`. Izračun življenjskih dob je odvisen od implementacije preverjevalnika izposoj, vendar si jih lahko intuitivno predstavljamo kot najmanjšo množico vrstic, kjer bo ta spremenljivka oz. mesto še uporabljeno.
+Prevajalnik nam pri primeru @lst:lifetime-annotate vrne napako, saj je spremenljivka `x` veljavna samo za življenjsko dobo `'b`, vendar prevajalnik zahteva, da je veljavna za `'a`. Izračun življenjskih dob je odvisen od implementacije preverjevalnika izposoj, vendar si jih lahko intuitivno predstavljamo kot najmanjšo množico #footnote[Vprasanje: interval? Odgovor: mnozica je, ne nujno strnjen interval] vrstic, kjer bo ta spremenljivka oz. mesto še uporabljeno.
 
 // intuicija glede 2015 verzije borrow checkerja pred NLL: https://youtu.be/uCN_LRcswts?si=S2Ii5VHYF4X7HDo-&t=515
 // tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa

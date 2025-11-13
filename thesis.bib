@@ -238,6 +238,25 @@
   annotation = {OCLC: on1363816350}
 }
 
+@inproceedings{matsushitaRustHornBeltSemanticFoundation2022a,
+  title = {{{RustHornBelt}}: A Semantic Foundation for Functional Verification of {{Rust}} Programs with Unsafe Code},
+  shorttitle = {{{RustHornBelt}}},
+  booktitle = {Proceedings of the 43rd {{ACM SIGPLAN International Conference}} on {{Programming Language Design}} and {{Implementation}}},
+  author = {Matsushita, Yusuke and Denis, Xavier and Jourdan, Jacques-Henri and Dreyer, Derek},
+  date = {2022-06-09},
+  pages = {841--856},
+  publisher = {ACM},
+  location = {San Diego CA USA},
+  doi = {10.1145/3519939.3523704},
+  url = {https://dl.acm.org/doi/10.1145/3519939.3523704},
+  urldate = {2025-11-12},
+  abstract = {Rust is a systems programming language that offers both lowlevel memory operations and high-level safety guarantees, via a strong ownership type system that prohibits mutation of aliased state. In prior work, Matsushita et al. developed RustHorn, a promising technique for functional verification of Rust code: it leverages the strong invariants of Rust types to express the behavior of stateful Rust code with first-order logic (FOL) formulas, whose verification is amenable to offthe-shelf automated techniques. RustHorn’s key idea is to use prophecies to describe the behavior of mutable borrows. However, the soundness of RustHorn was only established for a safe subset of Rust, and it has remained unclear how to extend it to support various safe APIs that encapsulate unsafe code (i.e., code where Rust’s aliasing discipline is relaxed).},
+  eventtitle = {{{PLDI}} '22: 43rd {{ACM SIGPLAN International Conference}} on {{Programming Language Design}} and {{Implementation}}},
+  isbn = {978-1-4503-9265-5},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/LPY3GPM2/Matsushita et al. - 2022 - RustHornBelt a semantic foundation for functional verification of Rust programs with unsafe code.pdf}
+}
+
 @online{MemorySafetya,
   title = {Memory Safety},
   url = {https://www.chromium.org/Home/chromium-security/memory-safety/},
