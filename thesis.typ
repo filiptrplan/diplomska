@@ -2,9 +2,44 @@
 
 #import "@preview/codly:1.3.0": *
 #import "@preview/codly-languages:0.1.1": *
+#import "@preview/obsidius:0.1.0": *
 #show: codly-init.with()
 #codly(languages: codly-languages)
 #show raw: set text(size: 9pt)
+
+#import "@preview/fontawesome:0.6.0": *
+// Define the function
+#let remark(body, title: "Remark", color: rgb("#0074d9")) = {
+  let background-color = color.lighten(90%)
+  let stroke-color = color
+
+  block(
+    fill: background-color,
+    stroke: (left: 3pt + stroke-color),
+    inset: (x: 1.2em, y: 1em),
+    outset: (y: 0em), // Keeps it contained vertically
+    radius: (right: 4pt), // Subtle rounding on the right looks modern
+    width: 100%,
+    breakable: true,
+    above: 1.2em,
+    below: 1.2em,
+    stack(
+      dir: ltr,
+      spacing: 0.4em,
+      place(top, box(
+        height: 1em,
+        baseline: 20%,
+        text(stroke-color, fa-icon("circle-info")),
+      )),
+      pad(left: 1.5em, [
+        #set text(fill: stroke-color.darken(20%))
+        #strong(title) \
+        #set text(fill: black) // Reset text color for body
+        #body
+      ]),
+    ),
+  )
+}
 
 #let angl(cont) = [(angl. #emph(cont))]
 
@@ -60,7 +95,7 @@ V nadaljevanju bomo uporabljali dva podobna pojma. _Varen program_ bo pomenilo t
 
 Preverjevalnik izposoj se je med razvojem Rusta bistveno spremenil od svoje prvotne implementacije. Na začetku je bil dokaj preprost in veliko pravilnih programov ni sprejel zaradi svoje konzervativnosti pri zagotavljanju varnosti @2094nllRustRFC. Zato se je čez par let pojavila naslednja različica preverjevalnika, imenovana NLL (_non-lexical lifetimes_), ki je rešila veliko pogostih problemov s prvotno različico. Vendar NLL še vedno ne sprejema vseh veljavnih programov. Da bi rešili probleme NLL-ja, so Rustovi razvijalci predlagali najnovejšo različico preverjevalnika imenovano Polonius, ki drugače zastavi problem lastništva in tako sprejme še večji delež pravilnih programov @AliasbasedFormulationBorrow.
 
-NLL je bil prvotno zelo natančno opisan v RFC-ju, kar je potem vodilo njegov razvoj. Polonius pa je prvotno nastal kot predlog na spletnem blogu in se počasi razvijal s pomočjo dodatnih objav na blogu enega izmed Rustovih razvijalcev @PoloniusRevisitedPartb @PoloniusRevisitedPartc @WhatPoloniusPolonius. Do danes ne obstaja celovit centraliziran formalen opis Poloniusa, le nekaj spletnih objav, delni formalni opis v magistrskem delu enega izmed razvijalcev @stjernaModellingRustsReference, nedokončana knjiga @WhatPoloniusPolonius ter trenutna implementacija v Rustovem prevajalniku.
+NLL je bil prvotno zelo natančno opisan v RFC-ju, kar je potem vodilo njegov razvoj. Polonius pa je prvotno nastal kot predlog na spletnem blogu in se počasi razvijal s pomočjo dodatnih objav na blogu enega izmed Rustovih razvijalcev @PoloniusRevisitedPart @PoloniusRevisitedParta @WhatPoloniusPolonius. Do danes ne obstaja celovit centraliziran formalen opis Poloniusa, le nekaj spletnih objav, delni formalni opis v magistrskem delu enega izmed razvijalcev @stjernaModellingRustsReference, nedokončana knjiga @WhatPoloniusPolonius ter trenutna implementacija v Rustovem prevajalniku.
 
 Cilj te naloge je potemtakem na svoj način formalizirati inferenčna pravila, ki sestavljajo Polonius, in nadgraditi nekaj že vzpostavljenih formalizacij @stjernaModellingRustsReference. Najprej bomo raziskali pretekle poskuse formalizacije Rusta in sorodne načine upravljanja s pomnilnikom. Nato sledi intuitivni opis Rustovih pravili izposojanja ter bomo nato končali s formalizacijo Poloniusa ter pravil preverjevalnika izposoj.
 
@@ -257,6 +292,7 @@ Prevajalnik nam pri primeru @lst:lifetime-annotate vrne napako, saj je spremenlj
 V temu poglavju bomo prvo predstavili intuitivni opis delovanja Poloniusa in temu sledili s formalnim opisom pravil Rustovega preverjevalnika izposoj. Nazadnje bomo še predstavili delovanje Poloniusa iz vidika množic in relacij.
 
 == Intuitivna razlaga Poloniusa
+<chap:intuitivna-razlaga-poloniusa>
 
 Preden formalno predstavimo vse točne podrobnosti Poloniusa, je pomembno dobiti nekaj intuicije o njegovem delovanju, saj nam bo olajšala razumevanje zapletenih relacij in njihovih pravil na katerih algoritem temelji. Naslednjo razlago smo prilagodili iz originalne spletne objave, ki je zastavila Polonius @AliasbasedFormulationBorrow. Delovanje bomo predstavili na @lst:intuition[primeru], vendar brez natančnih opisov relacij in množic, ki nastopajo pri dejanski analizi.
 
@@ -330,8 +366,12 @@ V tretjem obhodu nato javimo napako, ker operacija mutiranja spremenljivke `x` n
 V intuitivni razlagi smo izpustili več podrobnosti, kot je izračun aktivnosti regij in posoj, podrobnosti propagacije različnih vsebovanosti skozi program in pogoje za ustvarjanje raznih drugih omejitev (constraints?). Prav tako je pomembno omeniti, da analiza deluje na MIR, ki je osnovan na podatkovni strukturi grafa, ne pa na samih vrsticah v programu.
 
 == Formalizacija pravil
-Da Rustov preverjevalnik izposoj zadosti zagotovilom o varnosti programa mora zavrniti programe,
-ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
+
+Do zdaj smo pravila izposojanja in lastništva opisovali intuitivno, vendar za prihodnje poglavja je bolje razumeti vsa pravila formalno. Trenutno ne obstaja uradnega formalnega opisa pravil preverjevalnika izposoj, vendar ekipa za projektom `a-mir-formality` se ukvarja ravno s to nalogo @BorrowCheckingAmirformalitya.
+
+Zaradi pomanjkanja uradne specifikacije pravil, se bomo zanesli na delo Amande Stjerne @stjernaModellingRustsReference, kjer je opisno in s tabelo predstavila pravila, ki se jih mora preverjevalnik izposoj držati. Njena pravila bomo nadgradili s formalno notacijo, ki je podobna tisti, ki jo bomo uporabili v naslednjih poglavjih.
+
+V @tab:borrow-check[tabeli] imamo podane pozitivne in negativne primere za vsako pravilo, točno tako kot jih je zastavila Stjerna. S pomočjo teh primerov in njene razlage bomo osnovali formalni zapis teh pravil.
 
 #import "rule_table.typ": rule_table
 #rule_table
@@ -340,49 +380,39 @@ ki se ne drzijo naslednjih pravil izvzetih iz @stjernaModellingRustsReference.
 #codly(display-name: true, display-icon: true, number-format: numbering.with("1"))
 
 Pravilo `Use-Init` nam pove, da lahko uporabljamo samo spremenljivke, ki so zagotovo inicializirane
-na točki v programu, kjer jih uporabljamo. Glede na prvotno implementacije Poloniusa Rustove ekipe poleg
-osnovnih dejstev opisanih v spletni objavi dobimo še dejstva `var_defined_at`, `var_used_at` in
-`var_dropped_at` @RustlangPoloniusDefines.
+na točki v programu, kjer jih uporabljamo. Skupaj s pravili `Move-Deinit`, ki pravi da ne smemo uporaljati premaknjenih vrednosti, in `Ref-Live`, ki nam onemogoči dostop do sproščenih vrednosti prek referenc, tvori osnovo za sistem lastništva. Ta pravila nam na primer preprečijo vračanje vrednosti, ki je bila ustvarjena na skladu, iz funkcije, saj je vrednost na izhodu iz funkcije sproščena @stjernaModellingRustsReference.
 
-Mogoče tole zgoraj ni tako relevantno, ker se ukvarjamo z implementacijo že. Lahko definiramo množico
-$"Poti"(p)$, ki nam poda vse poti skozi graf poteka od začetka funkcije do začetka trenutne točke $p$
-v programu. Potem lahko definiramo še predikat $"Init"(pi, x, p)$, ki velja natanko tedaj, ko je spremenljivka
-$x$ skozi pot $pi$ definirana na točki $p$. Končno pravilo se nato glasi:
+Za formalizacijo pravil se bomo zanašali na *graf poteka* (_angl. CFG - control flow graph_), ki je izračunan v fazah analize kode, ki so opravljene že preden vstopimo v preverjevalnik izposoj. Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Vozlišča v samem grafu si lahko predstavljamo kot posamezne stavke, vendar jih kasneje v nalogi definiramo bolj podrobno.
+
+Da definiramo pravilo `Use-Init`, najprej uvedemo množico $"Poti"(p)$, ki nam poda vse poti skozi graf poteka od začetka funkcije do začetka trenutne točke $p$ v programu. Potem lahko definiramo še predikat $"Init"(pi, x, p)$, ki velja natanko tedaj, ko je spremenljivka $x$ skozi pot $pi$ definirana na točki $p$. Končno pravilo se nato glasi:
 
 $ "Use-Init"(x, p) <==> forall pi in "Poti"(p): "Init"(pi, x, p) $
 
 // https://rustc-dev-guide.rust-lang.org/borrow_check/moves_and_initialization/move_paths.html za definicijo move path
-Opomba o mestih in poteh premika (_move path_): pojem predpone (_prefix_) je načeloma definiran za pot
-premika, vendar ga tukaj posplošimo na mesta iz MIR, ker se nam bolj sklada s terminologijo, ki jo uporabljamo.
-Rustov priročnik za prevajalnik tudi omeni, da sta ta pojma približno enaka. Uporabljamo ga namesto spremenljivk
-zaradi tega, ker nam opiše lahko bolj fino dostopne podatke kot so polja struktov.
+#remark(title: [Opomba o mestih in poteh premika (_move path_)])[
+  Pojem predpone (_prefix_) je načeloma definiran za pot
+  premika, vendar ga tukaj posplošimo na mesta iz MIR, ker se nam bolj sklada s terminologijo, ki jo uporabljamo.
+  Rustov priročnik za prevajalnik tudi omeni, da sta ta pojma približno enaka. Uporabljamo ga namesto spremenljivk
+  zaradi tega, ker nam opiše lahko bolj fino dostopne podatke kot so polja struktov.
+]
 
-Za pravilo Move-Deinit moramo vpeljati še dva predikata. Prvi nam bo povedal ali se mesti
-prekrivata t.j. ali je katero mesto predpona drugega (v Rustovem prevajalniku se temu reče _prefix_). Poimenovali
-ga bomo $"Prekrivanje"(m_1, m_2)$, ki velja natanko tedaj, ko je $m_1$ predpona $m_2$ ali obratno. Torej
-$"Prekrivanje"("tuple.0", "tuple.0.1")$ bi veljalo, $"Prekrivanje"("tuple.0", "tuple.1")$ pa ne.
+Pravilo `Move-Deinit` nam prepreči, da uporabimo ime (binding?), iz katerega je bila vrednost premaknjena. V kontekstu lastništva to pomeni, da ime ni več lastnik vrednosti. Da pravilo definiramo formalno, moramo vpeljati še dva predikata.
 
-Naslednji predikat, ki ga uvedemo je $"Premaknjen"(pi, m, p)$, ki velja natanko tedaj, ko je bilo mesto $m$ premaknjeno
-pred točko $p$ na poti $pi$. Kaj točno je premik moram še malo pobrskati po dokumentaciji ampak konceptualno to pomeni,
-da lastnik ni več $m$ ampak nekdo drug. Torej pravilo velja ko:
+Prvi nam pove ali se mesti prekrivata t.j. ali je katero mesto predpona drugega (v Rustovem prevajalniku se temu reče _prefix_). Poimenovali
+ga bomo $"Prekrivanje"(m_1, m_2)$, ki velja natanko tedaj, ko je $m_1$ predpona $m_2$ ali obratno. Torej $"Prekrivanje"("tuple.0", "tuple.0.1")$ bi veljalo, $"Prekrivanje"("tuple.0", "tuple.1")$ pa ne.
+
+Naslednji predikat, ki ga uvedemo, je $"Premaknjen"(pi, m, p)$, ki velja natanko tedaj, ko je bilo mesto $m$ premaknjeno
+pred točko $p$ na poti $pi$. Premik iz perspektive programerja pomeni, da lastnik ni več $m$ ampak nekdo drug. Rustov priročnik za prevajalnik pa nam pove, da v resnici premik iz imena pomeni samo, da ta vrednost ni več v množici inicializiranih vrednosti. Torej pravilo velja ko:
 
 $ "Move-Deinit"(m, p) <==> \ exists.not pi in "Poti"(p), m_2: "Prekrivanje"(m, m_2) and "Premaknjen"(pi, m_2, p) $
 
-Za naslednji pravili Shared-Readonly in Unique-Write moramo definirati še nekaj predikatov. Ker se tokrat
-ukvarjamo s posojami, moramo razločevati met deljenimi in spremenljivimi (unikatnimi). V ta namen vpeljemo
-predikat $"VrstaPosoje"(L) in {"shrd", "uniq"}$. Da pa lahko razločimo med aktivnimi in preteklimi posojami
-pa ustvarimo predikat $"PosojaAktivna"(L,p)$, ki velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$.
-Mesto, ki je bilo sposojeno z posojo $L$ označimo z $O(L)$.
+Pravili `Shared-Readonly` in `Unique-Write` pa skrbita za veljavnost referenc in omejitev na njihovi uporabi. To so ista pravila, ki smo jih opisali v @chap:intuitivna-razlaga-poloniusa[poglavju]. Za njiju moramo definirati še nekaj dodatnih predikatov.
 
-Poleg predikatov za posoje pa nam še manjkajo predikati, ki opisujejo operacije, ki se izvajajo nad mesti.
-Intuitivno je to lahko več različnih operacij vendar nas zanimajo dve vrsti. Take, ki bi razveljavile deljeno
-posojo označimo z $"RazveljaviDeljeno"(m,p)$ in velja natanko tedaj, ko se v točki $p$ nad mestom $m$ izvede
-taka operacija, ki bi lahko razveljavila posojo, ki si sposoja iz mesta $m$ (to bi bilo ali pisanje v mesto $m$ ali
-pa ustvarjanje spremenljive posoje).
+Ker se tokrat ukvarjamo s posojami, moramo razločevati med deljenimi in spremenljivimi (ta dva tipa sta povsem analogna tipu reference). V ta namen vpeljemo predikat $"VrstaPosoje"(L) in {"shrd", "uniq"}$. Da pa lahko razločimo med aktivnimi in preteklimi posojami pa ustvarimo predikat $"PosojaAktivna"(L,p)$, ki velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$. Mesto, ki je bilo sposojeno z posojo $L$ označimo z $O(L)$.
 
-Na podoben način definiramo $"RazveljaviSpremenljivo"(m,p)$, ki velja ko je operacija taka, ki razveljavi
-spremenljivo posojo (ustvarjanje kakršnekoli nove posoje, pisanje v mesto, branje iz mesta).
-Tako lahko sestavimo naši naslednji dve pravili:
+Poleg predikatov za posoje pa nam še manjkajo predikati, ki opisujejo operacije, ki se izvajajo nad mesti. Intuitivno je to lahko več različnih operacij vendar nas zanimajo dve vrsti. Take, ki bi razveljavile deljeno posojo označimo z $"RazveljaviDeljeno"(m,p)$ in velja natanko tedaj, ko se v točki $p$ nad mestom $m$ izvede taka operacija, ki bi lahko razveljavila posojo, ki si sposoja iz mesta $m$ (to bi bilo ali pisanje v mesto $m$ ali pa ustvarjanje spremenljive posoje).
+
+Na podoben način definiramo $"RazveljaviSpremenljivo"(m,p)$, ki velja ko je operacija taka, ki razveljavi spremenljivo posojo (ustvarjanje kakršnekoli nove posoje, pisanje v mesto, branje iz mesta). Tako lahko sestavimo naši naslednji dve pravili:
 
 $
     "Shared-Readonly"(p) & <==> exists.not L,m: \
@@ -448,7 +478,7 @@ dejanskimi Rustovimi življenjskimi dobami). Vsi primeri so izvzeti iz originaln
   #quote[An Rvalue is an expression that creates a value: in this case, the rvalue is a
     mutable borrow expression, which looks like `&mut <Place>`]
 
-  Rvalue pa je definiran z enumeratorjem `Rvalue` @RvalueRustc_middleMira. Nas pa zanima specifično
+  Rvalue pa je definiran z enumeratorjem `Rvalue` @RvalueRustc_middleMir. Nas pa zanima specifično
   varianta `Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)`, ki ustvari referenco tipa `BorrowKind`
   na mesto `Place`.
 
