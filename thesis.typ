@@ -371,7 +371,7 @@ Do zdaj smo pravila izposojanja in lastništva opisovali intuitivno, vendar za p
 
 Zaradi pomanjkanja uradne specifikacije pravil, se bomo zanesli na delo Amande Stjerne @stjernaModellingRustsReference, kjer je opisno in s tabelo predstavila pravila, ki se jih mora preverjevalnik izposoj držati. Njena pravila bomo nadgradili s formalno notacijo, ki je podobna tisti, ki jo bomo uporabili v naslednjih poglavjih.
 
-V @tab:borrow-check[tabeli] imamo podane pozitivne in negativne primere za vsako pravilo, točno tako kot jih je zastavila Stjerna. S pomočjo teh primerov in njene razlage bomo osnovali formalni zapis teh pravil.
+V @tab:borrow-check[tabeli] imamo podane pozitivne in negativne primere za vsako pravilo, točno tako kot jih je zastavila Stjerna. S pomočjo teh primerov in njene razlage bomo osnovali formalni zapis teh pravil. Važno je tudi omeniti, da vsa ta pravila delujejo na nivoju posamezne funkcije, ne celotnega programa.
 
 #import "rule_table.typ": rule_table
 #rule_table
@@ -384,7 +384,7 @@ na točki v programu, kjer jih uporabljamo. Skupaj s pravili `Move-Deinit`, ki p
 
 Za formalizacijo pravil se bomo zanašali na *graf poteka* (_angl. CFG - control flow graph_), ki je izračunan v fazah analize kode, ki so opravljene že preden vstopimo v preverjevalnik izposoj. Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Vozlišča v samem grafu si lahko predstavljamo kot posamezne stavke, vendar jih kasneje v nalogi definiramo bolj podrobno.
 
-Da definiramo pravilo `Use-Init`, najprej uvedemo množico $"Poti"(p)$, ki nam poda vse poti skozi graf poteka od začetka funkcije do začetka trenutne točke $p$ v programu. Potem lahko definiramo še predikat $"Init"(pi, x, p)$, ki velja natanko tedaj, ko je spremenljivka $x$ skozi pot $pi$ definirana na točki $p$. Končno pravilo se nato glasi:
+Da definiramo pravilo `Use-Init`, najprej uvedemo množico $"Poti"(p)$, ki nam poda vse poti skozi graf poteka od začetka funkcije do začetka trenutne točke $p$ v programu. Te poti so statične, t.j. se ne spreminjajo glede na vrednosti spremenljivk med tekom programa. Potem lahko definiramo še predikat $"Init"(pi, x, p)$, ki velja natanko tedaj, ko je spremenljivka $x$ skozi pot $pi$ definirana na točki $p$. Končno pravilo se nato glasi:
 
 $ "Use-Init"(x, p) <==> forall pi in "Poti"(p): "Init"(pi, x, p) $
 
@@ -408,30 +408,51 @@ $ "Move-Deinit"(m, p) <==> \ exists.not pi in "Poti"(p), m_2: "Prekrivanje"(m, m
 
 Pravili `Shared-Readonly` in `Unique-Write` pa skrbita za veljavnost referenc in omejitev na njihovi uporabi. To so ista pravila, ki smo jih opisali v @chap:intuitivna-razlaga-poloniusa[poglavju]. Za njiju moramo definirati še nekaj dodatnih predikatov.
 
-Ker se tokrat ukvarjamo s posojami, moramo razločevati med deljenimi in spremenljivimi (ta dva tipa sta povsem analogna tipu reference). V ta namen vpeljemo predikat $"VrstaPosoje"(L) in {"shrd", "uniq"}$. Da pa lahko razločimo med aktivnimi in preteklimi posojami pa ustvarimo predikat $"PosojaAktivna"(L,p)$, ki velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$. Mesto, ki je bilo sposojeno z posojo $L$ označimo z $O(L)$.
+Da razumemo kaj nam ta pravila pravijo, moramo definirati pojem posoje, ki je tesno povezana s sorodnim pojmom "izraz izposoje".
 
-Poleg predikatov za posoje pa nam še manjkajo predikati, ki opisujejo operacije, ki se izvajajo nad mesti. Intuitivno je to lahko več različnih operacij vendar nas zanimajo dve vrsti. Take, ki bi razveljavile deljeno posojo označimo z $"RazveljaviDeljeno"(m,p)$ in velja natanko tedaj, ko se v točki $p$ nad mestom $m$ izvede taka operacija, ki bi lahko razveljavila posojo, ki si sposoja iz mesta $m$ (to bi bilo ali pisanje v mesto $m$ ali pa ustvarjanje spremenljive posoje).
+/ Izraz izposoje #angl[borrow expression]: #[je jezikovni konstrukt, ki nam omogoča, da ustvarimo referenco (primer izraza izposoje bi bil `&mut x`). Rustov priročnik za prevajlnik @MIRMidlevelIR pojma _borrow expression_ ne definira, ampak ga uporabi tako:
+
+    #quote[An Rvalue is an expression that creates a value: in this case, the rvalue is a
+      mutable borrow expression, which looks like `&mut <Place>`]
+
+    Rvalue pa je definiran z enumeratorjem `Rvalue` @RvalueRustc_middleMir. Nas pa zanima specifično varianta `Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)`, ki ustvari referenco tipa `BorrowKind` na mesto `Place`.
+
+  ]
+
+Pojem _borrow expression_ pogosto uporabljajo @weissOxideEssenceRust2019 v svojem članku o formalizaciji podmnožice Rust-a. Njihov način uporabe se sklada z našo definicijo, ki se glasi:
+
+/ Posoja #angl[loan]: #[
+    je interni konstrukt prevajalnika, ki hrani stanje o referenci in njenemu izvoru @weissOxideEssenceRust2019. V trenutni implementaciji preverjalnika izposoj je izposoja predstavljena kot urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer je:
+    - `'a`: življenjska doba za katero je vrednost izposojena. To se nanaša na življenjske dobe kot
+      del Rustovega sistema tipov, ne pa kot množico izposoj, kot jih bomo definirali kasneje.
+    - `shared|uniq|mut`: tip izposoje
+    - `lvalue`: vrednost, ki je bila izposojena
+    Posoja je v prevajalniku sestavljena iz trojice `('a, shared|uniq|mut, lvalue)`.
+  ]
+
+Torej v našem matematičnem zapisu bomo posojo zapisali kot $L = (alpha, tau, O)$, kjer bo $tau in {"uniq", "shrd", "mut"}$ naš tip posoje in $O$ naš lvalue (oziroma _origin_ z Rustovsko terminologijo). Da lahko razločimo med aktivnimi in preteklimi posojami, pa ustvarimo predikat $"PosojaAktivna"(L,p)$, ki velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$.
+
+Poleg predikatov za posoje pa nam še manjkajo predikati, ki opisujejo operacije, ki se izvajajo nad mesti. Intuitivno je to lahko več različnih operacij, vendar nas zanimajo dve glavni vrsti. Take, ki bi razveljavile deljeno posojo označimo z $"RazveljaviDeljeno"(m,p)$ in velja natanko tedaj, ko se v točki $p$ nad mestom $m$ izvede taka operacija, ki bi lahko razveljavila posojo, ki si sposoja iz mesta $m$ (to bi bilo ali pisanje v mesto $m$ ali pa ustvarjanje spremenljive posoje).
 
 Na podoben način definiramo $"RazveljaviSpremenljivo"(m,p)$, ki velja ko je operacija taka, ki razveljavi spremenljivo posojo (ustvarjanje kakršnekoli nove posoje, pisanje v mesto, branje iz mesta). Tako lahko sestavimo naši naslednji dve pravili:
 
 $
-    "Shared-Readonly"(p) & <==> exists.not L,m: \
-    "PosojaAktivna"(L,p) & and "VrstaPosoje" = "shrd" and \
-  "Prekrivanje"(m, O(L)) & and "RazveljaviDeljeno"(m,p)
+  "Shared-Readonly"(p) & <==> exists.not L = ("_", tau, O),m: \
+  "PosojaAktivna"(L,p) & and tau = "shrd" and \
+   "Prekrivanje"(m, O) & and "RazveljaviDeljeno"(m,p)
 $
 
 $
-       "Unique-Write"(p) & <==> exists.not L,m: \
-    "PosojaAktivna"(L,p) & and "VrstaPosoje" = "uniq" and \
-  "Prekrivanje"(m, O(L)) & and "RazveljaviSpremenljivo"(m,p)
+     "Unique-Write"(p) & <==> exists.not L = ("_", tau, O),m: \
+  "PosojaAktivna"(L,p) & and "VrstaPosoje" in {"uniq", "mut"} and \
+   "Prekrivanje"(m, O) & and "RazveljaviSpremenljivo"(m,p)
 $
 
-Za zadnje pravilo potrebujemo še en predikat imenovan $"MestoAktivno"(m,p)$, ki velja natanko tedaj,
-ko je mesto $m$ še aktivno (torej ni bilo dropped) na točki $p$. Potem pravilo Ref-Live lahko zapišemo tako:
+Za zadnje pravilo potrebujemo še en predikat imenovan $"MestoAktivno"(m,p)$, ki velja natanko tedaj, ko je mesto $m$ še aktivno (torej ni bilo dropped) na točki $p$. Potem pravilo `Ref-Live` lahko zapišemo tako:
 
 $
-         "Ref-Live"(p) & <==> exists.not L, m: \
-  "PosojaAktivna"(L,p) & and "Prekrivanje"(m, O(L)) and not "MestoAktivno"(m,p)
+         "Ref-Live"(p) & <==> exists.not L = ("_", "_", O), m: \
+  "PosojaAktivna"(L,p) & and "Prekrivanje"(m, O) and not "MestoAktivno"(m,p)
 $
 
 == Primer
