@@ -289,12 +289,26 @@ Prevajalnik nam pri primeru @lst:lifetime-annotate vrne napako, saj je spremenlj
 
 // Glavno delo na področju formalizacije Poloniusa je magistrsko delo Amande Stjerna, ki je nastalo leta 2020, dve leti po prvotni formulaciji @stjernaModellingRustsReference @AliasbasedFormulationBorrow. V delu Stjerna prvo formalizira Polonius kot del sistema tipov avtorjev @weissOxideEssenceRust2019 imenovan Oxide @weissOxideEssenceRust2019. Stjerna upraviči svojo izbiro izhodiščnega sistema tipov s tem, da si deli koncept t.i. _provenance variables_. Delo se nato nadaljuje z implementacijo Poloniusa v jeziku Datalog (podmnožica Prologa), ki služi kot podlaga za prvo različico implementacije v Rustovem prevajalniku @RustlangPolonius2025.
 
-V temu poglavju bomo prvo predstavili intuitivni opis delovanja Poloniusa in temu sledili s formalnim opisom pravil Rustovega preverjevalnika izposoj. Nazadnje bomo še predstavili delovanje Poloniusa iz vidika množic in relacij.
+V temu poglavju bomo najprej predstavili intuitivni opis delovanja Poloniusa in temu sledili s formalnim opisom pravil Rustovega preverjevalnika izposoj. Nazadnje bomo še predstavili delovanje Poloniusa z opisom na osnovi množic in relacij.
 
 == Intuitivna razlaga Poloniusa
 <chap:intuitivna-razlaga-poloniusa>
 
-Preden formalno predstavimo vse točne podrobnosti Poloniusa, je pomembno dobiti nekaj intuicije o njegovem delovanju, saj nam bo olajšala razumevanje zapletenih relacij in njihovih pravil na katerih algoritem temelji. Naslednjo razlago smo prilagodili iz originalne spletne objave, ki je zastavila Polonius @AliasbasedFormulationBorrow. Delovanje bomo predstavili na @lst:intuition[primeru], vendar brez natančnih opisov relacij in množic, ki nastopajo pri dejanski analizi.
+Preden formalno predstavimo vse podrobnosti Poloniusa, je pomembno dobiti nekaj intuicije o njegovem delovanju, saj nam bo olajšala razumevanje zapletenih relacij in njihovih pravil, na katerih algoritem temelji. Naslednjo razlago smo prilagodili iz originalne spletne objave, ki je predstavila Polonius @AliasbasedFormulationBorrow. Delovanje bomo predstavili na @lst:intuition[primeru], vendar brez natančnih opisov relacij in množic, ki nastopajo pri dejanski analizi.
+
+#box[
+  #image("example_intuition.pdf", page: 1, width: 100%)
+
+  #set text(font: "JetBrainsMono NF", size: 11pt)
+  // Overlaying a "remark" (using your custom function logic)
+  #place(
+    dx: 5%,
+    dy: -10%,
+    rect(fill: yellow.lighten(50%).transparentize(50%), stroke: orange)[
+      Check citation here!
+    ],
+  )
+]
 
 #figure(
   ```rust
@@ -312,7 +326,7 @@ Preden formalno predstavimo vse točne podrobnosti Poloniusa, je pomembno dobiti
   caption: [Primer programa za Polonius iz @AliasbasedFormulationBorrow],
 ) <lst:intuition>
 
-@lst:intuition[Program] ima poleg tipov anotirane še *regije*, kot jih imenuje Polonius, ki si jih lahko predstavljamo kot življenjske dobe. Označene so s številkami `'0`, `'1`, `'2`, itd.
+@lst:intuition[Program] ima poleg tipov predpisane še *regije*, kot jih imenuje Polonius, ki si jih lahko predstavljamo kot življenjske dobe. Označene so s številkami `'0`, `'1`, `'2`, itd.
 
 Podroben ogled programa po vrsticah nam razkrije zakaj je neveljaven:
 
@@ -640,6 +654,10 @@ Bolj natančno, če velja $(R_1, R_2, P) in beta$ pomeni, da je $R_1$ podmnožic
 To dejstvo mora veljati na sredini stavka ($M("stmt")$), ki inducira zahtevo.
 
 _Opomba:_ Oznaka `<:` nam predstavlja vsebovanost med tipi (_subtyping relation_).
+
+#remark(title: "Povezava z NLL")[
+  V NLL-u so regije predstavljene kot množice točk oz. stavkov, kjer je ta vrednost veljavna. Torej `'a: 'b` bi pomenilo, da mora `'a` biti veljavna vssaj toliko dolgo kot `'b`. V angleščini bi temu rekli _'a outlives 'b_. Drugače povedano, množica točk 'b bi bila podmnožica 'a. Kar je pa ravno obratno, kot naš zapis v Poloniusu. Ključna razlika je, da so regije v Poloniusu množice posoj, ne pa točk. Intuitivno gledano lahko rečemo, da vsaka nova posoja doprinese dodatne omejitve k uporabi in ustvarjanju referenc. Zato je smiselno, da je v Poloniusu regija `'a` podmnožica regije `'b`, saj mora vsebovati _vsaj_ vse omejitve, ki se jih mora držati `'b`.
+]
 
 #figure(
   ```rust
