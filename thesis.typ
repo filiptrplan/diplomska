@@ -3,6 +3,8 @@
 #import "@preview/codly:1.3.0": *
 #import "@preview/codly-languages:0.1.1": *
 #import "@preview/obsidius:0.1.0": *
+#import "@preview/cetz:0.4.2"
+#import "drawings.typ": *
 #show: codly-init.with()
 #codly(languages: codly-languages)
 #show raw: set text(size: 9pt)
@@ -326,23 +328,25 @@ Preden formalno predstavimo vse podrobnosti Poloniusa, je pomembno dobiti nekaj 
   caption: [Primer programa za Polonius iz @AliasbasedFormulationBorrow],
 ) <lst:intuition>
 
-@lst:intuition[Program] ima poleg tipov predpisane še *regije*, kot jih imenuje Polonius, ki si jih lahko predstavljamo kot življenjske dobe. Označene so s številkami `'0`, `'1`, `'2`, itd.
+@lst:intuition[Program] ima poleg tipov predpisane še *regije*, kot jih imenuje Polonius, ki si jih lahko predstavljamo kot življenjske dobe, bolj podrobno pa so to množice *posoj* #angl[loans], ki jih kasneje definirano natančno, za zdaj pa si jih lahko predstavljamo kot možne "izvore" #angl[origins] referenc (npr. `&x`, `&mut a.b`, itd.). Označene so s številkami `'0`, `'1`, `'2`, itd.
 
-Podroben ogled programa po vrsticah nam razkrije zakaj je neveljaven:
+Zdaj pa si oglejmo korake v programu, ki na koncu privedejo do napake :
 
 - Vrstica 3: Usvarimo vektor deljenih referenc `v`.
 - Vrstica 4: Ustvarimo spremenljivo referenco `r`, ki kaže na vektor `v`.
 - Vrstici 5 in 6: Deljeno referenco na `x` vstavimo v vektor `v` preko `r`.
-- Vrstici 7 in 8: Poskušamo spremeniti vrednost `x`. Vendar v tem trenutku še vedno obstaja aktivna referenca na `x` v vektorju `v`, ki smo jo vstavili na vrstici 6. Vektor `v` še vedno potrebujemo v vrstici 8, torej javimo napako.
+- Vrstici 7 in 8: Poskušamo spremeniti vrednost `x`.
+
+Vendar v tem trenutku še vedno obstaja aktivna referenca na `x` v vektorju `v`, ki smo jo vstavili na vrstici 6. Vektor `v` še vedno potrebujemo v vrstici 8, torej javimo napako.
 
 #show "'a": `'a`
 #show "'b": `'b`
 
-Oglejmo si kako se intuitivno razumevanje napake prenese na analizo, ki jo opravi Polonius. Lahko si predstavljamo, da algoritem 3-krat obhodi kodo. To sicer ni natančno saj se te obhodi v implementaciji prekrivajo, vendar je za intuitivno razumevanje koristno. Prvi obhod izračuna dva glavna elementa: vsebovanost regij in pripadnost posoj regijam.
+Oglejmo si, kako se intuitivno razumevanje napake prenese na analizo, ki jo opravi Polonius. Lahko si predstavljamo, da algoritem 3-krat obhodi kodo. To sicer ni natančno, saj se ti obhodi v implementaciji prekrivajo, vendar je za intuitivno razumevanje koristno. Prvi obhod izračuna dva glavna elementa: vsebovanost regij in pripadnost posoj regijam.
 
-Vsebovanost dveh regij se izračuna glede na inferenčna pravila Rustovega sistema tipov(subtyping relations?) in jo zapišemo kot `'a: 'b`, kar pomeni da mora regija 'b vsebovati vse vrstice iz regije 'a (referenca z življenjsko dobo 'b mora živeti vsaj toliko dolgo kot 'a).
+Vsebovanost dveh regij se izračuna glede na pravila sklepanja Rustovega sistema tipov(subtyping relations?) in jo zapišemo kot `'a: 'b`, kar pomeni da mora regija 'a vsebovati vse posoje iz regije 'b (intuitivno mora referenca z življenjsko dobo 'b mora živeti vsaj toliko dolgo kot 'a).
 
-Pripadnost posoj regijam se določi ob ustvaritvi posoj. V tem kontekstu pripadnost ne pomeni pripadnost množici vrstic, ki sestavljajo regijo, vendar kot dodaten metapodatek regije. Posoje so interne strukture v Rustovem prevajalniku, ki hranijo podatke o ustvarjeni referenci @weissOxideEssenceRust2019. Ko ustvarimo posojo z `&` ali `&mut`, se tej določi pripadnost glede na regijo, ki je del tipa.
+Pripadnost posoj regijam se določi ob ustvaritvi posoj. V tem kontekstu pripadnost ne pomeni pripadnost množici vrstic, ki sestavljajo regijo v NLL-u, vendar kot dodaten metapodatek regije. Posoje so interne strukture v Rustovem prevajalniku, ki hranijo podatke o ustvarjeni referenci @weissOxideEssenceRust2019. Ko ustvarimo posojo z `&` ali `&mut`, se tej določi pripadnost glede na regijo, ki je del tipa.
 
 Za boljše razumevanje teh dveh korakov se obrnemo na @lst:intuition2[primer], kjer sta v komentarjih anotirana ta dva koraka.
 
@@ -352,10 +356,10 @@ Za boljše razumevanje teh dveh korakov se obrnemo na @lst:intuition2[primer], k
     let mut x: i32 = 22;
     let mut v: Vec<&'0 i32> = vec![];
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // V zgornji vrstici se ustvari posoja L0, ki pripada regiji '3.
+    // V zgornji vrstici se ustvari posoja L0 (iz &mut v), ki pripada regiji '3.
     // Vsebovanost - '3: '1
     let p: &'5 i32 = &'4 x;
-    // Ustvarimo L1, ki pripada regiji '4
+    // Ustvarimo L1 (iz &x), ki pripada regiji '4
     // Vsebovanost - '4: '5
     r.push(p);
     // Vsebovanost -  '5: '2
@@ -368,12 +372,26 @@ Za boljše razumevanje teh dveh korakov se obrnemo na @lst:intuition2[primer], k
   caption: [Primer programa za Polonius iz @AliasbasedFormulationBorrow],
 ) <lst:intuition2>
 
-Drugi obhod pa vsebovanosti iz prvega obhoda propagira (saj lahko nanje gledamo kot relacijo matematične vsebovanosti, ki je tranzitivna), ter s tem tudi propagira pripadnost posoj. Če sledimo tranzitivnemu zaprtju vsebovanosti lahko opazimo dve verigi:
+
+
+Drugi obhod propagira vsebovanosti iz prvega obhoda (saj lahko nanje gledamo kot relacijo matematične vsebovanosti, ki je tranzitivna), ter s tem tudi propagira pripadnost posoj. Če sledimo tranzitivnemu zaprtju vsebovanosti, lahko opazimo dve verigi:
 
 - Za posojo `L0`: `'3: '1`
 - Za posojo `L1`: `'4: '5: '2`
 
-Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regiji `'2`. Še ena pomembna stvar, ki jo drug obhod naredi, je določitev aktivnih regij in posoj, ki pa je ne bomo tukaj opisali. Povedali bomo samo, da Polonius izračuna, da sta regija `'2` in posledično posoja `L1` aktivni na vrstici 12 v @lst:intuition2[programu]. Pojma aktivnosti regij in posoj sta tukaj analogna pojmu aktivnosti spremenljivk pri prevajalnikih.
+#figure(
+  align(center)[#diagram-vsebovanosti-intuition2],
+  caption: [Diagram vsebovanosti regij in posoj @lst:intuition2[programa]],
+) <fig:diagram-vsebovanosti>
+
+Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regije `'2`. Poleg propagiranja vsebovanosti, drugi obhod tudi določi aktivnost regij in posoj, vendar tukaj tega postopka ne bomo opisali. Povedali bomo samo, da Polonius izračuna, da sta regija `'2` in posledično posoja `L1` aktivni na vrstici 12 v @lst:intuition2[programu]. Pojma aktivnosti regij in posoj sta tukaj analogna pojmu aktivnosti spremenljivk pri prevajalnikih.
+
+
+#figure(
+  align(center)[#aktivnosti-regij-intuition2],
+  caption: [Označene aktivnosti regij @lst:intuition2[programa]],
+) <fig:aktivnosti-regij>
+
 
 V tretjem obhodu nato javimo napako, ker operacija mutiranja spremenljivke `x` na vrstici 12 v @lst:intuition2[primeru] razveljavi pogoje posoje `L1`, ki je pa na tisti točki v programu še vedno živa. Razveljavitev pogojev posoje na kratko pomeni, da operacija ni dovoljena glede na tip reference. To so lahko npr. mutiranje mesta na katero kaže deljena referenca ali pa ustvarjanje nove reference na mesto, ko že obstaja spremenljiva referenca.
 
