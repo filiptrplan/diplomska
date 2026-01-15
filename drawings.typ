@@ -48,6 +48,7 @@
   region-subset("L1", "4", 2)
   region-subset("4", "5", 3)
   region-subset("5", "2", 4)
+  region-subset("2", "0", 5)
 })
 
 
@@ -76,7 +77,7 @@
       ),
     ))
   }
-  let o(idx) = 9.5 + idx * 0.65
+  let o(idx) = 9.5 + idx * 0.65 // helper function for x calculation
   draw-line(3, 14, o(0), 0, "0", dir: "left")
   draw-line(4, 11, o(1), 1, "1", dir: "left")
   draw-line(4, 11, o(2), 2, "2", dir: "left")
