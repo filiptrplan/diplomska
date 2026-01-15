@@ -211,6 +211,11 @@ Prevajalnik preverja pomnilniško pravilnost programov, ko so ti pretvorjeni v v
 
 Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc @crichtonGroundedConceptualModel2023 @yanovskiGhostCellSeparatingPermissions2021 @weissOxideEssenceRust2019. Prva vrsta so *deljene in zato nespremenljive reference* #angl[shared references]. Takih je lahko hkrati več in vse lahko kažejo na isto mesto v pomnilniku. Pravilo, ki zagotavlja, da so take deljene reference varne, pravi, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so *spremenljive reference* #angl[mutable / unique references]. Pri teh se pravila ravno obrnejo: lahko imamo zgolj eno tako referenco, zato pa lahko spreminjamo podatke na pomnilniškem mestu, ki ga referencira (preko spremenljive reference, ne preko prvotne spremenljivke).
 
+#remark(title: "Teorija za referencami")[
+  Tovrsten tip omejevanja ustvarjanja referenc se imenuje _aliasing XOR mutability_. Ta model s pomočjo tipov
+  poveže podatke z dovoljenjimi operacijami, ki jih lahko izvajamo na teh podatkih @yanovskiGhostCellSeparatingPermissions2021.
+]
+
 Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Prvo bomo pokazali pravilno in nepravilno uporabo deljene reference nato pa še spremenljive.
 
 #figure(
@@ -480,47 +485,29 @@ $
   "PosojaAktivna"(L,p) & and "Prekrivanje"(m, O) and not "MestoAktivno"(m,p)
 $
 
-== Definicije pojmov
+== Primer in formalizacija
 
-/ Referenca: v Rust-u je podobna kazalcu v ostalih programskih jezikih, vendar prevajalnik zagotavlja, da kaže
-  na veljavno vrednost podanega tipa za celotno dobo aktivnosti reference (? pisalo je for the life of the reference) @klabnikRustProgrammingLanguage2023.
-  Reference ločimo na dva tipa @crichtonGroundedConceptualModel2023 @yanovskiGhostCellSeparatingPermissions2021 @weissOxideEssenceRust2019:
-  - *Deljena referenca (_shared / immutable reference_)*: V programu lahko ustvarimo več deljenih referenc, ki
-    kažejo na isto mesto, vendar podatkov na tem mestu ne smemo spreminjati.
-  - *Spremenljiva referenca (_unique / mutable reference_)*: Da lahko mutiramo mesto na katerega kaže
-    referenca, ustvarimo spremenljivo referenco, ki je ena sama in nam omogoča spreminjanje vrednosti zapisane na posameznem mestu.
-    V literaturi jim večinoma pravijo _unique references_, vendar smo izbrali prevod _"spremenljiva"_, saj _"edinstvena"_ ne zveni ustrezno.
-  - Tovrsten tip omejevanja ustvarjanja referenc se imenuje _aliasing XOR mutability_. Ta model s pomočjo tipov
-    poveže podatke z dovoljenjimi operacijami, ki jih lahko izvajamo na teh podatkih @yanovskiGhostCellSeparatingPermissions2021.
+V naslednjih poglavjih se bomo lotili glavnega dela naloge, ki je matematična formalizacija delovanja Poloniusa. Da si bomo lažje predstavljali relacije in množice bomo celotno delovanje ponazorili na primeru iz @chap:intuitivna-razlaga-poloniusa[poglavja], ki ga bomo tukaj še enkrat prikazali.
 
-/ Življenska doba (_lifetime_): Vsaka referenca ima življenjsko dobo, ki nam opiše doseg v programu znotraj katerega je
-  referenca še vedno veljavna (torej kaže na veljavno mesto) @klabnikRustProgrammingLanguage2023.
-
-/ Posoja (_loan_): je tesno povezana s sorodnim pojmom *izraz izposoje* (_borrow expression_). Izraz izposoje
-  je jezikovni konstrukt, ki nam omogoča, da ustvarimo referenco (primer izraza izposoje bi bil `&mut x`).
-  Rustov priročnik za prevajlnik @MIRMidlevelIR pojma _borrow expression_ ne definira, ampak ga uporabi tako:
-
-  #quote[An Rvalue is an expression that creates a value: in this case, the rvalue is a
-    mutable borrow expression, which looks like `&mut <Place>`]
-
-  Rvalue pa je definiran z enumeratorjem `Rvalue` @RvalueRustc_middleMir. Nas pa zanima specifično
-  varianta `Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)`, ki ustvari referenco tipa `BorrowKind`
-  na mesto `Place`.
-
-  Pojem _borrow expression_ pogosto uporabljajo @weissOxideEssenceRust2019 v svojem članku o formalizaciji
-  podmnožice Rust-a. Njihov način uporabe se sklada z našo definicijo.
-
-  *Posoja* (_loan_) je interni konstrukt prevajalnika, ki hrani stanje o referenci in njenemu izvoru
-  @weissOxideEssenceRust2019. V trenutni implementaciji preverjalnika izposoj je izposoja predstavljena kot
-  urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer je:
-  - `'a`: življenjska doba za katero je vrednost izposojena. To se nanaša na življenjske dobe kot
-    del Rustovega sistema tipov, ne pa kot množico izposoj, kot jih bomo definirali kasneje.
-  - `shared|uniq|mut`: tip izposoje
-  - `lvalue`: vrednost, ki je bila izposojena
-
-/ NLL: je trenutna implementacija preverjevalnika izposoj v Rust-ovem prevajalniku.
+#figure(
+  ```rust
+  fn main() {
+    let mut x: i32 = 22;
+    let mut v: Vec<&'0 i32> = vec![];
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+    let p: &'5 i32 = &'4 x;
+    r.push(p);
+    x += 1;
+    take::<Vec<&'6 i32>>(v);
+  }
+  fn take<T>(p: T) { .. }
+  ```,
+  caption: [Primer programa za Polonius iz @AliasbasedFormulationBorrow],
+) <lst:main-example>
 
 == Osnovne množice in elementi
+
+Da sploh lahko matematično govorimo o delovanju Poloniusa, moramo definirate osnovne množice in elemente s katerimi bomo delali.
 
 === Množica posoj $cal(L)$
 
@@ -528,11 +515,11 @@ Množico vseh posoj (_angl. loans_) označimo z $cal(L)$. *Pogoji posoje* so las
 držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno.
 Pravimo, da *razveljavimo pogoje posoje*, če velja ena izmed naslednjih točk:
 - Referenca je deljena (_shared_), torej je oblike `&x` in
-  - ustvarimo novo spremenljivo referenco
+  - ustvarimo novo spremenljivo referenco _in/ali_
   - pišemo v mesto, ki je bilo izposojeno
 - Referenca je spremenljiva in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
 
-Ta pravila načeloma sledijo NLLm, bolj formalno jih opisujejo pravila razveljavljanja posoje (_loan killed_).
+Ta pravila načeloma sledijo NLL-u, bolj formalno pa jih opisujejo pravila razveljavljanja posoje (_loan killed_).
 Iz NLL RFC-ja @2094nllRustRFC:
 
 #quote[For a statement at point P in the graph, we define the "transfer function" – that is,
@@ -541,13 +528,15 @@ Iz NLL RFC-ja @2094nllRustRFC:
   - if this is an assignment `lv = <rvalue>`, then any loan for some path P of which `lv` is a prefix is killed.
 ]
 
-kjer je pojem _prefix_ definiran tako:
+Prevedena verzija(?):
 
-#quote[*Prefixes*. We say that the prefixes of an lvalue are all the lvalues you get by stripping away fields and derefs.
-  The prefixes of `*a.b` would be `*a.b`, `a.b`, and `a`.]
+#quote[
+  Za stavek na točki P v grafu definiramo "funkcijo prenosa" -- torej, katere posoje prinesemo v ali iz obsega. Funkcija je definirana tako:
+  - ... ostala pravila
+  - Če je stavek dodelitev `lv = <rvalue>`, potem je vsaka posoja poti P katere `lv` je predpona razveljavljena.
+]
 
-V članku avtor pravi posojam tudi izrazi izposoje (_borrow expressions_). V našem primeru bi se posoje ustvarile na naslednjih
-mestih:
+Poglejmo si še torej posoje, ki bi se ustvarile na našem primeru:
 
 #show: subst-env((
   L0: $"L"_0$,
@@ -573,8 +562,8 @@ mestih:
   fn main() {
     let mut x: i32 = 22;
     let mut v: Vec<&'0 i32> = vec![];
-    let r: &'1 mut Vec<&'2 i32> = &'3 mut v; // posoja L0
-    let p: &'5 i32 = &'4 x; // posoja L1
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v; // posoja L0 mesta `v`
+    let p: &'5 i32 = &'4 x; // posoja L1 mesta `x`
     r.push(p);
     x += 1;
     take::<Vec<&'6 i32>>(v);
@@ -583,6 +572,8 @@ mestih:
   ```,
   caption: [Posoje v programu],
 ) <listing:loans>
+
+Torej končamo z množico posoj $cal(L) = {L_0, L_1}$.
 
 === Množica regij $cal(R)$
 
