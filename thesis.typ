@@ -1,5 +1,6 @@
 #import "template.typ": chapter, thesis
 
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 #import "@preview/codly:1.3.0": *
 #import "@preview/codly-languages:0.1.1": *
 #import "@preview/obsidius:0.1.0": *
@@ -534,8 +535,7 @@ Množico vseh posoj (_angl. loans_) označimo s #posoje. *Pogoji posoje* so last
   - pišemo v mesto, ki je bilo izposojeno
 - Referenca je spremenljiva in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
 
-Ta pravila načeloma sledijo NLL-u, bolj formalno pa jih opisujejo pravila razveljavljanja #posoje (_loan killed_).
-Iz NLL RFC-ja @2094nllRustRFC:
+Ta pravila načeloma sledijo NLL-u, bolj formalno pa jih opisujejo pravila razveljavljanja posoje #angl[loan killed]. Iz NLL RFC-ja @2094nllRustRFC:
 
 #quote[For a statement at point P in the graph, we define the "transfer function" – that is,
   which loans it brings into or out of scope – as follows:
@@ -546,12 +546,12 @@ Iz NLL RFC-ja @2094nllRustRFC:
 Prevedena verzija(?):
 
 #quote[
-  Za stavek na točki P v grafu definiramo "funkcijo prenosa" -- torej, katere #posoje prinesemo v ali iz obsega. Funkcija je definirana tako:
+  Za stavek na točki P v grafu definiramo "funkcijo prenosa" -- torej, katere posoje prinesemo v ali iz obsega. Funkcija je definirana tako:
   - ... ostala pravila
-  - Če je stavek dodelitev `lv = <rvalue>`, potem je vsaka #posoje poti P katere `lv` je predpona razveljavljena.
+  - Če je stavek dodelitev `lv = <rvalue>`, potem je vsaka posoja poti P katere `lv` je predpona razveljavljena.
 ]
 
-Poglejmo si še torej #posoje, ki bi se ustvarile na našem primeru:
+Poglejmo si še torej posoje, ki bi se ustvarile na našem primeru:
 
 #show: subst-env((
   L0: $"L"_0$,
@@ -583,22 +583,15 @@ Poglejmo si še torej #posoje, ki bi se ustvarile na našem primeru:
   caption: [Posoje v programu],
 ) <listing:loans>
 
-Torej končamo z množico #posoje $#posoje = {L_0, L_1}$.
+Torej končamo z množico $#posoje = {L_0, L_1}$.
 
 === Množica regij #regije
 
-V trenutni implementaciji preverjevalnika izposoj NLL se posoje spremljajo s pomočjo življenjskih dob.
-V tej formulaciji pa je avtor življenjske dobe poimenoval regije (_regions_).
-Množica regij je označena z #regije subset 2^#posoje.
-Na primeru so že označene z `'1`, `'2`, `'3`, itd. Pripadnost posoj regijam bomo kasneje določili z relacijo.
+V trenutni implementaciji preverjevalnika izposoj NLL se posoje spremljajo s pomočjo življenjskih dob. V tej formulaciji pa je avtor življenjske dobe poimenoval regije #angl[regions]. Množica regij je označena z $regije subset 2^posoje$. Na primeru so že označene z `'1`, `'2`, `'3`, itd. Pripadnost posoj regijam bomo kasneje določili z relacijo.
 
 === Graf poteka izposoje
 
-Graf poteka (_angl. CFG - control flow graph_) je izračunan v prejšnjih fazah analize kode.
-Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij,
-ki nam bodo kasneje prišle prav. Te so izračunane tekom analize poteka podatkov
-(_dataflow analysis_) @MIRDataflowRust. Graf poteka označimo s $C = (C_V, C_E)$, kjer
-je $C_V$ množica vozlišč in $C_E$ množica povezav.
+Graf poteka #angl[CFG - control flow graph] je izračunan v prejšnjih fazah analize kode. Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Spremlja ga tudi nekaj dodatnih informacij, ki nam bodo kasneje prišle prav. Te so izračunane tekom analize poteka podatkov #angl[dataflow analysis] @MIRDataflowRust. Graf poteka označimo s $C = (C_V, C_E)$, kjer je $C_V$ množica vozlišč in $C_E$ množica povezav.
 
 Privzeto se ustvarijo naslednje povezave (to bi moral potrditi v kodi rustc, v članku tako piše):
 
@@ -626,6 +619,68 @@ Komentar nad strukturo, ki opisuje množico stavkov, pravi naslednje @RustCompil
   kar nam omogoči večjo granularnost. Bolj podrobno, ločimo med začetkom in sredino stavka. Sredina stavka
   je točka _tik preden_ ima stavek učinek. Torej za prirejanje `A = B` bi bila sredina stavka
   točka trenutek ravno preden bi se `B` zapisal v `A` ...]
+
+==== Primer grafa
+
+Da si lahko boljše predstavljamo graf poteka, ga bomo kontruirali za naslednji program:
+
+#figure(
+  [
+    ```rust
+    fn primer(pogoj: bool) {
+        let mut x = 1;
+        if pogoj {
+            x = 2;
+        }
+        let y = x;
+    }
+    ```
+  ],
+  caption: "Primer za graf poteka",
+) <ex-cfg-example-code>
+
+@ex-cfg-example-code[Program] se prevede v MIR. Tukaj ga bomo ponazorili s psevdokodo, vendar MIR sam je sam skupek struktur v Rustovem prevajalniku.
+
+#figure(
+  [
+    ```rust
+    fn primer(_1: bool) -> () {
+        let mut _0: ();                      // povratna vrednost (unit type)
+        let mut _2: i32;                     // x
+        let mut _3: i32;                     // y
+
+        bb0: {
+            _2 = const 1_i32;                // let mut x = 1;
+            switchInt(_1) -> [
+                false: bb2,                  // če je pogoj false -> skok na y = x
+                otherwise: bb1               // če je pogoj true -> skok na x = 2
+            ];
+        }
+
+        bb1: {
+            _2 = const 2_i32;                // x = 2;
+            goto -> bb2;
+        }
+
+        bb2: {
+            _3 = _2;                         // let y = x;
+            _0 = const ();                   // funkcija se konča (implicitni return ())
+            return;
+        }
+    }
+    ```],
+  caption: [MIR za @ex-cfg-example-code[program]],
+)
+
+Ker je ta sintaksa povsem izmišljena za pedagoške namene, je ne bomo pojasnili potanko, vendar omenimo par stvari:
+- Spremenljivke izgubijo imena in se oštevilčijo (`_1`, `_2`, `_3`)
+- Osnovne bloke se označuje z `bb<stevilo>`.
+- `switchInt` je dejanski tip terminatorja definiran v Rustovem prevajalniku @TerminatorKindRustc_middleMir.
+
+S tem razumevanjem lahko zdaj program ponazorimo v grafu.
+
+#figure(cfg-example, caption: [Graf poteka za @ex-cfg-example-code[program]])
+
 
 === Začetne relacije
 
