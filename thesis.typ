@@ -675,7 +675,7 @@ Da si lahko boljše predstavljamo graf poteka, ga bomo kontruirali za naslednji 
 Ker je ta sintaksa povsem izmišljena za pedagoške namene, je ne bomo pojasnili potanko, vendar omenimo par stvari:
 - Spremenljivke izgubijo imena in se oštevilčijo (`_1`, `_2`, `_3`)
 - Osnovne bloke se označuje z `bb<stevilo>`.
-- `switchInt` je dejanski tip terminatorja definiran v Rustovem prevajalniku @TerminatorKindRustc_middleMir.
+- `switchInt` je tip terminatorja definiran v Rustovem prevajalniku @TerminatorKindRustc_middleMir.
 
 S tem razumevanjem lahko zdaj program ponazorimo v grafu.
 

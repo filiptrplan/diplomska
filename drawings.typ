@@ -159,7 +159,7 @@
 
   // --- Povezave terminatorjev ---
   // Iz BB0 (switchInt) v BB1 (true) in BB2 (false)
-  edge(<s2m.south>, <s3s.north>, [`true`], "-|>"),
+  edge(<s2m.south>, <s3s.north>, [`true`], "-|>", label-anchor: "east", label-sep: -4pt),
   edge(<s2m.south>, (0, 4), (2, 4), <s5s.north>, [`false`], label-sep: 2pt, "-|>"),
 
   // Iz BB1 (goto) v BB2
