@@ -15,31 +15,31 @@
   rgb("#2563eb"), // Blue 600 (repeated/alternative)
   rgb("#dc2626"), // Red 600
 )
+#let region-subset(subset, region, color_idx, name_suffix: "") = {
+  import cetz.draw: *
+  let group_name = region + name_suffix
+  let rectname = group_name + "rect"
+  let color = colors.at(color_idx)
+  let stroke-color = color.darken(40%)
+  let bg-color = color.lighten(60%)
+  on-layer(-color_idx - 1, {
+    group(
+      {
+        rect-around(subset, padding: 0.2, radius: 0.1, name: rectname, stroke: stroke-color, fill: bg-color)
+        content(
+          (name: rectname, anchor: "north-west"),
+          anchor: "south",
+          padding: (bottom: 0.15, rest: 0),
+          text(fill: stroke-color, size: 0.8em)[#raw("'" + region)],
+        )
+      },
+      name: group_name,
+    )
+  })
+}
+
 #let diagram-vsebovanosti-intuition2 = cetz.canvas({
   import cetz.draw: *
-  let region-subset(subset, region, color_idx) = {
-    let rectname = region + "rect"
-    let color = colors.at(color_idx)
-    let stroke-color = color.darken(10%)
-    let bg-color = color.lighten(80%)
-    on-layer(-color_idx - 1, {
-      group(
-        {
-          rect-around(subset, padding: 0.2, radius: 0.1, name: rectname, stroke: stroke-color, fill: bg-color)
-          content(
-            (name: rectname, anchor: "north-west"),
-            anchor: "south",
-            padding: (
-              bottom: 0.15,
-              rest: 0,
-            ),
-            text(fill: stroke-color)[#raw("'" + region)],
-          )
-        },
-        name: region,
-      )
-    })
-  }
   on-layer(0, { content((0, 0), name: "L0", [`L0: &mut v`]) })
   region-subset("L0", "3", 0)
   region-subset("3", "1", 1)
@@ -51,6 +51,36 @@
   region-subset("2", "0", 5)
 })
 
+#let diagram-vsebovanosti-zacetna = cetz.canvas({
+  import cetz.draw: *
+  // 1. VRSTICA: r = &mut v
+  // L0 je vsebovan v '3, '3 v '1
+  on-layer(0, { content((0, 0), name: "L0", [`L0: &mut v`]) })
+  region-subset("L0", "3", 0)
+  region-subset("3", "1", 1)
+
+  // Invariančnost pri dodelitvi r: '0: '2 in '2: '0
+  on-layer(0, { content((3.5, 0), name: "R0_1", [`'0`]) })
+  region-subset("R0_1", "2", 2, name_suffix: "_inv1")
+
+  on-layer(0, { content((5.5, 0), name: "R2_1", [`'2`]) })
+  region-subset("R2_1", "0", 3, name_suffix: "_inv2")
+
+  // 2. VRSTICA: p = &x
+  on-layer(0, { content((0, -2.5), name: "L1", [`L1: &x`]) })
+  region-subset("L1", "4", 4)
+  region-subset("4", "5", 5)
+
+  // 3. VRSTICA: r.push(p)
+  // '5 vsebovan v '2
+  on-layer(0, { content((3.5, -2.5), name: "R5_1", [`'5`]) })
+  region-subset("R5_1", "2", 2, name_suffix: "_push")
+
+  // 4. VRSTICA: take(v)
+  // '0 vsebovan v '6
+  on-layer(0, { content((6.5, -2.5), name: "R0_2", [`'0`]) })
+  region-subset("R0_2", "6", 6)
+})
 
 
 #let aktivnosti-regij-intuition2 = cetz.canvas({
