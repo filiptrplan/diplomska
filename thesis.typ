@@ -56,6 +56,23 @@
       },
     )
 )
+
+// To je za math mode
+#let posoje = `posoje`
+#let regije = `regije`
+#let stavki = `stavki`
+#let točke = `točke`
+#let jevsebovanazacetno = `je_vsebovana_zacetno`
+#let regijaposojena = `regija_posojena`
+#let regijaaktivnana = `regija_aktivna_na`
+#let posojaprekinjenana = `posoja_prekinjena_na`
+#let posojarazveljavljenana = `posoja_razveljavljena_na`
+#let jevsebovana = `je_vsebovana`
+#let zahteva = `zahteva`
+#let posojaaktivnana = `posoja_aktivna_na`
+#let napaka = `napaka`
+
+
 #show: thesis.with(
   title: "Formalizacija originalne formulacije Poloniusa",
   author: "Filip Trplan",
@@ -337,9 +354,9 @@ Oglejmo si, kako se intuitivno razumevanje napake prenese na analizo, ki jo opra
 
 Prvi obhod izračuna dva glavna elementa: vsebovanost regij in pripadnost posoj regijam.
 
-Vsebovanost dveh regij se izračuna glede na pravila sklepanja Rustovega sistema tipov(subtyping relations?) in jo zapišemo kot `'a: 'b`, kar pomeni da mora regija 'a vsebovati vse posoje iz regije 'b (intuitivno mora referenca z življenjsko dobo 'b živeti vsaj toliko dolgo kot 'a).
+Vsebovanost dveh regij se izračuna glede na pravila sklepanja Rustovega sistema tipov(subtyping relations?) in jo zapišemo kot `'a: 'b`, kar pomeni da mora regija 'a vsebovati vse #posoje iz regije 'b (intuitivno mora referenca z življenjsko dobo 'b živeti vsaj toliko dolgo kot 'a).
 
-Pripadnost posoj regijam se določi ob ustvaritvi posoj. V tem kontekstu pripadnost ne pomeni pripadnost množici vrstic, ki sestavljajo regijo v NLL-u, vendar kot dodaten metapodatek regije. Posoje so interne strukture v Rustovem prevajalniku, ki hranijo podatke o ustvarjeni referenci @weissOxideEssenceRust2019. Ko ustvarimo posojo z `&` ali `&mut`, se tej določi pripadnost glede na regijo, ki je del tipa.
+Pripadnost #posoje regijam se določi ob ustvaritvi #posoje. V tem kontekstu pripadnost ne pomeni pripadnost množici vrstic, ki sestavljajo regijo v NLL-u, vendar kot dodaten metapodatek regije. #posoje so interne strukture v Rustovem prevajalniku, ki hranijo podatke o ustvarjeni referenci @weissOxideEssenceRust2019. Ko ustvarimo posojo z `&` ali `&mut`, se tej določi pripadnost glede na regijo, ki je del tipa.
 
 Za boljše razumevanje teh dveh korakov se obrnemo na @lst:intuition2[primer], kjer sta v komentarjih anotirana ta dva koraka.
 
@@ -379,7 +396,7 @@ Drugi obhod propagira vsebovanosti iz prvega obhoda (saj lahko nanje gledamo kot
   caption: [Diagram vsebovanosti regij in posoj @lst:intuition2[programa]],
 ) <fig:diagram-vsebovanosti>
 
-Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regije `'0`. Poleg propagiranja vsebovanosti, drugi obhod tudi določi aktivnost regij in posoj, vendar tukaj tega postopka ne bomo opisali. Povedali bomo samo, da Polonius izračuna, da sta regija `'0` in posledično posoja `L1` aktivni na vrstici 12 v @lst:intuition2[programu]. Pojma aktivnosti regij in posoj sta tukaj analogna pojmu aktivnosti spremenljivk pri prevajalnikih.
+Osredotočimo se na #posoje `L1`, ki je na koncu drugega obhoda pripadnica regije `'0`. Poleg propagiranja vsebovanosti, drugi obhod tudi določi aktivnost regij in #posoje, vendar tukaj tega postopka ne bomo opisali. Povedali bomo samo, da Polonius izračuna, da sta regija `'0` in posledično #posoje `L1` aktivni na vrstici 12 v @lst:intuition2[programu]. Pojma aktivnosti regij in #posoje sta tukaj analogna pojmu aktivnosti spremenljivk pri prevajalnikih.
 
 
 #figure(
@@ -388,9 +405,9 @@ Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regije
 ) <fig:aktivnosti-regij>
 
 
-V tretjem obhodu nato javimo napako, ker operacija mutiranja spremenljivke `x` na vrstici 12 v @lst:intuition2[primeru] razveljavi pogoje posoje `L1`, ki je pa na tisti točki v programu še vedno živa. Razveljavitev pogojev posoje na kratko pomeni, da operacija ni dovoljena glede na tip reference. To so lahko npr. mutiranje mesta na katero kaže deljena referenca ali pa ustvarjanje nove reference na mesto, ko že obstaja spremenljiva referenca.
+V tretjem obhodu nato javimo napako, ker operacija mutiranja spremenljivke `x` na vrstici 12 v @lst:intuition2[primeru] razveljavi pogoje #posoje `L1`, ki je pa na tisti točki v programu še vedno živa. Razveljavitev pogojev #posoje na kratko pomeni, da operacija ni dovoljena glede na tip reference. To so lahko npr. mutiranje mesta na katero kaže deljena referenca ali pa ustvarjanje nove reference na mesto, ko že obstaja spremenljiva referenca.
 
-V intuitivni razlagi smo izpustili več podrobnosti, kot je izračun aktivnosti regij in posoj, podrobnosti propagacije različnih vsebovanosti skozi program in pogoje za ustvarjanje raznih drugih omejitev #angl[constraints]. Prav tako je pomembno omeniti, da analiza deluje na MIR, ki je osnovan na podatkovni strukturi grafa, ne pa na samih vrsticah v programu.
+V intuitivni razlagi smo izpustili več podrobnosti, kot je izračun aktivnosti #regije in #posoje, podrobnosti propagacije različnih vsebovanosti skozi program in pogoje za ustvarjanje raznih drugih omejitev #angl[constraints]. Prav tako je pomembno omeniti, da analiza deluje na MIR, ki je osnovan na podatkovni strukturi grafa, ne pa na samih vrsticah v programu.
 
 == Formalizacija pravil
 
@@ -439,7 +456,7 @@ $ "Move-Deinit"(m, p) <==> \ exists.not pi in "Poti"(p), m_2: "Prekrivanje"(m, m
 
 Pravili `Shared-Readonly` in `Unique-Write` pa skrbita za veljavnost referenc in omejitve na njihovi uporabi. To so ista pravila, ki smo jih opisali v @chap:intuitivna-razlaga-poloniusa[poglavju]. Za njiju moramo definirati še nekaj dodatnih predikatov.
 
-Da razumemo kaj nam ta pravila pravijo, moramo definirati pojem posoje, ki je tesno povezana s sorodnim pojmom "izraz izposoje".
+Da razumemo kaj nam ta pravila pravijo, moramo definirati pojem #posoje, ki je tesno povezana s sorodnim pojmom "izraz izposoje".
 
 / Izraz izposoje #angl[borrow expression]: #[je jezikovni konstrukt, ki nam omogoča, da ustvarimo referenco (primer izraza izposoje bi bil `&mut x`). Rustov priročnik za prevajalnik @MIRMidlevelIR pojma _borrow expression_ ne definira, ampak ga uporabi tako:
 
@@ -452,7 +469,7 @@ Da razumemo kaj nam ta pravila pravijo, moramo definirati pojem posoje, ki je te
 
 Pojem _borrow expression_ pogosto uporabljajo #cite(<weissOxideEssenceRust2019>, form: "author") v svojem članku o formalizaciji podmnožice Rust-a. Njihov način uporabe se sklada z našo definicijo, ki se glasi:
 
-/ Posoja #angl[loan]: #[
+/ #posoje #angl[loan]: #[
     je interni konstrukt prevajalnika, ki hrani stanje o referenci in njenemu izvoru @weissOxideEssenceRust2019. V trenutni implementaciji preverjalnika izposoj je izposoja predstavljena kot urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer je:
     - `'a`: življenjska doba za katero je vrednost izposojena. To se nanaša na življenjske dobe kot
       del Rustovega sistema tipov, ne pa kot množico izposoj, kot jih bomo definirali kasneje.
@@ -460,11 +477,11 @@ Pojem _borrow expression_ pogosto uporabljajo #cite(<weissOxideEssenceRust2019>,
     - `lvalue`: vrednost, ki je bila izposojena
   ]
 
-Torej v našem matematičnem zapisu bomo posojo zapisali kot $L = (alpha, tau, O)$, kjer bo $tau in {"uniq", "shrd", "mut"}$ naš tip posoje in $O$ naš lvalue (oziroma _origin_ z Rustovsko terminologijo). Da lahko razločimo med aktivnimi in preteklimi posojami, pa ustvarimo predikat $"PosojaAktivna"(L,p)$, ki velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$.
+Torej v našem matematičnem zapisu bomo #posoje zapisali kot $L = (alpha, tau, O)$, kjer bo $tau in {"uniq", "shrd", "mut"}$ naš tip #posoje in $O$ naš lvalue (oziroma _origin_ z Rustovsko terminologijo). Da lahko razločimo med aktivnimi in preteklimi #posoje, pa ustvarimo predikat $"PosojaAktivna"(L,p)$, ki velja natanko tedaj, ko je #posoje $L$ aktivna na točki $p$.
 
-Poleg predikatov za posoje pa nam še manjkajo predikati, ki opisujejo operacije, ki se izvajajo nad mesti. Intuitivno je to lahko več različnih operacij, vendar nas zanimajo dve glavni vrsti. Take, ki bi razveljavile deljeno posojo označimo z $"RazveljaviDeljeno"(m,p)$ in velja natanko tedaj, ko se v točki $p$ nad mestom $m$ izvede taka operacija, ki bi lahko razveljavila posojo, ki si sposoja iz mesta $m$ (to bi bilo pisanje v mesto $m$ ali pa ustvarjanje spremenljive posoje).
+Poleg predikatov za #posoje pa nam še manjkajo predikati, ki opisujejo operacije, ki se izvajajo nad mesti. Intuitivno je to lahko več različnih operacij, vendar nas zanimajo dve glavni vrsti. Take, ki bi razveljavile deljeno #posoje označimo z $"RazveljaviDeljeno"(m,p)$ in velja natanko tedaj, ko se v točki $p$ nad mestom $m$ izvede taka operacija, ki bi lahko razveljavila #posoje, ki si sposoja iz mesta $m$ (to bi bilo pisanje v mesto $m$ ali pa ustvarjanje spremenljive #posoje).
 
-Na podoben način definiramo $"RazveljaviSpremenljivo"(m,p)$, ki velja ko je operacija taka, ki razveljavi spremenljivo posojo (ustvarjanje kakršnekoli nove posoje, pisanje v mesto, branje iz mesta). Tako lahko sestavimo naši naslednji dve pravili:
+Na podoben način definiramo $"RazveljaviSpremenljivo"(m,p)$, ki velja ko je operacija taka, ki razveljavi spremenljivo #posoje (ustvarjanje kakršnekoli nove #posoje, pisanje v mesto, branje iz mesta). Tako lahko sestavimo naši naslednji dve pravili:
 
 $
   "Shared-Readonly"(p) & <==> exists.not L = ("_", tau, O),m: \
@@ -509,17 +526,15 @@ V naslednjih poglavjih se bomo lotili glavnega dela naloge, ki je matematična f
 
 Da sploh lahko matematično govorimo o delovanju Poloniusa, moramo definirate osnovne množice in elemente s katerimi bomo delali.
 
-=== Množica posoj $cal(L)$
+=== Množica posoj #posoje
 
-Množico vseh posoj (_angl. loans_) označimo z $cal(L)$. *Pogoji posoje* so lastnosti, ki morajo
-držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno.
-Pravimo, da *razveljavimo pogoje posoje*, če velja ena izmed naslednjih točk:
+Množico vseh posoj (_angl. loans_) označimo s #posoje. *Pogoji posoje* so lastnosti, ki morajo držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno. Pravimo, da *razveljavimo pogoje posoje*, če velja ena izmed naslednjih točk:
 - Referenca je deljena (_shared_), torej je oblike `&x` in
   - ustvarimo novo spremenljivo referenco _in/ali_
   - pišemo v mesto, ki je bilo izposojeno
 - Referenca je spremenljiva in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
 
-Ta pravila načeloma sledijo NLL-u, bolj formalno pa jih opisujejo pravila razveljavljanja posoje (_loan killed_).
+Ta pravila načeloma sledijo NLL-u, bolj formalno pa jih opisujejo pravila razveljavljanja #posoje (_loan killed_).
 Iz NLL RFC-ja @2094nllRustRFC:
 
 #quote[For a statement at point P in the graph, we define the "transfer function" – that is,
@@ -531,12 +546,12 @@ Iz NLL RFC-ja @2094nllRustRFC:
 Prevedena verzija(?):
 
 #quote[
-  Za stavek na točki P v grafu definiramo "funkcijo prenosa" -- torej, katere posoje prinesemo v ali iz obsega. Funkcija je definirana tako:
+  Za stavek na točki P v grafu definiramo "funkcijo prenosa" -- torej, katere #posoje prinesemo v ali iz obsega. Funkcija je definirana tako:
   - ... ostala pravila
-  - Če je stavek dodelitev `lv = <rvalue>`, potem je vsaka posoja poti P katere `lv` je predpona razveljavljena.
+  - Če je stavek dodelitev `lv = <rvalue>`, potem je vsaka #posoje poti P katere `lv` je predpona razveljavljena.
 ]
 
-Poglejmo si še torej posoje, ki bi se ustvarile na našem primeru:
+Poglejmo si še torej #posoje, ki bi se ustvarile na našem primeru:
 
 #show: subst-env((
   L0: $"L"_0$,
@@ -548,11 +563,6 @@ Poglejmo si še torej posoje, ki bi se ustvarile na našem primeru:
   r4: $'4$,
   r5: $'5$,
   r6: $'6$,
-  beta: $beta$,
-  psi: $psi$,
-  zeta: $zeta$,
-  iota: $iota$,
-  nablaL: $nabla_L$,
   "inn": $in$,
   "implies": $arrow.r.double$,
 ))
@@ -573,13 +583,13 @@ Poglejmo si še torej posoje, ki bi se ustvarile na našem primeru:
   caption: [Posoje v programu],
 ) <listing:loans>
 
-Torej končamo z množico posoj $cal(L) = {L_0, L_1}$.
+Torej končamo z množico #posoje $#posoje = {L_0, L_1}$.
 
-=== Množica regij $cal(R)$
+=== Množica regij #regije
 
 V trenutni implementaciji preverjevalnika izposoj NLL se posoje spremljajo s pomočjo življenjskih dob.
 V tej formulaciji pa je avtor življenjske dobe poimenoval regije (_regions_).
-Množica regij je označena z $cal(R) subset 2^cal(L)$.
+Množica regij je označena z #regije subset 2^#posoje.
 Na primeru so že označene z `'1`, `'2`, `'3`, itd. Pripadnost posoj regijam bomo kasneje določili z relacijo.
 
 === Graf poteka izposoje
@@ -593,7 +603,7 @@ je $C_V$ množica vozlišč in $C_E$ množica povezav.
 Privzeto se ustvarijo naslednje povezave (to bi moral potrditi v kodi rustc, v članku tako piše):
 
 - Za vsak stavek se ustvari povezava med njegovim začetkom in sredino:
-  $forall "stmt" in cal(S): (S("stmt"), M("stmt")) in C_E$
+  $forall "stmt" in stavki: (S("stmt"), M("stmt")) in C_E$
 - Če $M("stmt")$ predstavlja _terminator_ (stavek na koncu bloka) potem dodamo povezavo iz njega v $S("stmt"')$
   za vsak stavek $"stmt"'$, ki mu sledi.
 
@@ -602,8 +612,8 @@ je njegova predstavitev precej bolj kompleksna.
 
 ==== Množica stavkov in točk
 
-Množico vseh stavkov v MIR označimo s $cal(S)$. Točke v grafu poteka (_CFG - control flow graph_)
-označimo s $cal(P)$. Lahko so dveh tipov:
+Množico vseh stavkov v MIR označimo s #stavki. Točke v grafu poteka (_CFG - control flow graph_)
+označimo s #točke. Lahko so dveh tipov:
 - *na začetku stavka:* označuje trenutek preden se stavek izvede. Označimo s $S("stmt")$.
 - *med stavkom:* označuje trenutek tik preden ima stavek učinek (v članku napisano "just before the statement takes effect").
   Označimo s $M("stmt")$.
@@ -624,11 +634,9 @@ iz direktno analize poteka podatkov. Te relacije bodo predstavljale našo izhodi
 
 ==== Začetna relacija vsebovanosti
 
-Začetno relacijo vsebovanosti (_base subset_) bomo označili z
-$beta subset cal(R) times cal(R) times cal(P)$. Torej to je relacija, ki povezuje dve regiji
-ob neki točki v programu.
+Začetno relacijo vsebovanosti (_base subset_) bomo označili z $jevsebovanazacetno subset regije times regije times točke$. Torej to je relacija, ki povezuje dve regiji ob neki točki v programu.
 
-Bolj natančno, če velja $(R_1, R_2, P) in beta$ pomeni, da je $R_1$ podmnožica regije $R_2$ na točki $P$ v programu.
+Bolj natančno, če velja $(R_1, R_2, P) in jevsebovanazacetno$ pomeni, da je $R_1$ podmnožica regije $R_2$ na točki $P$ v programu.
 To dejstvo mora veljati na sredini stavka ($M("stmt")$), ki inducira zahtevo.
 
 _Opomba:_ Oznaka `<:` nam predstavlja vsebovanost med tipi (_subtyping relation_).
@@ -645,21 +653,21 @@ _Opomba:_ Oznaka `<:` nam predstavlja vsebovanost med tipi (_subtyping relation_
 
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
     // tukaj zahtevamo naslednje: &'3 mut Vec<&'0 i32> <: &'1 mut Vec<&'2 i32>
-    // (r3, r1, P) inn beta, (r0, r2, P) inn beta, (r2, r0, P) inn beta
+    // (r3, r1, P) inn #je_vsebovana_zacetno, (r0, r2, P) inn #je_vsebovana_zacetno, (r2, r0, P) inn #je_vsebovana_zacetno
 
     let p: &'5 i32 = &'4 x;
     // zahtevamo: &'4 i32 <: &'5 i32
-    // (r4, r5, P) inn beta
+    // (r4, r5, P) inn #je_vsebovana_zacetno
 
     r.push(p);
     // zahtevamo: &'5 i32 <: &'2 i32
-    // (r5, r2, P) inn beta
+    // (r5, r2, P) inn #je_vsebovana_zacetno
 
     x += 1;
 
     take::<Vec<&'6 i32>>(v);
     // zahtevamo Vec<&'0 i32> <: Vec<&'6 i32>
-    // (r0, r6, P) inn beta
+    // (r0, r6, P) inn #je_vsebovana_zacetno
   }
   ```,
   caption: [Začetna relacija vsebovanosti],
@@ -667,9 +675,9 @@ _Opomba:_ Oznaka `<:` nam predstavlja vsebovanost med tipi (_subtyping relation_
 
 ==== Začetna relacija posoje regij
 
-Začetno relacijo posoje regij (_borrow region_) označimo s $psi subset.eq cal(R) times cal(L) times cal(P)$.
+Začetno relacijo posoje regij (_borrow region_) označimo s $regijaposojena subset.eq regije times posoje times točke$.
 
-Če velja $(R,L,P) in psi$ pomeni, da izraz izposoje na točki $P$ ustvari posojo $L$ in postane del
+Če velja $(R,L,P) in regijaposojena$ pomeni, da izraz izposoje na točki $P$ ustvari posojo $L$ in postane del
 regije $R$. Prav tako kot relacija vsebovanosti se ta zahteva vzpostavi na sredini stavka.
 
 #figure(
@@ -678,9 +686,9 @@ regije $R$. Prav tako kot relacija vsebovanosti se ta zahteva vzpostavi na sredi
     let mut x: i32 = 22;
     let mut v: Vec<&'0 i32> = vec![];
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // (r3, L0, P) inn psi
+    // (r3, L0, P) inn #regija_posojena
     let p: &'5 i32 = &'4 x;
-    // (r4, L1, P) inn psi
+    // (r4, L1, P) inn #regija_posojena
     r.push(p);
     x += 1;
     take::<Vec<&'6 i32>>(v);
@@ -691,8 +699,8 @@ regije $R$. Prav tako kot relacija vsebovanosti se ta zahteva vzpostavi na sredi
 
 ==== Relacija aktivnosti regije
 
-Začetno relacijo aktivnosti regije (_region live at_) označimo z $nabla_R subset.eq cal(R) times cal(P)$.
-$(R, P) in nabla_R$ pomeni, da je regija $R$ aktivna na točki $P$. Torej spremenljivka, katere tip vključuje $R$ (recimo `&'a`),
+Začetno relacijo aktivnosti regije (_region live at_) označimo z $regijaaktivnana subset.eq regije times točke$.
+$(R, P) in regijaaktivnana$ pomeni, da je regija $R$ aktivna na točki $P$. Torej spremenljivka, katere tip vključuje $R$ (recimo `&'a`),
 bo morda kasneje v programu uporabljena.
 
 To določi analiza aktivnosti, ki poteka isto kot v NLL RFC. Bolj specifično, s pomočjo raznih omejitev izračuna množico točk
@@ -700,9 +708,7 @@ kjer mora biti regija (v RFC-ju poimenovana _lifetime_) aktivna @2094nllRustRFC.
 
 ==== Relacija prekinitve posoje
 
-Začetno relacijo prekinitve posoje (_loan killed at_) označimo s $kappa subset.eq cal(L) times cal(P)$.
-$(L,P) in kappa$ pomeni, da je posoja $L$ prekinjena (_killed_) na točki $P$. Pojem prekinitve oziroma razveljavitve
-pogojev smo definirali že zgoraj. To se običajno zgodi na sredini prireditvenega stavka, ki prepiše pot (_path_) prej povezano s posojo $L$.
+Začetno relacijo prekinitve posoje (_loan killed at_) označimo s $posojaprekinjenana subset.eq posoje times točke$. $(L,P) in posojaprekinjenana$ pomeni, da je posoja $L$ prekinjena (_killed_) na točki $P$. Pojem prekinitve oziroma razveljavitve pogojev smo definirali že zgoraj. To se običajno zgodi na sredini prireditvenega stavka, ki prepiše pot (_path_) prej povezano s posojo $L$.
 
 V našem primeru nimamo nobenega primera prekinitve posoje, je pa relacija ključna v naslednjem primeru:
 
@@ -726,9 +732,7 @@ zdaj `y` kaže na `p` in `x` na `q`.
 
 ==== Relacija razveljavitve posoje
 
-Začetno relacijo razveljavitve posoje (_invalidates loan_) označimo z $iota subset cal(P) times cal(L)$.
-To pomeni, da dejanje na točki $P$ (recimo mutacija izposojenega mesta) razveljavi pogoje posoje $L$, kar
-je že opisano v poglavju o definicije množice $cal(L)$.
+Začetno relacijo razveljavitve posoje (_invalidates loan_) označimo z s $posojarazveljavljenana subset točke times posoje$. To pomeni, da dejanje na točki $P$ (recimo mutacija izposojenega mesta) razveljavi pogoje posoje $L$, kar je že opisano v poglavju o definiciji množice #posoje.
 
 #figure(
   ```rust
@@ -736,9 +740,9 @@ je že opisano v poglavju o definicije množice $cal(L)$.
     let mut x: i32 = 22;
     let mut v: Vec<&'0 i32> = vec![];
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // (r3, L0, P) inn psi
+    // (r3, L0, P) inn #regija_posojena
     let p: &'5 i32 = &'4 x;
-    // (r4, L1, P) inn psi
+    // (r4, L1, P) inn #regija_posojena
     r.push(p);
     x += 1; // tukaj razveljavimo L1 z mutacijo deljenega referenta
     take::<Vec<&'6 i32>>(v);
@@ -754,24 +758,24 @@ Polonius-a.
 
 V primerih ne bomo označevali točk v grafu poteka pri relacijah, ker bo koda anotirana na tistem mestu, kjer
 se posamezna relacija pojavi. V ozadju se to še vedno izvaja na nivoju MIR, vendar za naše poenostavljene
-primere to ni ključna informacija. (torej pisali bomo $(R_1, R_2) in beta$ namesto $(R_1, R_2, P) in beta$).
+primere to ni ključna informacija. (torej pisali bomo $(R_1, R_2) in jevsebovanazacetno$ namesto $(R_1, R_2, P) in jevsebovanazacetno$).
 
 ==== Relacija vsebovanosti
 
 Razširimo začetno relacijo vsebovanosti z (raširjeno) relacijo vsebovanosti (_subset_), ki jo označimo z
-$Gamma subset.eq cal(R) times cal(R) times cal(P)$. Definirana je z zaprtjem naslednjih pravil:
+$jevsebovana subset.eq regije times regije times točke$. Definirana je z zaprtjem naslednjih pravil:
 
-+ *Začetna relacija:* Če $(R_1, R_2, P) in beta$, potem $(R_1, R_2, P) in Gamma$. Torej vse trojice
++ *Začetna relacija:* Če $(R_1, R_2, P) in jevsebovanazacetno$, potem $(R_1, R_2, P) in jevsebovana$. Torej vse trojice
   iz začetne relacije se pojavijo tudi v razširjeni.
-+ *Tranzitivnost:* Če $(R_1, R_2, P) in Gamma$ in $(R_2, R_3, P) in Gamma$, potem $(R_1, R_3, P) in Gamma$.
++ *Tranzitivnost:* Če $(R_1, R_2, P) in jevsebovana$ in $(R_2, R_3, P) in jevsebovana$, potem $(R_1, R_3, P) in jevsebovana$.
   Relacija vsebovanosti na isti točki v programu je tranzitivna.
 + *Propagacija:* Če veljajo vse izmed naštetega:
-  + $(R_1, R_2, P) in Gamma$
+  + $(R_1, R_2, P) in jevsebovana$
   + $(P, Q) in C_E$: točki si sledita v grafu poteka
-  + $(R_1, Q) in nabla_R$: regija 1 je aktivna na naslednji točki
-  + $(R_2, Q) in nabla_R$: regija 2 je aktivna
+  + $(R_1, Q) in regijaaktivnana$: regija 1 je aktivna na naslednji točki
+  + $(R_2, Q) in regijaaktivnana$: regija 2 je aktivna
 
-  potem sledi $(R_1, R_2, Q) in Gamma$. To pomeni, da se relacija propagira čez graf poteka, če sta obe
+  potem sledi $(R_1, R_2, Q) in jevsebovana$. To pomeni, da se relacija propagira čez graf poteka, če sta obe
   regiji aktivni na naslednji točki v grafu. Pogoj za aktivnost nam pride prav kasneje.
 
 Na primeru ustvarimo naslednje relacije:
@@ -783,24 +787,24 @@ Na primeru ustvarimo naslednje relacije:
     let mut v: Vec<&'0 i32> = vec![];
 
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // (r3, r1) in beta, (r0, r2) inn beta, (r2, r0) inn beta
+    // (r3, r1) in je_vsebovana_zacetno, (r0, r2) inn je_vsebovana_zacetno, (r2, r0) inn je_vsebovana_zacetno
 
     let p: &'5 i32 = &'4 x;
-    // (r3, r1) inn beta, (r0, r2) inn beta, (r2, r0) inn beta
-    // (r4, r5) inn beta
+    // (r3, r1) inn je_vsebovana_zacetno, (r0, r2) inn je_vsebovana_zacetno, (r2, r0) inn je_vsebovana_zacetno
+    // (r4, r5) inn je_vsebovana_zacetno
 
     r.push(p);
-    // (r3, r1) inn beta, (r0, r2) inn beta, (r2, r0) inn beta
-    // (r4, r5) inn beta
-    // (r5, r2) inn beta
+    // (r3, r1) inn je_vsebovana_zacetno, (r0, r2) inn je_vsebovana_zacetno, (r2, r0) inn je_vsebovana_zacetno
+    // (r4, r5) inn je_vsebovana_zacetno
+    // (r5, r2) inn je_vsebovana_zacetno
 
     x += 1;
 
     take::<Vec<&'6 i32>>(v);
-    // (r3, r1) inn beta, (r0, r2) inn beta, (r2, r0) inn beta
-    // (r4, r5) inn beta
-    // (r5, r2) inn beta
-    // (r0, r6) inn beta
+    // (r3, r1) inn je_vsebovana_zacetno, (r0, r2) inn je_vsebovana_zacetno, (r2, r0) inn je_vsebovana_zacetno
+    // (r4, r5) inn je_vsebovana_zacetno
+    // (r5, r2) inn je_vsebovana_zacetno
+    // (r0, r6) inn je_vsebovana_zacetno
   }
 
   fn take<T>(p: T) { .. }
@@ -811,23 +815,22 @@ Na primeru ustvarimo naslednje relacije:
 ==== Relacija zahteve
 
 Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Označimo jo s
-$zeta subset.eq cal(R) times cal(L) times cal(P)$ in definirana je z zaprtjem naslednjih pravil:
+$zahteva subset.eq regije times posoje times točke$ in definirana je z zaprtjem naslednjih pravil:
 
-+ *Začetna relacija:* Če $(R, L, P) in psi$, potem $(R, L, P) in zeta$. To nam pove, da če se trojica
-  nahaja v relaciji posoje regij, se nahaja tudi v $zeta$.
-+ *Vsebovanost:* Če velja $(R_1, L, P) in zeta$ in $(R_1, R_2, P) in Gamma$, potem sledi
-  $(R_2, L, P) in zeta$. To nam pove, da če neka regija $R_1$, ki je podmnožica večje regije $R_2$, na točki $P$
++ *Začetna relacija:* Če $(R, L, P) in regijaposojena$, potem $(R, L, P) in zahteva$. To nam pove, da če se trojica
+  nahaja v relaciji posoje regij, se nahaja tudi v zahteva.
++ *Vsebovanost:* Če velja $(R_1, L, P) in zahteva$ in $(R_1, R_2, P) in jevsebovana$, potem sledi
+  $(R_2, L, P) in zahteva$. To nam pove, da če neka regija $R_1$, ki je podmnožica večje regije $R_2$, na točki $P$
   zahteva posojo $L$, potem tudi $R_2$ zahteva isto posojo.
 + *Propagacija:* Če veljajo vse:
-  + $(R,L,P) in zeta$: $R$ zahteva $L$ na $P$
-  + $(L, P) in.not kappa$: $L$ ni prekinjena na $P$
+  + $(R,L,P) in zahteva$: $R$ zahteva $L$ na $P$
+  + $(L, P) in.not posojaprekinjenana$: $L$ ni prekinjena na $P$
   + $(P, Q) in C_E$: $Q$ sledi $P$ v grafu poteka
-  + $(R,Q) in nabla_R$: regija $R$ je aktivna na točki $Q$
+  + $(R,Q) in regijaaktivnana$: regija $R$ je aktivna na točki $Q$
 
-  potem propagiramo relacijo v $(R,L,Q) in zeta$.
+  potem propagiramo relacijo v $(R,L,Q) in zahteva$.
 
-Opazimo, da pri relaciji vsebovanosti $beta$ in pri relaciji zahteve $zeta$ mora biti regija pri pravilu
-za propagacijo aktivna na naslednji točki $Q$. Z naslednjim primerom ponazorimo zakaj je to ključna omejitev.
+Opazimo, da pri relaciji vsebovanosti #jevsebovanazacetno in pri relaciji zahteve #zahteva mora biti regija pri pravilu za propagacijo aktivna na naslednji točki $Q$. Z naslednjim primerom ponazorimo zakaj je to ključna omejitev.
 
 #figure(
   ```rust
@@ -835,18 +838,18 @@ za propagacijo aktivna na naslednji točki $Q$. Z naslednjim primerom ponazorimo
   let y = 44;
 
   let mut p: &'0 i32 = &'1 x; // posoja L0
-  // (r1,r0) inn beta
-  // (r1, L0) inn zeta
+  // (r1,r0) inn je_vsebovana_zacetno
+  // (r1, L0) inn zahteva
 
   p = &'3 y; // posoja L1
-  // (r3,r0) inn beta
-  // (r3, L1) inn zeta
+  // (r3,r0) inn je_vsebovana_zacetno
+  // (r3, L1) inn zahteva
   // r1 ni več aktivna, ker smo jo prepisali z r3
 
   x += 1;
-  // razveljavi se posoja L0: (L0) inn iota
+  // razveljavi se posoja L0: (L0) inn posoja_razveljavljena_na
   // tukaj bi brez pravila o aktivnosti regij še vedno zahtevali
-  // (L0, r0) inn zeta zaradi pravila o propagaciji
+  // (L0, r0) inn zahteva zaradi pravila o propagaciji
 
   print( *p );
   // ta izraz posledično ne bi bil veljaven
@@ -856,22 +859,19 @@ za propagacijo aktivna na naslednji točki $Q$. Z naslednjim primerom ponazorimo
 
 ==== Relacija aktivnosti posoje
 
-Relacija aktivnosti posoje (_loan live at_) pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s
-$nabla_L subset.eq cal(L) times cal(P)$ in jo definiramo takrat, ko
+Relacija aktivnosti posoje (_loan live at_) pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s $posojaaktivnana subset.eq posoje times točke$ in jo definiramo takrat, ko
 
-$ exists R in cal(R): (R,P) in nabla_R and (R,L,P) in zeta $
+$ exists R in regije: (R,P) in regijaaktivnana and (R,L,P) in zahteva $
 
 To na kratko pomeni, da je posoja aktivna, če jo na isti točki zahteva neka aktivna regija.
 
 === Javljanje napake
 
-S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu javimo napako (v obsegu preverjalnika posoj).
-Že spet si pomagamo z relacijo, ki jo tokrat poimenujemo *relacija napake* (_error_) in jo označimo z
-$epsilon subset cal(P)$. Ta relacija nam pove, da javimo napako na točki $P$ v programu.
+S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu javimo napako (v obsegu preverjalnika posoj). Že spet si pomagamo z relacijo, ki jo tokrat poimenujemo *relacija napake* (_error_) in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu.
 
 Definiramo jo, ko velja:
 
-$ exists L in cal(L): (P, L) in iota and (L,P) in nabla_L $
+$ exists L in posoje: (P, L) in posojarazveljavljenana and (L,P) in posojaaktivnana $
 
 Torej napaka se javi natanko tedaj, ko neko dejanje na točki $P$ razveljavi pogoje posoje $L$, ki je hkrati tudi
 aktivna na točki $P$.
@@ -888,15 +888,15 @@ Poglejmo še kako se dokončno napaka javi na našem primeru:
     // relacije, ki so ustvarjene tukaj niso relevantne za napako
 
     let p: &'5 i32 = &'4 x;
-    // (r4, L1) inn zeta
-    // (r4, r5) inn beta implies (r5, L1) inn zeta
+    // (r4, L1) inn `zahteva`
+    // (r4, r5) inn `je_vsebovana_zacetno` implies (r5, L1) inn `zahteva`
 
     r.push(p);
-    // (r5, r2) inn beta implies (r2, L1) inn zeta
+    // (r5, r2) inn `je_vsebovana_zacetno` implies (r2, L1) inn `zahteva`
 
     x += 1;
-    // Tukaj se razveljavi posoja L1: (L1) inn iota.
-    // Da se nam javi napaka mora biti ta posoja aktivna (L1) inn nablaL.
+    // Tukaj se razveljavi posoja L1: (L1) inn `posoja_razveljavljena_na`.
+    // Da se nam javi napaka mora biti ta posoja aktivna (L1) inn posoja_aktivna_na.
     // Torej jo mora zahtevati neka aktivna regija, na trenutni točki pa je
     // aktivna regija r2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš
     // vektor `v`. Elementi vektorja pa imajo regijo r2, ki pa je del posoje L1.

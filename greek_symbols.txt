@@ -1,0 +1,13 @@
+Mnozica posoj: cal(L) -> `posoje`
+Mnozica regij: cal(R) -> `regije`
+Mnozica stavkov: cal(S) -> `stavki`
+Mnozica tock: cal(P) -> `točke`
+Zacetna relacija vsebovanosti: beta -> `je_vsebovana_zacetno`
+Zacetna relacija posoje regij: psi -> `regija_posojena`
+Relacija aktivnosti regije: nabla_R -> `regija_aktivna_na`
+Relacija prekinitve posoje: kappa -> `posoja_prekinjena_na`
+Relacija razveljavitve posoje: iota -> `posoja_razveljavljena_na`
+Rasirjena relacija vsebovanosti: Gamma -> `je_vsebovana`
+Relacija zahteve: zeta -> `zahteva`
+Relacija aktivnosti posoje: nabla_L -> `posoja_aktivna_na`
+Relacija napake: epsilon -> `napaka`
