@@ -779,7 +779,7 @@ To relacijo smo vizualizirali na @fig:aktivnosti-regij[diagramu] v @chap:intuiti
 
 === Relacija prekinitve posoje
 
-Začetno relacijo prekinitve posoje (_loan killed at_) označimo s $posojaprekinjenana subset.eq posoje times točke$. $(L,P) in posojaprekinjenana$ pomeni, da je posoja $L$ prekinjena (_killed_) na točki $P$. Pojem prekinitve oziroma razveljavitve pogojev smo definirali že zgoraj. To se običajno zgodi na sredini prireditvenega stavka, ki prepiše pot (_path_) prej povezano s posojo $L$.
+Začetno relacijo prekinitve posoje #angl[loan killed at] označimo s $posojaprekinjenana subset.eq posoje times točke$. $(L,P) in posojaprekinjenana$ pomeni, da je posoja $L$ prekinjena #angl[killed] na točki $P$. Pojem prekinitve oziroma razveljavitve pogojev smo definirali že zgoraj. To se običajno zgodi na sredini prireditvenega stavka, ki prepiše pot prej povezano s posojo $L$.
 
 V našem primeru nimamo nobenega primera prekinitve posoje, je pa relacija ključna v naslednjem primeru:
 
@@ -803,7 +803,7 @@ zdaj `y` kaže na `p` in `x` na `q`.
 
 === Relacija razveljavitve posoje
 
-Začetno relacijo razveljavitve posoje (_invalidates loan_) označimo z s $posojarazveljavljenana subset točke times posoje$. To pomeni, da dejanje na točki $P$ (recimo mutacija izposojenega mesta) razveljavi pogoje posoje $L$, kar je že opisano v poglavju o definiciji množice #posoje.
+Začetno relacijo razveljavitve posoje #angl[invalidates loan] označimo s $posojarazveljavljenana subset točke times posoje$. To pomeni, da dejanje na točki $P$ (recimo mutacija izposojenega mesta) razveljavi pogoje posoje $L$, kar je že opisano v poglavju o definiciji množice #posoje.
 
 #figure(
   ```rust
@@ -811,9 +811,9 @@ Začetno relacijo razveljavitve posoje (_invalidates loan_) označimo z s $posoj
     let mut x: i32 = 22;
     let mut v: Vec<&'0 i32> = vec![];
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // (r3, L0, P) inn #regija_posojena
+    // (r3, L0, P) inn regija_posojena
     let p: &'5 i32 = &'4 x;
-    // (r4, L1, P) inn #regija_posojena
+    // (r4, L1, P) inn regija_posojena
     r.push(p);
     x += 1; // tukaj razveljavimo L1 z mutacijo deljenega referenta
     take::<Vec<&'6 i32>>(v);
@@ -824,8 +824,7 @@ Začetno relacijo razveljavitve posoje (_invalidates loan_) označimo z s $posoj
 
 == Izpeljane relacije
 
-V tem poglavju bomo opisali relacije, ki jih izpeljemo iz začetnih. Te relacije tvorijo najbolj pomembni del analize
-Polonius-a.
+V tem poglavju bomo opisali relacije, ki jih izpeljemo iz začetnih. Te relacije tvorijo najbolj pomembni del analize Poloniusa.
 
 V primerih ne bomo označevali točk v grafu poteka pri relacijah, ker bo koda anotirana na tistem mestu, kjer
 se posamezna relacija pojavi. V ozadju se to še vedno izvaja na nivoju MIR, vendar za naše poenostavljene
@@ -833,7 +832,7 @@ primere to ni ključna informacija. (torej pisali bomo $(R_1, R_2) in jevsebovan
 
 === Relacija vsebovanosti
 
-Razširimo začetno relacijo vsebovanosti z (raširjeno) relacijo vsebovanosti (_subset_), ki jo označimo z
+Razširimo začetno relacijo vsebovanosti z (raširjeno) relacijo vsebovanosti #angl[subset], ki jo označimo z
 $jevsebovana subset.eq regije times regije times točke$. Definirana je z zaprtjem naslednjih pravil:
 
 + *Začetna relacija:* Če $(R_1, R_2, P) in jevsebovanazacetno$, potem $(R_1, R_2, P) in jevsebovana$. Torej vse trojice
@@ -858,24 +857,24 @@ Na primeru ustvarimo naslednje relacije:
     let mut v: Vec<&'0 i32> = vec![];
 
     let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // (r3, r1) in je_vsebovana_zacetno, (r0, r2) inn je_vsebovana_zacetno, (r2, r0) inn je_vsebovana_zacetno
+    // (r3, r1) in je_vsebovana, (r0, r2) inn je_vsebovana, (r2, r0) inn je_vsebovana
 
     let p: &'5 i32 = &'4 x;
-    // (r3, r1) inn je_vsebovana_zacetno, (r0, r2) inn je_vsebovana_zacetno, (r2, r0) inn je_vsebovana_zacetno
-    // (r4, r5) inn je_vsebovana_zacetno
+    // (r3, r1) inn je_vsebovana, (r0, r2) inn je_vsebovana, (r2, r0) inn je_vsebovana
+    // (r4, r5) inn je_vsebovana
 
     r.push(p);
-    // (r3, r1) inn je_vsebovana_zacetno, (r0, r2) inn je_vsebovana_zacetno, (r2, r0) inn je_vsebovana_zacetno
-    // (r4, r5) inn je_vsebovana_zacetno
-    // (r5, r2) inn je_vsebovana_zacetno
+    // (r3, r1) inn je_vsebovana, (r0, r2) inn je_vsebovana, (r2, r0) inn je_vsebovana
+    // (r4, r5) inn je_vsebovana
+    // (r5, r2) inn je_vsebovana
 
     x += 1;
 
     take::<Vec<&'6 i32>>(v);
-    // (r3, r1) inn je_vsebovana_zacetno, (r0, r2) inn je_vsebovana_zacetno, (r2, r0) inn je_vsebovana_zacetno
-    // (r4, r5) inn je_vsebovana_zacetno
-    // (r5, r2) inn je_vsebovana_zacetno
-    // (r0, r6) inn je_vsebovana_zacetno
+    // (r3, r1) inn je_vsebovana, (r0, r2) inn je_vsebovana, (r2, r0) inn je_vsebovana
+    // (r4, r5) inn je_vsebovana
+    // (r5, r2) inn je_vsebovana
+    // (r0, r6) inn je_vsebovana
   }
 
   fn take<T>(p: T) { .. }
@@ -909,11 +908,11 @@ Opazimo, da pri relaciji vsebovanosti #jevsebovanazacetno in pri relaciji zahtev
   let y = 44;
 
   let mut p: &'0 i32 = &'1 x; // posoja L0
-  // (r1,r0) inn je_vsebovana_zacetno
+  // (r1,r0) inn je_vsebovana
   // (r1, L0) inn zahteva
 
   p = &'3 y; // posoja L1
-  // (r3,r0) inn je_vsebovana_zacetno
+  // (r3, r0) inn je_vsebovana
   // (r3, L1) inn zahteva
   // r1 ni več aktivna, ker smo jo prepisali z r3
 
@@ -923,7 +922,9 @@ Opazimo, da pri relaciji vsebovanosti #jevsebovanazacetno in pri relaciji zahtev
   // (L0, r0) inn zahteva zaradi pravila o propagaciji
 
   print( *p );
-  // ta izraz posledično ne bi bil veljaven
+  // ta izraz je tukaj, da je referenca `p` še vedno živa na
+  // izrazu x += 1, sicer bi Rustov prevajalnik takoj že zavrgel (drop)
+  // spremenljivko `p` po vrstici 8.
   ```,
   caption: [Primer relacije zahteve],
 ) <listing:reqRelation>
@@ -935,6 +936,43 @@ Relacija aktivnosti posoje (_loan live at_) pomeni, da je posoja $L$ aktivna na 
 $ exists R in regije: (R,P) in regijaaktivnana and (R,L,P) in zahteva $
 
 To na kratko pomeni, da je posoja aktivna, če jo na isti točki zahteva neka aktivna regija.
+
+=== Vizualizacija na primeru
+
+Poskusimo zdaj vizualizirati te glavne relacije na našem glavnem primeru, ki ga tukaj prikažemo še enkrat.
+
+#figure(
+  ```rust
+  fn main() {
+    let mut x: i32 = 22;
+    let mut v: Vec<&'0 i32> = vec![];
+    let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+    let p: &'5 i32 = &'4 x;
+    r.push(p);
+    x += 1;
+    take::<Vec<&'6 i32>>(v);
+  }
+  fn take<T>(p: T) { .. }
+  ```,
+  caption: [Primer programa za Polonius iz @AliasbasedFormulationBorrow],
+) <lst:main-example2>
+
+Prvo bomo na vsaki točki (oz. vrstici v našem poenostavljenem primeru) določili množico vseh aktivnih regij. To nam poda relacija #regijaaktivnana in je prikazana na @ex-graph-active[diagramu].
+
+#figure(
+  final-example-graph-active,
+  caption: [Relacija #regijaaktivnana],
+  supplement: "Diagram",
+) <ex-graph-active>
+
+Potem bomo vizualno ponazorili razširjeno relacijo #jevsebovana, ki že upošteva pravila tranzitivnosti ter propagacije čez točke v grafu. To nam pokaže @ex-graph-subset[diagram].
+
+#figure(
+  final-example-graph-subset,
+  caption: [Relacija #jevsebovana],
+  supplement: "Diagram",
+) <ex-graph-subset>
+
 
 == Javljanje napake
 
@@ -960,10 +998,10 @@ Poglejmo še kako se dokončno napaka javi na našem primeru:
 
     let p: &'5 i32 = &'4 x;
     // (r4, L1) inn `zahteva`
-    // (r4, r5) inn `je_vsebovana_zacetno` implies (r5, L1) inn `zahteva`
+    // (r4, r5) inn `je_vsebovana` implies (r5, L1) inn `zahteva`
 
     r.push(p);
-    // (r5, r2) inn `je_vsebovana_zacetno` implies (r2, L1) inn `zahteva`
+    // (r5, r2) inn `je_vsebovana` implies (r2, L1) inn `zahteva`
 
     x += 1;
     // Tukaj se razveljavi posoja L1: (L1) inn `posoja_razveljavljena_na`.

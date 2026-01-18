@@ -122,8 +122,268 @@
 
 #let fletcher-title(pos, body, ..args) = {
   body = text(size: 10pt, body)
-  node(pos, shape: rect, fill: white, inset: 3pt, ..args, body)
+  node(pos, shape: rect, fill: white, inset: 5pt, ..args, body)
 }
+
+#let r0 = `'0`;
+#let r1 = `'1`;
+#let r2 = `'2`;
+#let r3 = `'3`;
+#let r4 = `'4`;
+#let r5 = `'5`;
+#let r6 = `'6`;
+
+
+#let region(region, color_idx, subset: none, name_suffix: "", coord: (0, 0)) = {
+  import cetz.draw: *
+  let group_name = region + name_suffix
+  let rectname = group_name + "rect"
+  let color = colors.at(color_idx)
+  let stroke-color = color.darken(40%)
+  let bg-color = color.lighten(60%).transparentize(30%)
+  if subset == none {
+    on-layer(-color_idx - 1, {
+      group(
+        {
+          on-layer(0, {
+            content(
+              coord,
+              text(fill: stroke-color, size: 0.8em)[#raw(region)],
+              name: rectname,
+            )
+          })
+          rect-around(rectname, padding: 0.2, radius: 0.1, stroke: stroke-color, fill: bg-color)
+        },
+        name: group_name,
+      )
+    })
+  } else {
+    on-layer(-color_idx - 1, {
+      group(
+        {
+          rect-around(
+            subset,
+            padding: (top: 0.55, rest: 0.2),
+            radius: 0.1,
+            name: rectname,
+            stroke: stroke-color,
+            fill: bg-color,
+          )
+          content(
+            (name: rectname, anchor: "north-west"),
+            anchor: "north-west",
+            padding: (top: 0.15, left: 0.1, rest: 0),
+            text(fill: stroke-color, size: 0.8em)[#raw(region)],
+          )
+        },
+        name: group_name,
+      )
+    })
+  }
+}
+
+
+#let l4vsebovana = cetz.canvas({
+  import cetz.draw: *
+  region("'3", 0)
+  region("'1", 1, subset: "'3")
+
+  let r02 = "'0 == '2"
+  region(r02, 2, coord: (2, 0))
+})
+
+#let l5vsebovana = cetz.canvas({
+  import cetz.draw: *
+  region("'3", 0)
+  region("'1", 1, subset: "'3")
+
+  let r02 = "'0 == '2"
+  region(r02, 2, coord: (2, 0))
+  region("'5", 3, coord: (4, 0))
+  region("'4", 4, subset: "'5")
+})
+
+
+#let l6vsebovana = cetz.canvas({
+  import cetz.draw: *
+  region("'3", 0)
+  region("'1", 1, subset: "'3")
+
+  let r02 = "'0 == '2"
+  region(r02, 2, coord: (2.5, 0))
+  region("'5", 3, subset: r02)
+  region("'4", 4, subset: "'5")
+})
+
+
+#let l8vsebovana = cetz.canvas({
+  import cetz.draw: *
+  region("'3", 0)
+  region("'1", 1, subset: "'3")
+
+  let r02 = "'0 == '2"
+  let r6t = "'6     "
+  region(r6t, 2, coord: (2.5, 0))
+  region(r02, 3, subset: r6t)
+  region("'5", 4, subset: r02)
+  region("'4", 5, subset: "'5")
+})
+
+#let final-example-graph-subset = diagram(
+  node-stroke: 1pt,
+  spacing: 2em,
+  label-size: 8pt,
+  // --- je_vsebovana ---
+  node(
+    (0, 0),
+    [
+      `let mut x: i32 = 22;` \
+    ],
+    name: <l1vsebovana>,
+  ),
+  edge("d", "-|>"),
+
+  node(
+    (0, 1),
+    [
+      `let mut v: Vec<&'0 i32> = vec![];` \
+    ],
+    name: <l3vsebovana>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 2),
+    [
+      `let r: &'1 mut Vec<&'2 i32> = &'3 mut v;` \
+      #l4vsebovana
+    ],
+    name: <l4vsebovana>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 3),
+    [
+      `let p: &'5 i32 = &'4 x;` \
+      #l5vsebovana
+    ],
+    name: <l5vsebovana>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 4),
+    [
+      `r.push(p);` \
+      #l6vsebovana
+    ],
+    name: <l6vsebovana>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 5),
+    [
+      `x += 1;` \
+      #l6vsebovana
+    ],
+    shape: rect,
+    name: <l7vsebovana>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 6),
+    [
+      `take::<Vec<&'6 i32>>(v);` \
+      #l8vsebovana
+    ],
+    name: <l8vsebovana>,
+    shape: rect,
+  ),
+
+  // node(enclose: (<l1vsebovana>, <l4vsebovana>, <l8vsebovana>), name: <vsebovana-enclose>),
+  // fletcher-title(<vsebovana-enclose.north-west>, [`vsebovana`]),
+)
+
+#let final-example-graph-active = diagram(
+  node-stroke: 1pt,
+  spacing: 2em,
+  label-size: 8pt,
+  node(
+    (0, 0),
+    [
+      `let mut x: i32 = 22;` \
+      ${}$
+    ],
+    name: <l2aktivna>,
+  ),
+  edge("d", "-|>"),
+
+  node(
+    (0, 1),
+    [
+      `let mut v: Vec<&'0 i32> = vec![];` \
+      ${r0}$
+    ],
+    name: <l3aktivna>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 2),
+    [
+      `let r: &'1 mut Vec<&'2 i32> = &'3 mut v;` \
+      ${r0, r1, r2, r3}$
+    ],
+    name: <l4aktivna>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 3),
+    [
+      `let p: &'5 i32 = &'4 x;` \
+      ${r0, r1, r2, r3, r4, r5}$
+    ],
+    name: <l5aktivna>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 4),
+    [
+      `r.push(p);` \
+      ${r0, r1, r2, r3, r4, r5}$
+    ],
+    name: <l6aktivna>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 5),
+    [
+      `x += 1;` \
+      ${r0, r4}$
+    ],
+    shape: rect,
+    name: <l7aktivna>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 6),
+    [
+      `take::<Vec<&'6 i32>>(v);` \
+      ${r0, r4, r6}$
+    ],
+    name: <l8aktivna>,
+  ),
+
+  // node(enclose: (<l2aktivna>, <l4aktivna>, <l8aktivna>), name: <aktivna-enclose>),
+  // fletcher-title(<aktivna-enclose.north-west>, [`je_regija_aktivna`]),
+)
 
 #let cfg-example = diagram(
   node-stroke: 1pt,
