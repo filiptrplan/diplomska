@@ -994,7 +994,7 @@ $ exists L in posoje: (P, L) in posojarazveljavljenana and (L,P) in posojaaktivn
 Torej napaka se javi natanko tedaj, ko neko dejanje na točki $P$ razveljavi pogoje posoje $L$, ki je hkrati tudi
 aktivna na točki $P$.
 
-Poglejmo še kako se dokončno napaka javi na našem primeru:
+Poglejmo še kako se dokončno napaka javi na našem primeru. Če je kakšen korak nejasen, si lahko pomagate z diagram v prejšnjem poglavju.
 
 #figure(
   ```rust
@@ -1015,11 +1015,8 @@ Poglejmo še kako se dokončno napaka javi na našem primeru:
     x += 1;
     // Tukaj se razveljavi posoja L1: (L1) inn `posoja_razveljavljena_na`.
     // Da se nam javi napaka mora biti ta posoja aktivna (L1) inn posoja_aktivna_na.
-    // Torej jo mora zahtevati neka aktivna regija, na trenutni točki pa je
-    // aktivna regija r2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš
-    // vektor `v`. Elementi vektorja pa imajo regijo r2, ki pa je del posoje L1.
-    // Torej, ker smo razveljavili posojo L1, medtem ko je bila aktivna regija,
-    // ki jo ta posoja zahteva, javimo napako.
+    // Torej jo mora zahtevati neka aktivna regija, na trenutni točki pa je aktivna regija r2, ker jo lahko uporabimo v funkciji `take`, ki sprejme našvektor `v`. Elementi vektorja pa imajo regijo r2, ki pa je del posoje L1.
+    // Torej, ker smo razveljavili posojo L1, medtem ko je bila aktivna regija, ki jo ta posoja zahteva, javimo napako.
 
     take::<Vec<&'6 i32>>(v);
   }
