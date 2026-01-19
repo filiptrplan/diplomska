@@ -82,23 +82,34 @@
   year: "2025",
   faculty: "Fakulteta za računalništvo in informatiko",
   description: [
-    Besedilo teme diplomskega dela študent prepiše iz študijskega informacijskega
-    sistema, kamor ga je vnesel mentor. V nekaj stavkih bo opisal, kaj pričakuje
-    od kandidatovega diplomskega dela. Kaj so cilji, kakšne metode naj uporabi,
-    morda bo zapisal tudi ključno literaturo
+    Naloga matematično formalizira novo različico Rustovega preverjevalnika izposoj s pomočjo množic in relacij na preprost in razumljiv način.
   ],
   title_en: "Formalization of the Original Formulation of Polonius",
   description_en: [
-    opis diplome v angleščini
+    The thesis provides a mathematical formalization of the new version of Rust's borrow checker using sets and relations in a simple and understandable manner.
   ],
   abstract_sl: [
-    Ta diplomska naloga se ukvarja s formalizacijo Poloniusa, najnovejše različice preverjevalnika izposoj v programskem jeziku Rust. Rust implementira varnost pomnilnika s pomočjo sistema lastništva, ki preprečuje napake kot so viseči kazalci in uporaba že sproščenega pomnilnika. Medtem ko so bile prejšnje različice preverjevalnika dobro dokumentirane, Polonius obstaja predvsem v obliki spletnih objav in eksperimentalne implementacije. Ta naloga poskusi matematično opisati Polonius z definicijo osnovnih množic, relacij in pravil.
+    Naloga zastavi matematično formalizacijo Poloniusa, preverjevalnika izposoj za programski jezik Rust. Posebnost Rusta je ta, da zagotovi pomnilniško varnost s pomočjo njegovega sistema tipov in preverjevalnika izposoj in s tem ne vpliva na tek programa. Trenutna implementacija imenovana NLL je preveč konzervativna v nekaterih primerih -- zato so razvijalci Rusta uvedli novo različico imenovano Polonius, ki je osnovana na bolj natančni analizi toka podatkov. Polonius pa nikjer ni uradno definiran in viri o njem so raztreščeni, zato je cilj te naloge da postavi matematičen okvir skozi katerega lahko razumemo to novo različico.
   ],
   keywords_sl: "Rust, Polonius, preverjevalnik izposoj, formalizacija",
   abstract_en: [
-    This thesis deals with the formalization of Polonius, the latest version of the borrow checker in the Rust programming language. Rust implements memory safety through an ownership system that prevents errors such as dangling pointers and use-after-free. While previous versions of the checker have been well documented, Polonius exists primarily in the form of blog posts and an experimental implementation. This thesis attempts to mathematically describe Polonius by defining basic sets, relations, and rules.
+    This thesis provides a mathematical formalization of Polonius, the next-generation borrow checker for the Rust programming language. Rust's distinguishing feature is its ability to guarantee memory safety through its type system and borrow checker, ensuring safety without impacting runtime performance. The current implementation, known as NLL (Non-Lexical Lifetimes), remains overly conservative in certain cases -- consequently, Rust developers have introduced a new version called Polonius, which is based on a more precise data-flow analysis. However, Polonius lacks an official specification, and information regarding its workings remains scattered. The goal of this thesis is to establish a mathematical framework that enables a clear understanding of this new implementation."
   ],
   keywords_en: "Rust, Polonius, borrow checker, formalization",
+  zahvala: [
+    Zahvaljujem se svojemu mentorju doc. dr. Boštjanu Slivniku za vodstvo, pomoč in temeljite ter koristne popravke ob izdelavi diplomskega dela. Zahvala gre tudi mojim staršem za spodbudo in punci Klari za vso podporo ter optimizem ob pisanju.
+  ],
+  kratice: [
+    #table(
+      columns: (15%, 85%),
+      stroke: none,
+      gutter: 0.6em,
+      [*NLL*], [Non-Lexical Lifetimes (neleksikalne življenjske dobe)],
+      [*MIR*], [Mid-level Intermediate Representation (vmesna predstavitvena koda)],
+      [*CFG*], [Control Flow Graph (graf poteka programa)],
+      [*RFC*], [Request for Comments (dokument s specifikacijami)],
+    )
+  ],
 )
 
 #chapter(breakpage: false)[Uvod]

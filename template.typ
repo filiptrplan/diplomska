@@ -49,6 +49,8 @@
   keywords_sl: none,
   abstract_en: none,
   keywords_en: none,
+  zahvala: none,
+  kratice: none,
   doc,
 ) = [
   #set document(
@@ -213,6 +215,11 @@
 
   #pagebreak()
 
+  #heading(level: 1, numbering: none, outlined: false)[Zahvala]
+  #zahvala
+
+  #pagebreak()
+
   #v(6em)
 
   // without dots
@@ -230,6 +237,12 @@
     ),
   )
   #outline(title: text(size: 25pt)[Kazalo #v(1em)])
+
+  #pagebreak()
+
+
+  #heading(level: 1, numbering: none, outlined: false)[Seznam uporabljenih simbolov in kratic]
+  #kratice
 
   #pagebreak()
 
