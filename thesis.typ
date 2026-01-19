@@ -883,6 +883,7 @@ Na primeru ustvarimo naslednje relacije:
 ) <listing:subsetRelations>
 
 === Relacija zahteve
+<chap-relacija-zahteve>
 
 Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Označimo jo s
 $zahteva subset.eq regije times posoje times točke$ in definirana je z zaprtjem naslednjih pravil:
@@ -931,7 +932,7 @@ Opazimo, da pri relaciji vsebovanosti #jevsebovanazacetno in pri relaciji zahtev
 
 === Relacija aktivnosti posoje
 
-Relacija aktivnosti posoje (_loan live at_) pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s $posojaaktivnana subset.eq posoje times točke$ in jo definiramo takrat, ko
+Relacija aktivnosti posoje #angl[loan live at] pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s $posojaaktivnana subset.eq posoje times točke$ in jo definiramo takrat, ko
 
 $ exists R in regije: (R,P) in regijaaktivnana and (R,L,P) in zahteva $
 
@@ -973,6 +974,14 @@ Potem bomo vizualno ponazorili razširjeno relacijo #jevsebovana, ki že upošte
   supplement: "Diagram",
 ) <ex-graph-subset>
 
+Iz diagrama za #jevsebovana lahko potem izhajamo, da konstruiramo @ex-graph-zahteva[diagram] za #zahteva, tako da sledimo pravilom opisanih v @chap-relacija-zahteve[poglavju].
+
+
+#figure(
+  final-example-graph-zahteva,
+  caption: [Relacija #zahteva],
+  supplement: "Diagram",
+) <ex-graph-zahteva>
 
 == Javljanje napake
 

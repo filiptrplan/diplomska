@@ -21,7 +21,7 @@
   let rectname = group_name + "rect"
   let color = colors.at(color_idx)
   let stroke-color = color.darken(40%)
-  let bg-color = color.lighten(60%)
+  let bg-color = color.lighten(60%).transparentize(10%)
   on-layer(-color_idx - 1, {
     group(
       {
@@ -140,7 +140,7 @@
   let rectname = group_name + "rect"
   let color = colors.at(color_idx)
   let stroke-color = color.darken(40%)
-  let bg-color = color.lighten(60%).transparentize(30%)
+  let bg-color = color.lighten(60%).transparentize(10%)
   if subset == none {
     on-layer(-color_idx - 1, {
       group(
@@ -198,9 +198,9 @@
   region("'1", 1, subset: "'3")
 
   let r02 = "'0 == '2"
-  region(r02, 2, coord: (2, 0))
-  region("'5", 3, coord: (4, 0))
-  region("'4", 4, subset: "'5")
+  region(r02, 4, coord: (2, 0))
+  region("'4", 2, coord: (4, 0))
+  region("'5", 3, subset: "'4")
 })
 
 
@@ -210,9 +210,10 @@
   region("'1", 1, subset: "'3")
 
   let r02 = "'0 == '2"
-  region(r02, 2, coord: (2.5, 0))
-  region("'5", 3, subset: r02)
-  region("'4", 4, subset: "'5")
+  let r4 = "'4  "
+  region(r4, 2, coord: (2.5, 0))
+  region("'5", 3, subset: r4)
+  region(r02, 4, subset: "'5")
 })
 
 
@@ -222,11 +223,11 @@
   region("'1", 1, subset: "'3")
 
   let r02 = "'0 == '2"
-  let r6t = "'6     "
-  region(r6t, 2, coord: (2.5, 0))
-  region(r02, 3, subset: r6t)
-  region("'5", 4, subset: r02)
-  region("'4", 5, subset: "'5")
+  let r4 = "'4  "
+  region(r4, 2, coord: (2.5, 0))
+  region("'5", 3, subset: r4)
+  region(r02, 4, subset: "'5")
+  region("'6", 5, subset: r02)
 })
 
 #let final-example-graph-subset = diagram(
@@ -279,6 +280,7 @@
       #l6vsebovana
     ],
     name: <l6vsebovana>,
+    shape: rect,
   ),
 
   edge("d", "-|>"),
@@ -300,6 +302,136 @@
       #l8vsebovana
     ],
     name: <l8vsebovana>,
+    shape: rect,
+  ),
+
+  // node(enclose: (<l1vsebovana>, <l4vsebovana>, <l8vsebovana>), name: <vsebovana-enclose>),
+  // fletcher-title(<vsebovana-enclose.north-west>, [`vsebovana`]),
+)
+
+
+#let l4zahteva = cetz.canvas({
+  import cetz.draw: *
+  let r02 = "'0 == '2"
+  on-layer(0, { content((0, 0), name: "L0", [`L0: &mut v`]) })
+  region-subset("L0", "3", 0)
+  region-subset("3", "1", 1)
+})
+
+#let l5zahteva = cetz.canvas({
+  import cetz.draw: *
+  on-layer(0, { content((0, 0), name: "L0", [`L0: &mut v`]) })
+  region-subset("L0", "3", 0)
+  region-subset("3", "1", 1)
+
+
+  on-layer(0, { content((3, 0), name: "L1", [`L1: &x`]) })
+  region-subset("L1", "4", 2)
+  region-subset("4", "5", 3)
+})
+
+
+#let l6zahteva = cetz.canvas({
+  import cetz.draw: *
+  let r02 = "0 == '2"
+  on-layer(0, { content((0, 0), name: "L0", [`L0: &mut v`]) })
+  region-subset("L0", "3", 0)
+  region-subset("3", "1", 1)
+
+
+  on-layer(0, { content((3, 0), name: "L1", [`L1: &x`]) })
+  region-subset("L1", "4", 2)
+  region-subset("4", "5", 3)
+  region-subset("5", r02, 4)
+})
+
+
+#let l8zahteva = cetz.canvas({
+  import cetz.draw: *
+  let r02 = "0 == '2"
+  on-layer(0, { content((0, 0), name: "L0", [`L0: &mut v`]) })
+  region-subset("L0", "3", 0)
+  region-subset("3", "1", 1)
+
+
+  on-layer(0, { content((4, 0), name: "L1", [`L1: &x`]) })
+  region-subset("L1", "4", 2)
+  region-subset("4", "5", 3)
+  region-subset("5", r02, 4)
+  region-subset(r02, "6", 5)
+})
+
+#let final-example-graph-zahteva = diagram(
+  node-stroke: 1pt,
+  spacing: 2em,
+  label-size: 8pt,
+  // --- je_zahteva ---
+  node(
+    (0, 0),
+    [
+      `let mut x: i32 = 22;` \
+    ],
+    name: <l1zahteva>,
+  ),
+  edge("d", "-|>"),
+
+  node(
+    (0, 1),
+    [
+      `let mut v: Vec<&'0 i32> = vec![];` \
+    ],
+    name: <l3zahteva>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 2),
+    [
+      `let r: &'1 mut Vec<&'2 i32> = &'3 mut v;` \
+      #l4zahteva
+    ],
+    name: <l4zahteva>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 3),
+    [
+      `let p: &'5 i32 = &'4 x;` \
+      #l5zahteva
+    ],
+    name: <l5zahteva>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 4),
+    [
+      `r.push(p);` \
+      #l6zahteva
+    ],
+    name: <l6zahteva>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 5),
+    [
+      `x += 1;` \
+      #l6zahteva
+    ],
+    shape: rect,
+    name: <l7zahteva>,
+  ),
+
+  edge("d", "-|>"),
+  node(
+    (0, 6),
+    [
+      `take::<Vec<&'6 i32>>(v);` \
+      #l8zahteva
+    ],
+    name: <l8zahteva>,
     shape: rect,
   ),
 
