@@ -6,6 +6,15 @@
   file = {/home/filip/Zotero/storage/9WVTM9KY/2094-nll.html}
 }
 
+@online{4YearsRust,
+  title = {4 Years of {{Rust}} | {{Rust Blog}}},
+  url = {https://blog.rust-lang.org/2019/05/15/4-Years-Of-Rust/},
+  urldate = {2026-01-20},
+  abstract = {Empowering everyone to build reliable and efficient software.},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/VMJ54TPB/4-Years-Of-Rust.html}
+}
+
 @article{bakerListProcessingReal1978,
   title = {List Processing in Real Time on a Serial Computer},
   author = {Baker, Henry G.},
@@ -95,6 +104,25 @@
   abstract = {When the current borrow checker, non-lexical lifetimes (NLL), was developed, one of the patterns the Rust developers wanted to add support for had to be abandoned: Case 3, in which a reference is conditionally returned early from a function. This case is particularly tricky to support as it requires a high-resolution analysis of the conditional flow references beyond the means of the current borrow checker. Therefore, current Rust does not support this code pattern (and others like it), even though it is provably safe.}
 }
 
+@incollection{fluetLinearRegionsAre2006,
+  title = {Linear {{Regions Are All You Need}}},
+  booktitle = {Programming {{Languages}} and {{Systems}}},
+  author = {Fluet, Matthew and Morrisett, Greg and Ahmed, Amal},
+  editor = {Sestoft, Peter},
+  date = {2006},
+  volume = {3924},
+  pages = {7--21},
+  publisher = {Springer Berlin Heidelberg},
+  location = {Berlin, Heidelberg},
+  doi = {10.1007/11693024_2},
+  url = {http://link.springer.com/10.1007/11693024_2},
+  urldate = {2026-01-20},
+  abstract = {The type-and-effects system of the Tofte-Talpin region calculus makes it possible to safely reclaim objects without a garbage collector. However, it requires that regions have last-in-first-out (LIFO) lifetimes following the block structure of the language. We introduce λrgnUL, a core calculus that is powerful enough to encode Tofte-Talpin-like languages, and that eliminates the LIFO restriction. The target language has an extremely simple, substructural type system. To prove the power of the language, we sketch how Tofte-Talpin-style regions, as well as the firstclass dynamic regions and unique pointers of the Cyclone programming language can be encoded in λrgnUL.},
+  isbn = {978-3-540-33095-0 978-3-540-33096-7},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/M587ZDLS/Fluet et al. - 2006 - Linear Regions Are All You Need.pdf}
+}
+
 @online{GettingStartedRust,
   title = {Getting {{Started}} - {{Rust Compiler Development Guide}}},
   url = {https://rustc-dev-guide.rust-lang.org/},
@@ -119,6 +147,14 @@
   langid = {english},
   keywords = {✅,High},
   file = {/home/filip/Zotero/storage/XS98GKF7/Grossman et al. - Region-Based Memory Management in Cyclone.pdf}
+}
+
+@article{grossmanRegionBasedMemoryManagementa,
+  title = {Region-{{Based Memory Management}} in {{Cyclone}}},
+  author = {Grossman, Dan and Morrisett, Greg and Jim, Trevor and Hicks, Michael and Wang, Yanling and Cheney, James},
+  abstract = {Cyclone is a type-safe programming language derived from C. The primary design goal of Cyclone is to let programmers control data representation and memory management without sacrificing type-safety. In this paper, we focus on the region-based memory management of Cyclone and its static typing discipline. The design incorporates several advancements, including support for region subtyping and a coherent integration with stack allocation and a garbage collector. To support separate compilation, Cyclone requires programmers to write some explicit region annotations, but a combination of default annotations, local type inference, and a novel treatment of region effects reduces this burden. As a result, we integrate C idioms in a region-based framework. In our experience, porting legacy C to Cyclone has required altering about 8\% of the code; of the changes, only 6\% (of the 8\%) were region annotations.},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/WHI36T56/Grossman et al. - Region-Based Memory Management in Cyclone.pdf}
 }
 
 @article{hoAeneasRustVerification2022,
@@ -167,13 +203,6 @@
   file = {/home/filip/Zotero/storage/QAUI2IVA/Huber - Automatically Generating Memory Safety Certificates for Rust Programs.pdf}
 }
 
-@article{huberAutomaticallyGeneratingMemorya,
-  title = {Automatically {{Generating Memory Safety Certificates}} for {{Rust Programs}}},
-  author = {Huber, Pascal},
-  langid = {english},
-  file = {/home/filip/Zotero/storage/82P5Q8IE/Huber - Automatically Generating Memory Safety Certificates for Rust Programs.pdf}
-}
-
 @online{IntroductionRustonomicon,
   title = {Introduction - {{The Rustonomicon}}},
   url = {https://doc.rust-lang.org/nomicon/intro.html},
@@ -205,6 +234,25 @@
   issue = {POPL},
   langid = {english},
   file = {/home/filip/Zotero/storage/AM8UVJZL/Jung et al. - 2018 - RustBelt securing the foundations of the Rust programming language.pdf}
+}
+
+@article{jungStackedBorrowsAliasing2020,
+  title = {Stacked Borrows: An Aliasing Model for {{Rust}}},
+  shorttitle = {Stacked Borrows},
+  author = {Jung, Ralf and Dang, Hoang-Hai and Kang, Jeehoon and Dreyer, Derek},
+  date = {2020-01},
+  journaltitle = {Proceedings of the ACM on Programming Languages},
+  shortjournal = {Proc. ACM Program. Lang.},
+  volume = {4},
+  pages = {1--32},
+  issn = {2475-1421},
+  doi = {10.1145/3371109},
+  url = {https://dl.acm.org/doi/10.1145/3371109},
+  urldate = {2026-01-21},
+  abstract = {RALF JUNG, Mozilla, USA and MPI-SWS, Germany HOANG-HAI DANG, MPI-SWS, Germany JEEHOON KANG, KAIST, Korea DEREK DREYER, MPI-SWS, Germany Type systems are useful not just for the safety guarantees they provide, but also for helping compilers generate more efficient code by simplifying important program analyses. In Rust, the type system imposes a strict discipline on pointer aliasing, and it is an express goal of the Rust compiler developers to make use of that alias information for the purpose of program optimizations that reorder memory accesses. The problem is that Rust also supports unsafe code, and programmers can write unsafe code that bypasses the usual compiler checks to violate the aliasing discipline. To strike a balance between optimizations and unsafe code, the language needs to provide a set of rules such that unsafe code authors can be sure, if they are following these rules, that the compiler will preserve the semantics of their code despite all the optimizations it is doing. In this work, we propose Stacked Borrows, an operational semantics for memory accesses in Rust. Stacked Borrows defines an aliasing discipline and declares programs violating it to have undefined behavior, meaning the compiler does not have to consider such programs when performing optimizations. We give formal proofs (mechanized in Coq) showing that this rules out enough programs to enable optimizations that reorder memory accesses around unknown code and function calls, based solely on intraprocedural reasoning. We also implemented this operational model in an interpreter for Rust and ran large parts of the Rust standard library test suite in the interpreter to validate that the model permits enough real-world unsafe Rust code. CCS Concepts: • Theory of computation → Operational semantics.},
+  issue = {POPL},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/R58PWFJX/Jung et al. - 2020 - Stacked borrows an aliasing model for Rust.pdf}
 }
 
 @article{kevinandriansantosoRustsMemorySafety2023,
@@ -366,14 +414,6 @@
   file = {/home/filip/Zotero/storage/LELVR5G6/Reed - Patina A Formalization of the Rust Programming Language.pdf}
 }
 
-@article{reedPatinaFormalizationRusta,
-  title = {Patina: {{A Formalization}} of the {{Rust Programming Language}}},
-  author = {Reed, Eric},
-  abstract = {Rust is a new systems language that uses some advanced type system features, specifically affine types and regions, to statically guarantee memory safety and eliminate the need for a garbage collector. While each individual addition to the type system is well understood in isolation and are known to be sound, the combined system is not known to be sound. Furthermore, Rust uses a novel checking scheme for its regions, known as the Borrow Checker, that is not known to be correct. Since Rust’s goal is to be a safer alternative to C/C++, we should ensure that this safety scheme actually works. We present a formal semantics that captures the key features relevant to memory safety, unique pointers and borrowed references, specifies how they guarantee memory safety, and describes the operation of the Borrow Checker. We use this model to prove the soudness of some core operations and justify the conjecture that the model, as a whole, is sound. Additionally, our model provides a syntactic version of the Borrow Checker, which may be more understandable than the non-syntactic version in Rust.},
-  langid = {english},
-  file = {/home/filip/Zotero/storage/GBJRIJ3T/Reed - Patina A Formalization of the Rust Programming Language.pdf}
-}
-
 @online{RustCompilerRustc_borrowck,
   title = {Rust/Compiler/Rustc\_borrowck/Src/Polonius/Legacy/Location.Rs at 9c0bcb514f49cd1e6a30affb2fe4cfca060129a2 · Rust-Lang/Rust},
   url = {https://github.com/rust-lang/rust/blob/9c0bcb514f49cd1e6a30affb2fe4cfca060129a2/compiler/rustc_borrowck/src/polonius/legacy/location.rs},
@@ -492,6 +532,41 @@
   langid = {english},
   keywords = {⏳,✅,Medium},
   file = {/home/filip/Zotero/storage/5SGS682K/Tofte and Talpin - 1997 - Region-Based Memory Management.pdf}
+}
+
+@article{tofteRegionBasedMemoryManagement1997a,
+  title = {Region-{{Based Memory Management}}},
+  author = {Tofte, Mads and Talpin, Jean-Pierre},
+  date = {1997-02},
+  journaltitle = {Information and Computation},
+  shortjournal = {Information and Computation},
+  volume = {132},
+  number = {2},
+  pages = {109--176},
+  issn = {08905401},
+  doi = {10.1006/inco.1996.2613},
+  url = {https://linkinghub.elsevier.com/retrieve/pii/S0890540196926139},
+  urldate = {2026-01-20},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/R893N95G/Tofte and Talpin - 1997 - Region-Based Memory Management.pdf}
+}
+
+@article{villaniTreeBorrows2025a,
+  title = {Tree {{Borrows}}},
+  author = {Villani, Neven and Hostert, Johannes and Dreyer, Derek and Jung, Ralf},
+  date = {2025-06-10},
+  journaltitle = {Proceedings of the ACM on Programming Languages},
+  shortjournal = {Proc. ACM Program. Lang.},
+  volume = {9},
+  pages = {1019--1042},
+  issn = {2475-1421},
+  doi = {10.1145/3735592},
+  url = {https://dl.acm.org/doi/10.1145/3735592},
+  urldate = {2026-01-21},
+  abstract = {The Rust programming language is well known for its ownership-based type system, which offers strong guarantees like memory safety and data race freedom. However, Rust also provides               unsafe               escape hatches, for which safety is not guaranteed automatically and must instead be manually upheld by the programmer. This creates a tension. On the one hand, compilers would like to exploit the strong guarantees of the type system—particularly those pertaining to aliasing of pointers—in order to unlock powerful intraprocedural optimizations. On the other hand, those optimizations are easily invalidated by “badly behaved” unsafe code. To ensure correctness of such optimizations, it thus becomes necessary to clearly define what unsafe code is “badly behaved.” In prior work,               Stacked Borrows               defined a set of rules achieving this goal. However, Stacked Borrows rules out several patterns that turn out to be common in real-world unsafe Rust code, and it does not account for advanced features of the Rust borrow checker that were introduced more recently.                                         To resolve these issues, we present               Tree Borrows               . As the name suggests, Tree Borrows is defined by replacing the stack at the heart of Stacked Borrows with a tree. This overcomes the aforementioned limitations: our evaluation on the 30 000 most widely used Rust crates shows that Tree Borrows rejects 54\,\% fewer test cases than Stacked Borrows does. Additionally, we prove (in Rocq) that it retains most of the Stacked Borrows optimizations and also enables important new ones, notably read-read reorderings.},
+  issue = {PLDI},
+  langid = {english},
+  file = {/home/filip/Zotero/storage/AH7FB9C4/Villani et al. - 2025 - Tree Borrows.pdf}
 }
 
 @inproceedings{wangKRustFormalExecutable2018,

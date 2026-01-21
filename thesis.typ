@@ -186,19 +186,41 @@ V nasprotju z NLL-om Polonius prevede primer @listing:mot_ex kot veljaven, saj i
 
 #chapter[Pregled literature]
 
-== Poskusi formalizacije Rusta
-// za vsak poskus povej iz katerega vidika so se ga lotili in kaj manjka
+Rust je jezik inžinirjev, ne akademikov. Od začetka je bil zasnovan tako, da reši praktične probleme danes in se ukvarja s specifikacijami in formalnostjo potem. Ta pristop je porodil veliko vprašanj o temu kako sploh jezik deluje, zakaj deluje in ali deluje pravilno. Čeprav je Rust prišel na svet šele leta 2015 @4YearsRust, je v zadnjem desetletju nastalo vrsto člankov o raznih formalnih pogled na Rust.
 
-== Sorodni modeli lastnistvu
-// GhostCell
-// permission calculus
-// kako se povezujejo z Rustom
+V tem poglavju se bomo lotili treh glavnih katergorij raziskav in virov:
++ *Poskusi formalizacije Rusta:* ogledali si bomo kako so se raziskovalci lotili problema formalizacije različnih komponent Rusta.
++ *Sorodni modeli lastništvu:* ker je Rustov pomnilniški model eden izmed njegovih ključnih značilk, si bomo pogledali kateri podobni sistemi so ga navdihnili ali z njim soobstajali.
++ *Polonius v akademskem svetu in praksi:* tukaj bomo opisali kako je Polonius nastal, kje je trenutno in drugo literaturo o njemu.
+
+== Poskusi formalizacije Rusta
+
+Formalizacija Rusta in preverjanje pravilnosti kode je zelo relevantna tema, saj je jezik kompleksen in brez uradne specifikacije. Tukaj se bomo osredotočili bolj na formalizacije preverjevalnika izposoj, saj je to tema te naloge. Obstjajo pa še številne druge formalizacije, ki se ukvarjajo s pravilnostjo programov ali pa sistema tipov @matsushitaRustHornBeltSemanticFoundation2022a @villaniTreeBorrows2025a.
+
+#show "lambdaR": $lambda_"Rust"$
+
+Eden izmed ključnih del na področju formalizacije je RustBelt od #cite(<jungRustBeltSecuringFoundations2018>, form: "author"), ki so zasnovali jezik imenovan lambdaR in ga potem opremili s semantičnim modelom imenovan RustBelt. lambdaR je sam bolj podoben MIR-u, kot pa površinskemu Rustu in vsebuje tudi sistem tipov in pravil sklepanja, ki modelirajo Rustov MIR, vendar ne natančno, saj to ni bil cilj članka. Končajo s dokazom, da katerikoli lambdaR program, ki je semantično in tipsko pravilen, ne bo končal v zataknjenem stanju @jungRustBeltSecuringFoundations2018.
+
+Še en model Rusta je imenovan Oxide @weissOxideEssenceRust2019 od #cite(<weissOxideEssenceRust2019>, form: "author"), ki zasnuje višje nivojski jezik, tokrat bolj podoben izvirni kodu Rusta. Avtorji se bolj osredotočijo na preverjevalnik izposoj kot pri RustBelt, ker njihov cilj ni natančno modelirati operacijske semantike, ampak samo povzeti bistvo Rusta (po njihovih besedah). Oxidova sintaksa je zelo podobna Rustu, samo da so vsi tipi eksplicitno podani. Avtorji nadaljuje članek s tem, da ustvarijo pravila sklepanja nad tem sistemom tipov in uvedejo pojem _approximate provenances_, ki je njihov način izražanja regij, kot so zastavljene v NLL-ju. Članek se nadaljuje s pravili majhnih korakov (small step semantics?) in konča s formalnim dokazom, da se pravilno konstruirani programi v Oxidu ne zataknejo. Kar je pri tem članku še zanimivo je, da specifično omenijo Polonius in povejo, da je Poloniusov model regij zelo podoben njihovim _approximate provenances_. Omenijo, da tudi če niso uradno raziskali povezavo med sistemoma, na Oxide lahko gledamo kot formulacijo Poloniusa s sistemi tipov.
+
+Takih podobnih modelov je še mnogo, tukaj jih bomo omenili še par za celotnost. Članek od #cite(<crichtonGroundedConceptualModel2023>, form: "author") zastavi poenostavljen pedagoški model za razumevanja sistema lastništva @crichtonGroundedConceptualModel2023. Zanimivo je omeniti, da v njemu tudi eksplicitno opišejo Polonius, vendar na kratko. Patina @reedPatinaFormalizationRust je eden izmed prvih formalnih semantičnih modelov za Rust in je nastala še pred uvedbo NLL-ja. KRust @wangKRustFormalExecutable2018 je formalni izvedljiv semantični model v frameworku(?) imenovan K in tudi v kolikor vemo prvi semantični model v dobi NLL-a. Featherweight Rust @pearceLightweightFormalismReference2021 se eksplicitno ukvarja s formalizacijo preverjevalnika izposoj (tipa NLL) tako da definira slovnico in small-step semantics. Zasnovan je bil tako, da je striktna podmnožica Rusta. Še zadnji članek, ki ga bomo omenili je od #cite(<hoSoundBorrowCheckingRust2024>, form: "author"), ki je dokazal, da LLBC (low-level borrow calculus, model rustovega MIR), res pravilno modelira Rust in ne konča v zataknjenem stanju.
+
+== Sorodni modeli lastništvu
+
+V temu poglavju se bomo osredotočili na t.i. *regijsko upravljanje s pomnilnikom* #angl[Region-based memory management] @tofteRegionBasedMemoryManagement1997, ki sta ga zastavila #cite(<tofteRegionBasedMemoryManagement1997>, form: "author"). Ta model upravljanja s pomnilnikom lahko razumemo skoraj kot direktni predhodnik lastništva, Rustovega modela upravljanja s pomnilnikom.
+
+Glavna motivacija dela je bila, da najdejo kompromis med striktno eksplicitnim upravljanjem s pomnilnikom kot pri C in avtomatskim čiščenjem pomnilnika kot pri Javi. Njun navdih je bilo delovanje sklada, kjer se spomin alocira na začetku okvirja in se sprosti na koncu. Kot približek takega upravljanja sta uvedla koncept regij, ki so dodatne označbe poleg tipov, ki podajo informacije o tem kdaj se katera vrednost mora sprostiti.
+
+Ker bi pa bilo anotiranje vsake vrednosti z regijami nepraktično, delo tudi uvede sistem inferenciranja teh regij, podoben tistemu, ki inferecira življenjske dobe v Rustu. V delu definirata visokonivojski jezik `SExp` podoben SML-u skupaj s sistemom ML tipov in small-step semantics. Nato uvedeta jezik `TExp` v katerega se `SExp` pretvarja. Ključna razlika med njima je, da ima `TExp` regijske anotacije. Delo nadaljujeta s sistemom za avtomatično izpeljavo teh regij osnovnanem na Milnerjevemu sistemu tipov. Končata z množico dokazev o pravilnosti njunega sistema in pravilnosti prevoda med `SExp` in `TExp`.
+
+Rust sicer ni bil prvi jezik, ki je uvedel ta pristop upravljanja s pomnilnikom (poleg seveda akademskega jezika predstavljenega v izvornem delu). Eden izmed najbolj znanih takih jezikov je Cyclone @grossmanRegionBasedMemoryManagement, ki je jezik podoben C-ju. Ustvarjen je bil kot dopolnilo C-ju z raznimi bolj naprednimi tipi in tudi kasneje z regijskim upravljanjem s pomnilnikom, ki ga lahko programer doda C programu z nekaj dodatnimi regijskimi anotacijami. Prva implementacija sicer ni bila popolna in je še vedno kdaj uvedla memory leaks, vendar so kasnejše različice jezika z linearnimi regijami to poskušali popraviti @fluetLinearRegionsAre2006.
 
 == Polonius v akademiji in praksi
 // Poglej si se ownership types in linear types!!!
 // kako je bil opisan z blog postom
 // integracija v rustc
 // Stjernova formalizacija v Datalogu in Crichtonov borrow checker
+// a-mir-formality
 // omejitve trenutnih opisov
 
 #chapter[Rustov model upravljanja s pomnilnikom -- lastništvo]
@@ -298,6 +320,7 @@ Pravila o referencah lahko povzamemo z dvema praviloma @klabnikRustProgrammingLa
 + Reference morajo biti vedno veljavne (kazati na veljavno mesto).
 
 Še ena podrobnost, ki je pomembna za razumevanje lastništva, so *življenjske dobe* #angl[lifetimes]. Te so v Rustu sestavni del tipov. Kot sami tipi v Rustu so ponavadi izpeljane, vendar se pogosto pri funkcijski zapisih #footnote[prevod signatures?] zgodi, da jih moramo eksplicitno podati. Na primer, dejanski tip reference na niz ni `&String` ampak `&'a String`, kjer je `'a` življenjska doba. Pomembno je tudi omeniti, da so življenjske dobe del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna @klabnikRustProgrammingLanguage2023. Najlažje to predstavimo s primerom @lst:lifetime-annotate.
+
 
 #figure(
   ```rust
