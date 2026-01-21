@@ -195,7 +195,7 @@
         ```
       },
     ),
-    caption: [Pravila preverjevalnika izposoj iz @stjernaModellingRustsReference. Pozitivni primeri predstavljajo mesta, kjer preverjevalnik sprejme kodo, negativni pa kjer jo zavrne.],
+    caption: [Pravila preverjevalnika izposoj iz @stjernaModellingRustsReference2020. Pozitivni primeri predstavljajo mesta, kjer preverjevalnik sprejme kodo, negativni pa kjer jo zavrne.],
   ) <tab:borrow-check>
 ]
 

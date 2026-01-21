@@ -126,9 +126,9 @@ V nadaljevanju bomo uporabljali dva podobna pojma. _Varen program_ bo pomenilo t
 
 Preverjevalnik izposoj se je med razvojem Rusta bistveno spremenil od svoje prvotne implementacije. Na začetku je bil dokaj preprost in veliko pravilnih programov ni sprejel zaradi svoje konzervativnosti pri zagotavljanju varnosti @2094nllRustRFC. Zato se je čez par let pojavila naslednja različica preverjevalnika, imenovana NLL (_non-lexical lifetimes_), ki je rešila veliko pogostih problemov s prvotno različico. Vendar NLL še vedno ne sprejema vseh veljavnih programov. Da bi rešili probleme NLL-ja, so Rustovi razvijalci predlagali najnovejšo različico preverjevalnika imenovano Polonius, ki drugače zastavi problem lastništva in tako sprejme še večji delež pravilnih programov @matsakisAliasbasedFormulationBorrow.
 
-NLL je bil prvotno zelo natančno opisan v RFC-ju, kar je potem vodilo njegov razvoj. Polonius pa je prvotno nastal kot predlog na spletnem blogu in se počasi razvijal s pomočjo dodatnih objav na blogu enega izmed Rustovih razvijalcev @PoloniusRevisitedPartb @PoloniusRevisitedPartc @WhatPoloniusPolonius. Do danes ne obstaja celovit centraliziran formalen opis Poloniusa, le nekaj spletnih objav, delni formalni opis v magistrskem delu enega izmed razvijalcev @stjernaModellingRustsReference, nedokončana knjiga @WhatPoloniusPolonius ter trenutna implementacija v Rustovem prevajalniku.
+NLL je bil prvotno zelo natančno opisan v RFC-ju, kar je potem vodilo njegov razvoj. Polonius pa je prvotno nastal kot predlog na spletnem blogu in se počasi razvijal s pomočjo dodatnih objav na blogu enega izmed Rustovih razvijalcev @PoloniusRevisitedPartb @PoloniusRevisitedPartc @WhatPoloniusPolonius. Do danes ne obstaja celovit centraliziran formalen opis Poloniusa, le nekaj spletnih objav, delni formalni opis v magistrskem delu enega izmed razvijalcev @stjernaModellingRustsReference2020, nedokončana knjiga @WhatPoloniusPolonius ter trenutna implementacija v Rustovem prevajalniku.
 
-Cilj te naloge je potemtakem na svoj način formalizirati inferenčna pravila, ki sestavljajo Polonius, in nadgraditi nekaj že vzpostavljenih formalizacij @stjernaModellingRustsReference. Najprej bomo raziskali pretekle poskuse formalizacije Rusta in sorodne načine upravljanja s pomnilnikom. Nato sledi intuitivni opis Rustovih pravili izposojanja ter bomo nato končali s formalizacijo Poloniusa ter pravil preverjevalnika izposoj.
+Cilj te naloge je potemtakem na svoj način formalizirati inferenčna pravila, ki sestavljajo Polonius, in nadgraditi nekaj že vzpostavljenih formalizacij @stjernaModellingRustsReference2020. Najprej bomo raziskali pretekle poskuse formalizacije Rusta in sorodne načine upravljanja s pomnilnikom. Nato sledi intuitivni opis Rustovih pravili izposojanja ter bomo nato končali s formalizacijo Poloniusa ter pravil preverjevalnika izposoj.
 
 == Motivacijski primer <chap:motivacijski-primer>
 
@@ -215,13 +215,17 @@ Ker bi pa bilo anotiranje vsake vrednosti z regijami nepraktično, delo tudi uve
 
 Rust sicer ni bil prvi jezik, ki je uvedel ta pristop upravljanja s pomnilnikom (poleg seveda akademskega jezika predstavljenega v izvornem delu). Eden izmed najbolj znanih takih jezikov je Cyclone @grossmanRegionBasedMemoryManagement, ki je jezik podoben C-ju. Ustvarjen je bil kot dopolnilo C-ju z raznimi bolj naprednimi tipi in tudi kasneje z regijskim upravljanjem s pomnilnikom, ki ga lahko programer doda C programu z nekaj dodatnimi regijskimi anotacijami. Prva implementacija sicer ni bila popolna in je še vedno kdaj uvedla memory leaks, vendar so kasnejše različice jezika z linearnimi regijami to poskušali popraviti @fluetLinearRegionsAre2006.
 
-== Polonius v akademiji in praksi
-// Poglej si se ownership types in linear types!!!
-// kako je bil opisan z blog postom
-// integracija v rustc
-// Stjernova formalizacija v Datalogu in Crichtonov borrow checker
-// a-mir-formality
-// omejitve trenutnih opisov
+== Polonius v akademskem svetu in praksi
+
+Polonius je bil prvotno formuliran v spletni objavi N. D. Matsakisa, kjer je poljudno pojasnil kako bi Polonius naslovil problem starega sistema NLL in podal osnovno formulacijo v Datalogu @matsakisAliasbasedFormulationBorrow. Delo se je nato nadaljevalo v GitHub repositoriju `rust-lang/polonius` @RustlangPolonius2025, kjer se je ta originalna formulacija implementirali v Rust kodi.
+
+Leta #cite(<stjernaModellingRustsReference2020>, form: "year") je Amanda Stjerna v svojem magistrskem delu podala prvo matematično formulacijo Poloniusa kot sistema tipov @stjernaModellingRustsReference2020. Ta formulacija je bila močno osnovana na zgoraj omenjenemu Oxidu, saj sta si modela zelo podobna. V svojem delu je tudi definirala pravila za preverjevalnik posoj, ki jih kasneje v nalogi tudi opišemo in formaliziramo. Njeno delo se nadaljuje potem z bolj natančnim opisom Poloniusovega notranjega delovanja z vsemi podrobnostmi potrebnimi za dejansko implementacijo. V kolikor vemo je to delo eno izmed najbolj podrobnih in celovitih opisov Poloniusovega delovanja in se tudi tekom naloge zgledujemo po njemu na mnogo mestih.
+
+Trenutno ne obstaja še uradna specifikacija za Polonius, vendar se situacija počasi spreminja. Leta 2025 je bil implementiran v glavni veji Rustovega prevajalnika in je trenutno dostopen v `nightly` različici prevajalnika za zastavico @ScalablePoloniusSupporta. Če pogledamo v kodo prevajalnika, lahko vidimo da obstajata dve različici Poloniusa @RustlangRust2026: `legacy` različica podobna prvotni implementaciji iz @RustlangPolonius2025 ter t.i. `alpha` različica, ki je nastala zaradi omejitev glede hitrosti izvajanja `legacy` verzije. `alpha` različica je napisana v Rustu in ne poskuša emulirati Dataloga ampak je tudi manj močna in ji manjkajo nekatere sposobnosti polne različice @ScalablePoloniusSupporta.
+
+#show "amir": `a-mir-formality`
+
+Pomanjkanje uradne specifikacije je problem, ki ga trenutno rešuje Rustova ekipa za tipe s projektom imenovan amir @BorrowCheckingAmirformalityb @RustlangAmirformality2026. Ta projekt želi služiti kot uradna izvedljiva specifikacija za Rust, glede na katero se bo potem preverjalo pravilno delovanje Rustovega prevajalnika. "Izvedljiva" v tem kontekstu pomeni, da ji lahko kot vhod daš Rust program (oz. MiniRust, ki je bolj podoben MIR @MinirustMinirust2026), amir pa ga sprejme oz. zavrne, glede na to ali je pravilno tipiziran in pomnilniško varen. V drugi polovici leta 2025 se je začelo delo na formulaciji specifikacije za `alpha` različico Poloniusa, in je v času pisanja (začetek 2026) že skoraj končano. Če amir reši svoje ostale probleme, bo Rust lahko končno dobil uradno specifikacijo, ki mu že od spočetja manjka.
 
 #chapter[Rustov model upravljanja s pomnilnikom -- lastništvo]
 
@@ -346,9 +350,9 @@ Prevajalnik nam pri primeru @lst:lifetime-annotate vrne napako, saj je spremenlj
 
 #chapter[Formalizacija Poloniusa]
 
-// Glavno delo na področju formalizacije Poloniusa je magistrsko delo Amande Stjerna, ki je nastalo leta 2020, dve leti po prvotni formulaciji @stjernaModellingRustsReference @matsakisAliasbasedFormulationBorrow. V delu Stjerna prvo formalizira Polonius kot del sistema tipov avtorjev @weissOxideEssenceRust2019 imenovan Oxide @weissOxideEssenceRust2019. Stjerna upraviči svojo izbiro izhodiščnega sistema tipov s tem, da si deli koncept t.i. _provenance variables_. Delo se nato nadaljuje z implementacijo Poloniusa v jeziku Datalog (podmnožica Prologa), ki služi kot podlaga za prvo različico implementacije v Rustovem prevajalniku @RustlangPolonius2025.
-
 V temu poglavju bomo najprej predstavili intuitivni opis delovanja Poloniusa in temu sledili s formalnim opisom pravil Rustovega preverjevalnika izposoj. Nazadnje bomo še predstavili delovanje Poloniusa z opisom na osnovi množic in relacij.
+
+Pomembno je še enkrat izpostaviti delo Stjerne, ki je bila velik navdih za našo formulacijo Poloniusa @stjernaModellingRustsReference2020. Njeno delo je sicer bolj osredotočeno na implementacijo in se primarno ukvarja tudi z izračunom aktivnosti regij, medtem ko naše je bolj osredotočeno na propagacijo omejitev (ki je sicer tudi opisana v njenem delu).
 
 == Intuitivna razlaga Poloniusa
 <chap:intuitivna-razlaga-poloniusa>
@@ -450,7 +454,7 @@ V intuitivni razlagi smo izpustili več podrobnosti, kot je izračun aktivnosti 
 
 Do zdaj smo pravila izposojanja in lastništva opisovali intuitivno, vendar za prihodnje poglavja je bolje razumeti vsa pravila formalno. Trenutno uradnni formalni opis pravil preverjevalnika izposoj ne obstaja, vendar se ekipa za projektom `a-mir-formality` ukvarja ravno s to nalogo @BorrowCheckingAmirformalityb.
 
-Zaradi pomanjkanja uradne specifikacije pravil, se bomo zanesli na delo Amande Stjerne @stjernaModellingRustsReference, kjer je opisno in s tabelo predstavila pravila, ki se jih mora preverjevalnik izposoj držati. Njena pravila bomo nadgradili s formalno notacijo, ki je podobna tisti, ki jo bomo uporabili v naslednjih poglavjih.
+Zaradi pomanjkanja uradne specifikacije pravil, se bomo zanesli na delo Amande Stjerne @stjernaModellingRustsReference2020, kjer je opisno in s tabelo predstavila pravila, ki se jih mora preverjevalnik izposoj držati. Njena pravila bomo nadgradili s formalno notacijo, ki je podobna tisti, ki jo bomo uporabili v naslednjih poglavjih.
 
 V @tab:borrow-check[tabeli] imamo podane pozitivne in negativne primere za vsako pravilo, točno tako kot jih je zastavila Stjerna. S pomočjo teh primerov in njene razlage bomo osnovali formalni zapis teh pravil. Pomembno je tudi omeniti, da vsa ta pravila delujejo na nivoju posamezne funkcije, ne celotnega programa.
 
@@ -461,7 +465,7 @@ V @tab:borrow-check[tabeli] imamo podane pozitivne in negativne primere za vsako
 #codly(display-name: true, display-icon: true, number-format: numbering.with("1"))
 
 Pravilo `Use-Init` nam pove, da lahko uporabljamo samo spremenljivke, ki so zagotovo inicializirane
-na točki v programu, kjer jih uporabljamo. Skupaj s pravili `Move-Deinit`, ki pravi da ne smemo uporaljati premaknjenih vrednosti, in `Ref-Live`, ki nam onemogoči dostop do sproščenih vrednosti preko referenc, tvori osnovo za sistem lastništva. Ta pravila nam na primer preprečijo vračanje vrednosti, ki je bila ustvarjena na skladu, iz funkcije, saj je vrednost na izhodu iz funkcije sproščena @stjernaModellingRustsReference.
+na točki v programu, kjer jih uporabljamo. Skupaj s pravili `Move-Deinit`, ki pravi da ne smemo uporaljati premaknjenih vrednosti, in `Ref-Live`, ki nam onemogoči dostop do sproščenih vrednosti preko referenc, tvori osnovo za sistem lastništva. Ta pravila nam na primer preprečijo vračanje vrednosti, ki je bila ustvarjena na skladu, iz funkcije, saj je vrednost na izhodu iz funkcije sproščena @stjernaModellingRustsReference2020.
 
 Za formalizacijo pravil se bomo zanašali na *graf poteka* (_angl. CFG - control flow graph_), ki je izračunan v fazah analize kode, ki so opravljene že preden vstopimo v preverjevalnik izposoj. Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Vozlišča v samem grafu si lahko predstavljamo kot posamezne stavke, vendar jih kasneje v nalogi definiramo bolj podrobno.
 
@@ -1060,13 +1064,17 @@ Poglejmo še kako se dokončno napaka javi na našem primeru. Če je kakšen kor
   caption: [Napaka v programu],
 ) <listing:error>
 
+== Vizualna reprezentacija delovanja Poloniusa
+
+Da si lažje predstavljamo kako se različne relacije povezujejo bomo tukaj prikazali diagram vseh relacij in povezav med njimi. Graf je zelo podoben tistemu iz @stjernaModellingRustsReference2020, vendar poenostavljen saj se naša naloga ukvarja samo z bistvom Poloniusa in ne njegovo implementacijo.
+
 #chapter("Zaključek")
 
 Ena izmed Rustovih glavnih prednosti je njegovo "brezplačno" #angl[zero-cost] upravljanje s pomnilnikom tekom programa. To nas sicer stane časa pri prevajanju zaradi preverjevalnika izposoj, ki določa kaj je smatrano kot pomnilniško varno, kaj pa se zavrne, ker bi lahko povzročalo nedoločeno obnašanje #angl[undefined behaviour].
 
 Trenutna implementacija preverjevalnika izposoj NLL je preveč konzervativna v nekaterih primerih in posledično zavrne varne programe, ki bi jih lahko sprejeli z bolj natančno analizo. Zato je #cite(<matsakisAliasbasedFormulationBorrow>, form: "author") v svoji spletni objavi zastavil Polonius, ki bolje sledi toku podatkov v programu in lahko sprejme te bolj kompleksne primere.
 
-V nasprotju z NLL-om, ki je bi dokaj formalno definiran znotraj RFC dokumenta @2094nllRustRFC, je bila Poloniusova definicija že od začetka zelo neformalna in povezana z implementacijo. Napisan je bil v Datalogu, ki je podmnožica Prologa, nato pa v Rustu. Ekipa, ki ga je implementirala se nikoli ni ukvarjala s točnim opisom njegovega delovanja in do pred kratkim je bil eden izmed edinih virov magistrska naloga Amande Stjerne @stjernaModellingRustsReference, ki je ena izmed razvijalcev Rusta. V zadnjem letu se je šele pojavil projekt imenovan `a-mir-formality`, ki hoče sestaviti uradno specifikacijo za Rustov sistem tipov in preverjevalnik izposoj (vključno s Poloniusom) @BorrowCheckingAmirformalityb.
+V nasprotju z NLL-om, ki je bi dokaj formalno definiran znotraj RFC dokumenta @2094nllRustRFC, je bila Poloniusova definicija že od začetka zelo neformalna in povezana z implementacijo. Napisan je bil v Datalogu, ki je podmnožica Prologa, nato pa v Rustu. Ekipa, ki ga je implementirala se nikoli ni ukvarjala s točnim opisom njegovega delovanja in do pred kratkim je bil eden izmed edinih virov magistrska naloga Amande Stjerne @stjernaModellingRustsReference2020, ki je ena izmed razvijalcev Rusta. V zadnjem letu se je šele pojavil projekt imenovan `a-mir-formality`, ki hoče sestaviti uradno specifikacijo za Rustov sistem tipov in preverjevalnik izposoj (vključno s Poloniusom) @BorrowCheckingAmirformalityb.
 
 Cilj te naloge je bil formulirati alternativo Datalog implementaciji Poloniusa na formalen matematičen način, da bi omogočili lažje razumevanje tega kompleksnega sistema. To smo storili s pomočjo množic in relacij definiranih nad njimi. Osnovne množice kot so #točke, #regije in #posoje so predstavljale Rustove strukture v prevajalniku s pomočjo katerih se definira začetne relacije, ki so dejstva iz katerih izhaja celotna analiza.
 
