@@ -1068,6 +1068,12 @@ Poglejmo še kako se dokončno napaka javi na našem primeru. Če je kakšen kor
 
 Da si lažje predstavljamo kako se različne relacije povezujejo bomo tukaj prikazali diagram vseh relacij in povezav med njimi. Graf je zelo podoben tistemu iz @stjernaModellingRustsReference2020, vendar poenostavljen saj se naša naloga ukvarja samo z bistvom Poloniusa in ne njegovo implementacijo.
 
+#figure(
+  polonius-diagram,
+  supplement: "Diagram",
+  caption: "Relacije Poloniusa. Z rdečo so označene začetne relacije in z vijolično izpeljane.",
+)
+
 #chapter("Zaključek")
 
 Ena izmed Rustovih glavnih prednosti je njegovo "brezplačno" #angl[zero-cost] upravljanje s pomnilnikom tekom programa. To nas sicer stane časa pri prevajanju zaradi preverjevalnika izposoj, ki določa kaj je smatrano kot pomnilniško varno, kaj pa se zavrne, ker bi lahko povzročalo nedoločeno obnašanje #angl[undefined behaviour].

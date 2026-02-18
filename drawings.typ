@@ -15,6 +15,10 @@
   rgb("#2563eb"), // Blue 600 (repeated/alternative)
   rgb("#dc2626"), // Red 600
 )
+
+#let green = rgb("#059669")
+#let violet = rgb("#7c3aed")
+
 #let region-subset(subset, region, color_idx, name_suffix: "") = {
   import cetz.draw: *
   let group_name = region + name_suffix
@@ -586,4 +590,47 @@
 
   // Iz BB1 (goto) v BB2
   edge(<s4m.east>, (1, 8), (1, 5), <s5s.west>, "-|>"),
+)
+
+#let posoje = `posoje`
+#let regije = `regije`
+#let stavki = `stavki`
+#let točke = `točke`
+#let jevsebovanazacetno = `je_vsebovana_zacetno`
+#let regijaposojena = `regija_posojena`
+#let regijaaktivnana = `regija_aktivna_na`
+#let posojaprekinjenana = `posoja_prekinjena_na`
+#let posojarazveljavljenana = `posoja_razveljavljena_na`
+#let jevsebovana = `je_vsebovana`
+#let zahteva = `zahteva`
+#let posojaaktivnana = `posoja_aktivna_na`
+#let napaka = `napaka`
+
+#let bgred = red.lighten(50%).transparentize(70%)
+#let bgviolet = violet.lighten(50%).transparentize(70%)
+
+#let polonius-diagram = diagram(
+  node-stroke: 1pt,
+  edge-stroke: 0.6pt,
+  spacing: 2em,
+  label-size: 8pt,
+  node-corner-radius: 3pt,
+  node((0, 0), jevsebovanazacetno, name: <jevsebovanazacetno>, fill: bgred, stroke: red),
+  node((1, 1), regijaaktivnana, name: <regijaaktivnana>, fill: bgred, stroke: red),
+  node((2, 0), regijaposojena, name: <regijaposojena>, fill: bgred, stroke: red),
+  node((2.7, 1), posojaprekinjenana, name: <posojaprekinjenana>, fill: bgred, stroke: red),
+  node((0, 2), jevsebovana, name: <jevsebovana>, fill: bgviolet, stroke: violet),
+  node((2, 2), zahteva, name: <zahteva>, fill: bgviolet, stroke: violet),
+  node((1, 3), posojaaktivnana, name: <posojaaktivnana>, fill: bgviolet, stroke: violet),
+  node((1, 4), napaka, name: <napaka>, fill: bgviolet, stroke: violet),
+  node((2, 4), posojarazveljavljenana, name: <posojarazvljevljenana>, fill: bgred, stroke: red),
+  edge(<jevsebovanazacetno>, <jevsebovana>, "-|>"),
+  edge(<regijaaktivnana>, <jevsebovana>, "-|>"),
+  edge(<jevsebovana>, <zahteva>, "-|>"),
+  edge(<regijaposojena>, <zahteva>, "-|>"),
+  edge(<posojaprekinjenana>, <zahteva>, "-|>"),
+  edge(<regijaaktivnana>, <posojaaktivnana>, "-|>"),
+  edge(<zahteva>, <posojaaktivnana>, "-|>"),
+  edge(<posojaaktivnana>, <napaka>, "-|>"),
+  edge(<posojarazvljevljenana>, <napaka>, "-|>"),
 )
