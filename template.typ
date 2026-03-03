@@ -71,6 +71,7 @@
   )
   #show link: set text(font: "DejaVu Sans Mono", size: 0.9em)
   #set heading(numbering: "1.1")
+  #set cite(form: "normal")
 
   #set page(
     header: context {
