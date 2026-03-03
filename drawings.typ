@@ -529,7 +529,7 @@
   // --- Osnovni blok bb0 (Vstop in If pogoj) ---
   node((0, 0), [$S(s_1)$], name: <s1s>),
   edge(<s1s>, <s1m>, "-|>"),
-  node((0, 1), [$M(s_1):$ #raw("_1 = 1")], name: <s1m>), // x = 1
+  node((0, 1), [$M(s_1):$ #raw("_2 = 1")], name: <s1m>), // x = 1
   edge(<s1m>, <s2s>, "-|>"),
   node((0, 2), [$S(s_2)$], name: <s2s>),
   edge(<s2s>, <s2m>, "-|>"),
@@ -548,7 +548,7 @@
   // --- Osnovni blok bb1 (True veja: x = 2) ---
   node((0, 5), [$S(s_3)$], name: <s3s>),
   edge(<s3s>, <s3m>, "-|>"),
-  node((0, 6), [$M(s_3):$ #raw("_1 = 2")], name: <s3m>),
+  node((0, 6), [$M(s_3):$ #raw("_2 = 2")], name: <s3m>),
   edge(<s3m>, <s4s>, "-|>"),
   node((0, 7), [$S(s_4)$], name: <s4s>),
   edge(<s4s>, <s4m>, "-|>"),
@@ -567,7 +567,7 @@
   // --- Osnovni blok bb2 (Združitev: let y = x) ---
   node((2, 5), [$S(s_5)$], name: <s5s>),
   edge(<s5s>, <s5m>, "-|>"),
-  node((2, 6), [$M(s_5):$ #raw("_2 = _1")], name: <s5m>), // y = x
+  node((2, 6), [$M(s_5):$ #raw("_3 = _2")], name: <s5m>), // y = x
   edge(<s5m>, <s6s>, "-|>"),
   node((2, 7), [$S(s_6)$], name: <s6s>),
   edge(<s6s>, <s6m>, "-|>"),
