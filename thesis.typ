@@ -9,6 +9,7 @@
 #show: codly-init.with()
 #codly(languages: codly-languages)
 #show raw: set text(size: 9pt)
+#set scale(reflow: true)
 
 #import "@preview/fontawesome:0.6.0": *
 
@@ -1022,7 +1023,7 @@ Prvo bomo na vsaki točki (oz. vrstici v našem poenostavljenem primeru) določi
 Potem bomo vizualno ponazorili razširjeno relacijo #jevsebovana, ki že upošteva pravila tranzitivnosti ter propagacije čez točke v grafu. To nam pokaže @ex-graph-subset[diagram].
 
 #figure(
-  final-example-graph-subset,
+  scale(90%, final-example-graph-subset),
   caption: [Relacija #jevsebovana],
   supplement: "Diagram",
 ) <ex-graph-subset>
@@ -1031,14 +1032,14 @@ Iz diagrama za #jevsebovana lahko potem izhajamo, da konstruiramo @ex-graph-zaht
 
 
 #figure(
-  final-example-graph-zahteva,
+  scale(85%, final-example-graph-zahteva),
   caption: [Relacija #zahteva],
   supplement: "Diagram",
 ) <ex-graph-zahteva>
 
 == Javljanje napake
 
-S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu javimo napako (v obsegu preverjalnika posoj). Že spet si pomagamo z relacijo, ki jo tokrat poimenujemo _relacija napake_ (_error_) in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu.
+S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu javimo napako (v obsegu preverjalnika posoj). Že spet si pomagamo z relacijo, ki jo tokrat poimenujemo _relacija napake_ #angl[error] in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu.
 
 Definiramo jo, ko velja:
 
@@ -1085,7 +1086,7 @@ Poglejmo še kako se dokončno napaka javi na našem primeru. Če je kakšen kor
 Da si lažje predstavljamo kako se različne relacije povezujejo bomo tukaj prikazali diagram vseh relacij in povezav med njimi. Graf je zelo podoben tistemu iz @stjernaModellingRustsReference2020, vendar poenostavljen saj se naša naloga ukvarja samo z bistvom Poloniusa in ne njegovo implementacijo.
 
 #figure(
-  polonius-diagram,
+  scale(80%, polonius-diagram),
   supplement: "Diagram",
   caption: "Relacije Poloniusa. Z rdečo so označene začetne relacije in z vijolično izpeljane.",
 )
