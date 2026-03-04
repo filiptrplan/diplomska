@@ -21,10 +21,11 @@
     #set block(breakable: false)
     #block[
       #huge[
+        #v(34mm)
         Poglavje #counter(heading).display()
-        #v(0.5em)
+        #v(0.4em)
         #it.body
-        #v(1em)
+        #v(15mm)
       ]
     ]
   ]
@@ -70,8 +71,24 @@
     first-line-indent: 1em,
   )
   #show link: set text(font: "DejaVu Sans Mono", size: 0.9em)
+  #set par(justify: true)
   #set heading(numbering: "1.1")
   #set cite(form: "normal")
+  #set figure(placement: top)
+  // This is a shortcut for first line indent on paragraphs that don't have it.
+  #show "~": h(1em)
+  // caption alignment for figures
+  #show figure.caption: it => {
+    v(0.4em)
+    it
+    v(9mm)
+  }
+  // proper spacing for figures
+  #show figure: it => {
+    // v(0.8em)
+    it
+    // v(1.2em)
+  }
 
   #set page(
     header: context {
@@ -97,9 +114,11 @@
           page_text, align(right)[#smallcaps[#author]],
         )
       ]
+      v(3mm)
       body
       v(-0.9em)
       line(length: 100%, stroke: 0.5pt)
+      v(-5mm)
     },
     footer: context {
       let page = counter(page).get().first()
@@ -155,9 +174,9 @@
     paper: "a4",
     margin: (
       inside: 30mm, // oddsidemargin adjustment
-      outside: 20mm, // marginparwidth adjustment
-      top: 20mm, // headheight adjustment
-      bottom: 30mm,
+      outside: 42mm, // marginparwidth adjustment
+      top: 42mm, // headheight adjustment
+      bottom: 42mm,
     ),
   )
 

@@ -12,7 +12,6 @@
 
 #import "@preview/fontawesome:0.6.0": *
 
-#show figure: set figure(placement: auto)
 // Define the function
 #let remark(body, title: "Remark", color: rgb("#0074d9")) = {
   let background-color = color.lighten(90%)
@@ -952,10 +951,9 @@ $zahteva subset.eq regije times posoje times točke$ in je definirana z zaprtjem
   + $(L, P) in.not posojaprekinjenana$: $L$ ni prekinjena na $P$
   + $(P, Q) in C_E$: $Q$ sledi $P$ v grafu poteka
   + $(R,Q) in regijaaktivnana$: regija $R$ je aktivna na točki $Q$
-
   potem propagiramo relacijo v $(R,L,Q) in zahteva$.
 
-Opazimo, da pri relaciji vsebovanosti #jevsebovanazacetno in pri relaciji zahteve #zahteva mora biti regija pri pravilu za propagacijo aktivna na naslednji točki $Q$. S @listing:reqRelation[programom] ponazorimo zakaj je to ključna omejitev.
+~ Opazimo, da pri relaciji vsebovanosti #jevsebovanazacetno in pri relaciji zahteve #zahteva mora biti regija pri pravilu za propagacijo aktivna na naslednji točki $Q$. S @listing:reqRelation[programom] ponazorimo zakaj je to ključna omejitev.
 
 #figure(
   ```rust
