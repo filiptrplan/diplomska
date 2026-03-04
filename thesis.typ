@@ -45,7 +45,7 @@
   )
 }
 
-#let angl(cont) = [(angl. #emph(cont))]
+#let angl(cont) = [(angl. #cont)]
 
 #let subst-env(scope) = it => (
   scope
@@ -203,7 +203,7 @@ Formalizacija Rusta in preverjanje pravilnosti kode je zelo relevantna tema, saj
 
 #show "lambdaR": $lambda_"Rust"$
 
-V nadaljevanju bomo nekajkrat omenili vmesno kodo *MIR* #angl[Mid-level intermediate representation], s pomočjo katere prevajalnik preverja pomnilniško pravilnost prograrmov. MIR je bistveno poenostavljena oblika Rusta in zadnji korak pred generiranjem strojne kode v zadnjem delu prevajalnika (v Rustovem primeru LLVM). Temelji na grafu kontrole toka, ki ga opišemo pozneje v nalogi.
+V nadaljevanju bomo nekajkrat omenili vmesno kodo _MIR_ #angl[Mid-level intermediate representation], s pomočjo katere prevajalnik preverja pomnilniško pravilnost prograrmov. MIR je bistveno poenostavljena oblika Rusta in zadnji korak pred generiranjem strojne kode v zadnjem delu prevajalnika (v Rustovem primeru LLVM). Temelji na grafu kontrole toka, ki ga opišemo pozneje v nalogi.
 
 Eden izmed ključnih del na področju formalizaije je akademski članek RustBelt Junga idr., ki so zasnovali jezik imenovan lambdaR in ga potem opremili s semantičnim modelom imenovan RustBelt. lambdaR je sam bolj podoben MIR-u kot pa izvirni kodi Rusta in vsebuje tudi sistem tipov ter pravila sklepanja, ki modelirajo Rustov MIR, vendar ne celostno, saj to ni bil cilj članka. Končajo z dokazom, da katerikoli lambdaR program, ki je semantično in tipsko pravilen, ne bo končal v zataknjenem stanju @jungRustBeltSecuringFoundations2018.
 
@@ -218,7 +218,7 @@ Takih podobnih modelov je še mnogo, tukaj jih bomo omenili še par za celostnos
 
 == Modeli sorodni lastništvu
 
-V temu poglavju se bomo osredotočili na t.i. *regijsko upravljanje s pomnilnikom* #angl[Region-based memory management] @tofteRegionBasedMemoryManagement1997, ki sta ga zastavila Tofte in Talpin. Ta model upravljanja s pomnilnikom lahko razumemo skoraj kot direktni predhodnik lastništva, Rustovega modela upravljanja s pomnilnikom.
+V temu poglavju se bomo osredotočili na t.i. _regijsko upravljanje s pomnilnikom_ #angl[Region-based memory management] @tofteRegionBasedMemoryManagement1997, ki sta ga zastavila Tofte in Talpin. Ta model upravljanja s pomnilnikom lahko razumemo skoraj kot direktni predhodnik lastništva, Rustovega modela upravljanja s pomnilnikom.
 
 Glavna motivacija dela je bila, da najdejo kompromis med striktno eksplicitnim upravljanjem s pomnilnikom, kot pri C, in avtomatskim čiščenjem pomnilnika, kot pri Javi. Njun navdih je bilo delovanje sklada, kjer se spomin dodeli na začetku okvirja in se sprosti na koncu. Kot približek takega upravljanja sta uvedla koncept regij, ki so dodatne označbe poleg tipov, ki podajo informacije o tem kdaj se katera vrednost mora sprostiti.
 
@@ -275,9 +275,9 @@ Lastništvo je vezano na doseg. Koncept dosega lahko preprosto prikažemo z leks
 
 V primerih 3 in 4 nismo videli bistvene razlike med Rustom ter sorodnimi jeziki, kot so C++. Razlika se pojavi v tem, kako se reference ustvarjajo in kako so razdeljene na dva različna tipa. Ko v Rustu govorimo o referencah, lahko rečemo, da so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da prevajalnik v Rustu poskrbi, da referenca v Rustu vedno kaže na veljavno vrednost pravega tipa -- in to skozi celotno življenjsko dobo te reference @klabnikRustProgrammingLanguage2023. Ta varnostni mehanizem nam omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: gotovost, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
 
-V nadaljevanju bo MIR ključen, saj je ta oblika Rusta pomembna, ker nam bistveno poenostavi preverjanje izposoj in omogoča lažjo analizo. Prav tako je v MIR-u točno definiran pojem *mesta* #angl[place], ki je eden izmed ključnih pojmov pri analizi pravilnosti programa. Mesto je izraz, ki nam opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. `_1`) ali pa njena projekcija (npr. polje strukture `_1.polje`) @MIRMidlevelIR.
+V nadaljevanju bo MIR ključen, saj je ta oblika Rusta pomembna, ker nam bistveno poenostavi preverjanje izposoj in omogoča lažjo analizo. Prav tako je v MIR-u točno definiran pojem _mesta_ #angl[place], ki je eden izmed ključnih pojmov pri analizi pravilnosti programa. Mesto je izraz, ki nam opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. `_1`) ali pa njena projekcija (npr. polje strukture `_1.polje`) @MIRMidlevelIR.
 
-Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc @crichtonGroundedConceptualModel2023 @yanovskiGhostCellSeparatingPermissions2021 @weissOxideEssenceRust2019. Prva vrsta so *deljene in zato nespremenljive reference* #angl[shared references]. Takih je lahko hkrati več in vse lahko kažejo na isto mesto v pomnilniku. Pravilo, ki zagotavlja, da so take deljene reference varne, pravi, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so *spremenljive reference* #angl[mutable / unique references]. Pri teh se pravila ravno obrnejo: lahko imamo zgolj eno tako referenco, zato pa lahko spreminjamo podatke na pomnilniškem mestu, ki ga referencira (preko spremenljive reference, ne preko prvotne spremenljivke).
+Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc @crichtonGroundedConceptualModel2023 @yanovskiGhostCellSeparatingPermissions2021 @weissOxideEssenceRust2019. Prva vrsta so _deljene in zato nespremenljive reference_ #angl[shared references]. Takih je lahko hkrati več in vse lahko kažejo na isto mesto v pomnilniku. Pravilo, ki zagotavlja, da so take deljene reference varne, pravi, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so _spremenljive reference_ #angl[mutable / unique references]. Pri teh se pravila ravno obrnejo: lahko imamo zgolj eno tako referenco, zato pa lahko spreminjamo podatke na pomnilniškem mestu, ki ga referencira (preko spremenljive reference, ne preko prvotne spremenljivke).
 
 #remark(title: "Teorija za referencami")[
   Tovrsten tip omejevanja ustvarjanja referenc se imenuje _aliasing XOR mutability_. Ta model s pomočjo tipov
@@ -336,7 +336,7 @@ Pravila o referencah lahko povzamemo z dvema praviloma @klabnikRustProgrammingLa
 + Hkrati je lahko ustvarjena _ali_ ena spremenljiva referenca _ali_ poljubno število deljenih referenc.
 + Reference morajo biti vedno veljavne (kazati na veljavno mesto).
 
-Še ena podrobnost, ki je pomembna za razumevanje lastništva, so *življenjske dobe* #angl[lifetimes]. Te so v Rustu sestavni del tipov. Kot sami tipi v Rustu, so ponavadi izpeljane, vendar se pogosto pri podpisu funkcije zgodi, da jih moramo eksplicitno podati. Na primer, dejanski tip reference na niz ni `&String` ampak `&'a String`, kjer je `'a` življenjska doba. Pomembno je tudi omeniti, da so življenjske dobe del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna @klabnikRustProgrammingLanguage2023. Najlažje to predstavimo s @lst:lifetime-annotate[programom].
+Še ena podrobnost, ki je pomembna za razumevanje lastništva, so _življenjske dobe_ #angl[lifetimes]. Te so v Rustu sestavni del tipov. Kot sami tipi v Rustu, so ponavadi izpeljane, vendar se pogosto pri podpisu funkcije zgodi, da jih moramo eksplicitno podati. Na primer, dejanski tip reference na niz ni `&String` ampak `&'a String`, kjer je `'a` življenjska doba. Pomembno je tudi omeniti, da so življenjske dobe del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna @klabnikRustProgrammingLanguage2023. Najlažje to predstavimo s @lst:lifetime-annotate[programom].
 
 
 #figure(
@@ -388,7 +388,7 @@ Preden formalno predstavimo vse podrobnosti Poloniusa, je pomembno dobiti nekaj 
   caption: [Primer programa za Polonius iz @matsakisAliasbasedFormulationBorrow],
 ) <lst:intuition>
 
-@lst:intuition[Program] ima poleg tipov predpisane še *regije*, kot jih imenuje Polonius, ki si jih lahko predstavljamo kot življenjske dobe. Bolj podrobno pa so to množice *posoj* #angl[loans], ki jih kasneje definirano natančno, za zdaj pa si jih lahko predstavljamo kot možne "izvore" #angl[origins] referenc (npr. `&x`, `&mut a.b`, itd.). Označene so s številkami `'0`, `'1`, `'2`, itd. Tukaj so prikazane kot del programa (npr. `&'3 mut v'`), vendar to ni veljavna sintaksa Rusta, je pa uporabna za razlago.
+@lst:intuition[Program] ima poleg tipov predpisane še _regije_, kot jih imenuje Polonius, ki si jih lahko predstavljamo kot življenjske dobe. Bolj podrobno pa so to množice _posoj_ #angl[loans], ki jih kasneje definirano natančno, za zdaj pa si jih lahko predstavljamo kot možne "izvore" #angl[origins] referenc (npr. `&x`, `&mut a.b`, itd.). Označene so s številkami `'0`, `'1`, `'2`, itd. Tukaj so prikazane kot del programa (npr. `&'3 mut v'`), vendar to ni veljavna sintaksa Rusta, je pa uporabna za razlago.
 
 Zdaj si oglejmo korake v programu, ki na koncu privedejo do napake :
 
@@ -480,7 +480,7 @@ V @tab:borrow-check[tabeli] imamo podane pozitivne in negativne primere za vsako
 Pravilo `Use-Init` nam pove, da lahko uporabljamo samo spremenljivke, ki so zagotovo inicializirane
 na točki v programu, kjer jih uporabljamo. Skupaj s pravili `Move-Deinit`, ki pravi da ne smemo uporaljati premaknjenih vrednosti, in `Ref-Live`, ki nam onemogoči dostop do sproščenih vrednosti preko referenc, tvori osnovo za sistem lastništva. Ta pravila nam na primer preprečijo vračanje vrednosti, ki je bila ustvarjena na skladu, iz funkcije, saj je vrednost na izhodu iz funkcije sproščena @stjernaModellingRustsReference2020.
 
-Za formalizacijo pravil se bomo zanašali na *graf poteka* (_angl. CFG - control flow graph_), ki je izračunan v fazah analize kode, ki so opravljene še preden vstopimo v preverjevalnik izposoj. Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Vozlišča v samem grafu si lahko predstavljamo kot posamezne stavke, vendar jih kasneje v nalogi definiramo bolj podrobno.
+Za formalizacijo pravil se bomo zanašali na _graf poteka_ (_angl. CFG - control flow graph_), ki je izračunan v fazah analize kode, ki so opravljene še preden vstopimo v preverjevalnik izposoj. Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Vozlišča v samem grafu si lahko predstavljamo kot posamezne stavke, vendar jih kasneje v nalogi definiramo bolj podrobno.
 
 Da definiramo pravilo `Use-Init`, najprej uvedemo množico $"Poti"(p)$, ki nam poda vse poti skozi graf poteka od začetka funkcije do trenutne točke $p$ v programu oz. grafu poteka. Te poti so statične, t.j. se ne spreminjajo glede na vrednosti spremenljivk med izvajanjem programa. Lahko si jih predstavljamo kot vse možne poti, po katerih bi lahko dosegli trenutno točko, če bi lahko poljubno spreminjali vhodne vrednosti in spremenljivke. Potem lahko definiramo še predikat $"Init"(pi, x, p)$, ki velja natanko tedaj, ko je spremenljivka $x$ skozi pot $pi$ definirana na točki $p$. Končno pravilo se nato glasi:
 
@@ -587,7 +587,7 @@ Da sploh lahko matematično govorimo o delovanju Poloniusa, moramo definirati os
 === Množica posoj #posoje
 <chap-mnozica-posoj>
 
-Množico vseh posoj (_angl. loans_) označimo s #posoje. *Pogoji posoje* so lastnosti, ki morajo držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno. Pravimo, da *razveljavimo pogoje posoje*, če velja ena izmed naslednjih točk:
+Množico vseh posoj (_angl. loans_) označimo s #posoje. _Pogoji posoje_ so lastnosti, ki morajo držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno. Pravimo, da _razveljavimo pogoje posoje_, če velja ena izmed naslednjih točk:
 - Referenca je deljena (_shared_), torej je oblike `&x` in
   - ustvarimo novo spremenljivo referenco _in/ali_
   - pišemo v mesto, ki je bilo izposojeno
@@ -664,8 +664,8 @@ je njegova predstavitev precej bolj kompleksna.
 ==== Množica stavkov in točk
 
 Množico vseh stavkov v MIR označimo s #stavki. Točke v grafu poteka označimo s #točke. Lahko so dveh tipov:
-- *na začetku stavka:* označuje trenutek preden se stavek izvede. Označimo s $S("stmt")$.
-- *med stavkom:* označuje trenutek tik preden ima stavek učinek (v članku napisano "just before the statement takes effect").
+- _na začetku stavka:_ označuje trenutek preden se stavek izvede. Označimo s $S("stmt")$.
+- _med stavkom:_ označuje trenutek tik preden ima stavek učinek (v članku napisano "just before the statement takes effect").
   Označimo z $M("stmt")$.
 
 Avtor spletne objave ne opredeli pojmov _na začetku stavka_ in _med stavkom_ natančno,
@@ -741,7 +741,7 @@ S tem razumevanjem lahko zdaj program ponazorimo v grafu.
 
 V @chap-osnovne-mnozice[poglavju] smo definirali osnovne množice nad katerimi bomo zdaj definirani različne relacije. Polonius je razdeljen na dva tipa relacij.
 
-*Začetna* #angl[input] relacija, je tista, ki jo dobimo že iz prejšnjih faz analize MIR-a. Predstavljajo izhodiščno točko za celo analizo in prevzamemo, da so že izračunane. Iz njih potem dobimo *izpeljane* relacije, ki so jedro Poloniusove analize ter njegova ključna inovacija.
+_Začetna_ #angl[input] relacija, je tista, ki jo dobimo že iz prejšnjih faz analize MIR-a. Predstavljajo izhodiščno točko za celo analizo in prevzamemo, da so že izračunane. Iz njih potem dobimo _izpeljane_ relacije, ki so jedro Poloniusove analize ter njegova ključna inovacija.
 
 === Začetna relacija vsebovanosti
 
@@ -1038,7 +1038,7 @@ Iz diagrama za #jevsebovana lahko potem izhajamo, da konstruiramo @ex-graph-zaht
 
 == Javljanje napake
 
-S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu javimo napako (v obsegu preverjalnika posoj). Že spet si pomagamo z relacijo, ki jo tokrat poimenujemo *relacija napake* (_error_) in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu.
+S pomočjo prejšnjih relacij lahko na koncu definiramo kje v programu javimo napako (v obsegu preverjalnika posoj). Že spet si pomagamo z relacijo, ki jo tokrat poimenujemo _relacija napake_ (_error_) in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu.
 
 Definiramo jo, ko velja:
 
