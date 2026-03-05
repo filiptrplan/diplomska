@@ -233,13 +233,9 @@ Rust ni bil prvi jezik, ki je uvedel pomnilniški model soroden regijskem upravl
 
 Polonius je bil prvotno formuliran v spletni objavi N. D. Matsakisa, kjer je poljudno pojasnil, kako bi Polonius naslovil problem starega NLL, in podal osnovno formulacijo v Datalogu @matsakisAliasbasedFormulationBorrow. Delo se je nato nadaljevalo v GitHub repozitoriju `rust-lang/polonius` @RustlangPolonius2025, kjer so to originalno formulacijo implementirali v Rustu.
 
-// TODO: prej omenjenem oxidu?
+Leta #cite(<stjernaModellingRustsReference2020>, form: "year") je Amanda Stjerna v svojem magistrskem delu podala prvo matematično formulacijo Poloniusa kot sistema tipov @stjernaModellingRustsReference2020. Ta formulacija je bila močno osnovana na Oxidu, saj sta si modela zelo podobna. V svojem delu je tudi opisala pravila za preverjevalnik posoj, ki jih kasneje v nalogi tudi opišemo in formaliziramo. Njeno delo se nadaljuje natančnejšim opisom Poloniusovega notranjega delovanja z vsemi podrobnostmi, potrebnimi za konkretno implementacijo. Kolikor vemo, je to delo eno izmed najbolj podrobnih in celovitih opisov Poloniusovega delovanja.
 
-Leta #cite(<stjernaModellingRustsReference2020>, form: "year") je Amanda Stjerna v svojem magistrskem delu podala prvo matematično formulacijo Poloniusa kot sistema tipov @stjernaModellingRustsReference2020. Ta formulacija je bila močno osnovana na prej omenjenemu Oxidu, saj sta si modela zelo podobna. V svojem delu je tudi opisala pravila za preverjevalnik posoj, ki jih kasneje v nalogi tudi opišemo in formaliziramo. Njeno delo se nadaljuje natančnejšim opisom Poloniusovega notranjega delovanja z vsemi podrobnostmi, potrebnimi za konkretno implementacijo. Kolikor vemo, je to delo eno izmed najbolj podrobnih in celovitih opisov Poloniusovega delovanja.
-
-// TODO: situacija pocasi spreminja?
-
-Trenutno še ne obstaja uradna specifikacija za Polonius, vendar se situacija počasi spreminja. Leta 2025 je bil Polonius implementiran v glavni veji Rustovega prevajalnika in je trenutno na zahtevo dostopen v `nightly` različici prevajalnika @ScalablePoloniusSupporta. Če pogledamo izvorno kodo prevajalnika, lahko vidimo da obstajata dve različici Poloniusa @RustlangRust2026: osnovna #angl[legacy] različica podobna prvotni implementaciji iz @RustlangPolonius2025 ter prilagojena #angl[alpha] različica, ki je nastala zaradi počasnega izvajanja osnovne različice. Prilagojena različica je napisana v Rustu in ne poskuša emulirati Dataloga, vendar ji manjkajo nekatere sposobnosti osnovne različice napisane v Datalogu @ScalablePoloniusSupporta.
+Trenutno še ne obstaja uradna specifikacija za Polonius, vendar se stanje počasi spreminja. Leta 2025 je bil Polonius implementiran v glavni veji Rustovega prevajalnika in je trenutno na zahtevo dostopen v `nightly` različici prevajalnika @ScalablePoloniusSupporta. Če pogledamo izvorno kodo prevajalnika, lahko vidimo da obstajata dve različici Poloniusa @RustlangRust2026: osnovna #angl[legacy] različica podobna prvotni implementaciji iz @RustlangPolonius2025 ter prilagojena #angl[alpha] različica, ki je nastala zaradi počasnega izvajanja osnovne različice. Prilagojena različica je napisana v Rustu in ne poskuša emulirati Dataloga, vendar ji manjkajo nekatere sposobnosti osnovne različice napisane v Datalogu @ScalablePoloniusSupporta.
 
 #show "amir": `a-mir-formality`
 
@@ -247,15 +243,15 @@ Pomanjkanje uradne specifikacije je problem, ki ga trenutno rešuje Rustova ekip
 
 #chapter[Rustov model upravljanja s pomnilnikom -- lastništvo]
 
-V @chap:motivacijski-primer[poglavju] smo s @listing:mot_ex[programom] predstavili primer, ki je motiviral nadgradnjo prejšnjega preverjevalnika izposoj NLL. Zraven smo podali intuitivno razlago, zakaj je ta program pravilen, vendar smo se nanašali na pravila, ki so osnovana na lastništvu -- Rustovem naboru pravil za zagotavljanja pomnilniško varnih programov.
+V @chap:motivacijski-primer[razdelku] smo s @listing:mot_ex[programom] predstavili primer, ki je motiviral nastanek Poloniusa. Zraven smo podali intuitivno razlago, zakaj je ta program varen, vendar smo se nanašali na pravila, ki so osnovana na lastništvu -- Rustovem naboru pravil za zagotavljanje pomnilniško varnih programov.
 
 Knjiga _The Rust Programming Language_, neuradni priročnik za Rust, nam pove, da lastništvo temelji na treh pravilih @klabnikRustProgrammingLanguage2023:
 
 + Vsaka vrednost v Rustu ima _lastnika_.
 + Za vsako vrednost lahko obstaja samo en lastnik hkrati.
-+ Ko lastnik izstopi#footnote[Napisano je _goes out of scope_] iz dosega, je vrednost sproščena #angl[dropped].
++ Ko lastnik ni več v dosegu, je vrednost sproščena #angl[dropped].
 
-Lastnik se tukaj nanaša na spremenljivko (bolj natančno _lvalue_), na katero je ta vrednost vezana. V @listing:ownership1[programu] opazimo, da vrednost `hello` enkrat zamenja lastnika, torej njen prvotni lastnik `a` potem ne vsebuje vrednosti. Če hočemo uporabiti `a` potem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
+Lastnik se tukaj nanaša na spremenljivko (bolj natančno lvalue), na katero je ta vrednost vezana. V @listing:ownership1[programu] opazimo, da vrednost `"hello"` enkrat zamenja lastnika, torej njen prvotni lastnik `a` potem več ne vsebuje vrednosti, saj je ta zdaj v lasti `b`. Če hočemo uporabiti `a` potem, ko ni več lastnik vrednosti, nam prevajalnik vrne napako.
 
 #figure(
   ```rust
@@ -266,7 +262,9 @@ Lastnik se tukaj nanaša na spremenljivko (bolj natančno _lvalue_), na katero j
   caption: [Primer napačnega lastništva],
 ) <listing:ownership1>
 
-Lastništvo je vezano na doseg. Koncept dosega lahko preprosto prikažemo z leksikalnim dosegom, tako da inicializiramo novo vrednost `a`-ja znotraj gnezdenega bloka, ki ustvari nov scope. To je prikazano v @listing:scope1[programu].
+// TODO: leksikalnim dosegom
+
+Lastništvo je vezano na doseg. Koncept dosega lahko preprosto ponazorimo z leksikalnim dosegom, tako da inicializiramo novo vrednost vezano na `a` znotraj gnezdenega bloka, ki ustvari nov doseg. To je prikazano v @listing:scope1[programu].
 
 #figure(
   ```rust
@@ -278,18 +276,28 @@ Lastništvo je vezano na doseg. Koncept dosega lahko preprosto prikažemo z leks
   caption: [Primer leksičnega dosega],
 ) <listing:scope1>
 
-V primerih 3 in 4 nismo videli bistvene razlike med Rustom ter sorodnimi jeziki, kot so C++. Razlika se pojavi v tem, kako se reference ustvarjajo in kako so razdeljene na dva različna tipa. Ko v Rustu govorimo o referencah, lahko rečemo, da so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da prevajalnik v Rustu poskrbi, da referenca v Rustu vedno kaže na veljavno vrednost pravega tipa -- in to skozi celotno življenjsko dobo te reference @klabnikRustProgrammingLanguage2023. Ta varnostni mehanizem nam omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: gotovost, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
+// TODO: zivljenjsko dobo te reference?
 
-V nadaljevanju bo MIR ključen, saj je ta oblika Rusta pomembna, ker nam bistveno poenostavi preverjanje izposoj in omogoča lažjo analizo. Prav tako je v MIR-u točno definiran pojem _mesta_ #angl[place], ki je eden izmed ključnih pojmov pri analizi pravilnosti programa. Mesto je izraz, ki nam opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. `_1`) ali pa njena projekcija (npr. polje strukture `_1.polje`) @MIRMidlevelIR.
+V primerih 3 in 4 nismo opazili bistvene razlike med Rustom ter sorodnimi jeziki, kot sta C in C++. Razlika se pojavi v načinu ustavrjanja referenc ter v njihovi delitvi na dva različna tipa. Rustove reference so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da Rustov prevajalnik poskrbi, da referenca vedno kaže na veljavno vrednost pravega tipa -- in to skozi celotno življenjsko dobo te reference @klabnikRustProgrammingLanguage2023. Ta varnostni mehanizem nam omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: zagotovilo, da reference "ne visijo v prazno" ter da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
 
-Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc @crichtonGroundedConceptualModel2023 @yanovskiGhostCellSeparatingPermissions2021 @weissOxideEssenceRust2019. Prva vrsta so _deljene in zato nespremenljive reference_ #angl[shared references]. Takih je lahko hkrati več in vse lahko kažejo na isto mesto v pomnilniku. Pravilo, ki zagotavlja, da so take deljene reference varne, pravi, da podatkov na tem mestu ne smemo spreminjati. Druga vrsta pa so _spremenljive reference_ #angl[mutable / unique references]. Pri teh se pravila ravno obrnejo: lahko imamo zgolj eno tako referenco, zato pa lahko spreminjamo podatke na pomnilniškem mestu, ki ga referencira (preko spremenljive reference, ne preko prvotne spremenljivke).
+V preostanku naloge ima MIR osrednjo vlogo, saj Rusta bistveno poenostavi preverjanje izposoj in omogoča lažjo analizo. Prav tako je v okviru MIRa točno definiran pojem _mesta_ #angl[place], ki je eden izmed ključnih pojmov pri analizi pomnilniške varnosti programa. Mesto je izraz, ki nam opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. `oseba`) ali pa njena projekcija (npr. polje strukture `oseba.starost`) @MIRMidlevelIR.
 
-#remark(title: "Teorija za referencami")[
-  Tovrsten tip omejevanja ustvarjanja referenc se imenuje _aliasing XOR mutability_. Ta model s pomočjo tipov
-  poveže podatke z dovoljenjimi operacijami, ki jih lahko izvajamo na teh podatkih @yanovskiGhostCellSeparatingPermissions2021.
-]
+Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc @crichtonGroundedConceptualModel2023 @yanovskiGhostCellSeparatingPermissions2021 @weissOxideEssenceRust2019. Delimo jih lahko na dveh oseh: spremenljive oz. nespremenljive ali unikatne oz. deljene. Ker slednja delitev bolje ponazori omejitve pri ustvarjanju referenc, bomo uporabljali naslednjo terminologijo:
 
-Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Najprej bomo pokazali pravilno in nepravilno uporabo deljene reference nato pa še spremenljive.
+/ Deljene reference #angl[shared references]: Ker s tem tipom želimo ustvariti več referenc na isto pomnilniško mesto, morajo biti tudi zato _nespremenljive_ #angl[immutable], kar pomeni, da podatkov na tem mestu ne smemo spreminjati. To pravilo mora veljati, da je uporaba tovrstnih referenc varna
+
+/ Unikatne reference #angl[unique references]: Občasno želimo tudi spreminjati vrednost na katero kaže referenca preko te reference. Zato uvedemo unikatne reference, ki so tudi posledično _spremenljive_ #angl[mutable]. Pravilo, ki ohranja pomnilniško varnost se glasi: če obstaja unikatna referenca na pomnilniško mesto, na to mesto ne sme kazati nobena druga aktivna referenca (deljena ali unikatna). Aktivnost reference tukaj pomeni isto kot aktivnost spremenljivke.
+
+_Opomba:_ V Rustovski terminologiji se ponavadi reference ne ločijo po isti osi. Ponavadi jih delimo na deljene ter nespremenljive reference.
+
+// #remark(title: "Teorija za referencami")[
+//   Tovrsten tip omejevanja ustvarjanja referenc se imenuje _aliasing XOR mutability_. Ta model s pomočjo tipov
+//   poveže podatke z dovoljenjimi operacijami, ki jih lahko izvajamo na teh podatkih @yanovskiGhostCellSeparatingPermissions2021.
+// ]
+
+Programi 5-8 ponazorijo pravilno ter nepravilno uporabo različnih tipov referenc. Če prvo obravnavamo programa 5 in 6, vidimo kako se pravilo o nespremenljivosti izrazi v kodi. Če bi v @lst:uporabadeljena[programu] po izpisu dodali še vrstico `*b = 7` (pisanje preko reference), bi nam prevajalnik vrnil napako zaradi kršitve zagotovila o preprečitvi branja.
+
+V programih 7 in 8 prav tako opazimo, da če bi poskusili izpisati spremenljivko `a`, ki je bila spremenljivo izposojena v @lst:uporabaspremenljiva[programu], bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali lastnika vrednosti in njeno spremenljivo referenco.
 
 #figure(
   ```rust
@@ -331,17 +339,12 @@ Poglejmo si primera uporabe takih referenc in njuno ključno razliko. Najprej bo
   caption: [Napačna uporaba spremenljive reference - hkratna uporaba lastnika],
 ) <lst:napacnaspremenljiva>
 
-Nekatere druge operacije pri obeh primerih bi vrnile napako zaradi kršitve pravil referenc (pisanje, kjer je dovoljeno samo branje ter ustvarjanje nove reference, kjer je že ustvarjena spremenljiva). Torej, če bi v @lst:uporabadeljena[programu] po izpisu dodali še vrstico `*b = 7;` (pisanje preko reference), bi nam prevajalnik vrnil napako zaradi kršitve zagotovila o preprečitvi branja. Prav tako če bi poskusili izpisati spremenljivko `a`, ki je bila spremenljivo izposojena v @lst:uporabaspremenljiva[programu], bi bil program zavrnjen, saj prevajalnik prepreči, da bi hkrati uporabljali lastnika vrednosti in njeno spremenljivo referenco.
 
 
 
-To razmerje med obema vrstama referenc -- večkratne nespremenljive ali pa ena sama spremenljiva -- lahko strnemo v načelo, ki ga angleško imenujemo _aliasing XOR mutability_. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več mestih hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le ena referenca. Model torej na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov @yanovskiGhostCellSeparatingPermissions2021.
+To razmerje med obema vrstama referenc -- večkratne nespremenljive ali pa ena sama spremenljiva -- lahko strnemo v načelo, ki ga angleško imenujemo _aliasing XOR mutability_. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več mestih hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo; ali pa jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le ena referenca. Model tako na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov @yanovskiGhostCellSeparatingPermissions2021.
 
-Pravila o referencah lahko povzamemo z dvema praviloma @klabnikRustProgrammingLanguage2023
-+ Hkrati je lahko ustvarjena _ali_ ena spremenljiva referenca _ali_ poljubno število deljenih referenc.
-+ Reference morajo biti vedno veljavne (kazati na veljavno mesto).
-
-Še ena podrobnost, ki je pomembna za razumevanje lastništva, so _življenjske dobe_ #angl[lifetimes]. Te so v Rustu sestavni del tipov. Kot sami tipi v Rustu, so ponavadi izpeljane, vendar se pogosto pri podpisu funkcije zgodi, da jih moramo eksplicitno podati. Na primer, dejanski tip reference na niz ni `&String` ampak `&'a String`, kjer je `'a` življenjska doba. Pomembno je tudi omeniti, da so življenjske dobe del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna @klabnikRustProgrammingLanguage2023. Najlažje to predstavimo s @lst:lifetime-annotate[programom].
+Še ena podrobnost, ki je pomembna za razumevanje lastništva, so _življenjske dobe_ #angl[lifetimes], ki so v Rustu sestavni del tipov. Kot sami tipi v Rustu so ponavadi izpeljane, vendar se pogosto pri podpisu funkcije zgodi, da jih moramo eksplicitno pripisati. Na primer, dejanski tip reference na niz ni `&String` ampak `&'a String`, kjer je `'a` življenjska doba. Življenjske dobe pa so del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer ta referenca mora biti veljavna @klabnikRustProgrammingLanguage2023. Koncept življenjskih dob kot nabor vrstic predstavimo s @lst:lifetime-annotate[programom].
 
 
 #figure(
@@ -360,7 +363,7 @@ Pravila o referencah lahko povzamemo z dvema praviloma @klabnikRustProgrammingLa
   caption: [Pripisane življenjske dobe],
 ) <lst:lifetime-annotate>
 
-Prevajalnik nam pri @lst:lifetime-annotate[programu] vrne napako, saj je spremenljivka `x` veljavna samo za življenjsko dobo `'b`, vendar prevajalnik zahteva, da je veljavna za `'a`. Izračun življenjskih dob je odvisen od implementacije preverjevalnika izposoj, vendar si jih lahko intuitivno predstavljamo kot najmanjšo množico vrstic, kjer bo ta spremenljivka oz. mesto še uporabljeno.
+Prevajalnik nam pri @lst:lifetime-annotate[programu] vrne napako, saj je spremenljivka `x` veljavna samo za življenjsko dobo `'b`, vendar prevajalnik zahteva, da je veljavna za `'a`, saj se uporabi pri izpisu na zaslon. V gnezdenem bloku efektivno dodelimo tipu `&'a i32` vrednost tipa `&'b i32`, vendar slednja ni podtip prve, saj je nabor vrstic `'b`-ja striktna podmnožica `'a`-jevega nabora. Izračun življenjskih dob je odvisen od implementacije preverjevalnika izposoj, vendar si jih lahko intuitivno predstavljamo kot najmanjšo množico vrstic, kjer bo ta spremenljivka oz. mesto še uporabljeno.
 
 // intuicija glede 2015 verzije borrow checkerja pred NLL: https://youtu.be/uCN_LRcswts?si=S2Ii5VHYF4X7HDo-&t=515
 // tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa
@@ -368,14 +371,12 @@ Prevajalnik nam pri @lst:lifetime-annotate[programu] vrne napako, saj je spremen
 
 #chapter[Formalizacija Poloniusa]
 
-V temu poglavju je najprej najprej predstavljen intuitivni opis delovanja Poloniusa in temu sledimo s formalnim opisom pravil Rustovega preverjevalnika izposoj. Nazadnje je predstavljeno delovanje Poloniusa z opisom na osnovi množic in relacij.
-
-Pomembno je še enkrat izpostaviti delo Stjerne, ki je bila velik navdih za našo formulacijo Poloniusa @stjernaModellingRustsReference2020. Njeno delo je sicer bolj osredotočeno na implementacijo in se primarno ukvarja tudi z izračunom aktivnosti regij, medtem ko naše je bolj osredotočeno na propagacijo omejitev, ki je sicer tudi opisana v njenem delu.
+V temu poglavju najprej predstavimo intuitivni opis delovanja Poloniusa in temu sledimo s formalnim opisom pravil Rustovega preverjevalnika izposoj. Nazadnje predstavimo formalizacijo Poloniusa z opisom na osnovi množic in relacij.
 
 == Intuitivna razlaga Poloniusa
 <chap:intuitivna-razlaga-poloniusa>
 
-Preden formalno predstavimo vse podrobnosti Poloniusa, je pomembno dobiti nekaj intuicije o njegovem delovanju, saj nam bo olajšala razumevanje zapletenih relacij in njihovih pravil, na katerih algoritem temelji. Naslednjo razlago smo prilagodili iz originalne spletne objave, ki je predstavila Polonius @matsakisAliasbasedFormulationBorrow. Delovanje bomo predstavili na @lst:intuition[programu], vendar brez natančnih opisov relacij in množic, ki nastopajo pri dejanski analizi.
+Preden formalno opišemo vse podrobnosti Poloniusa, je pomembno pridobiti nekaj intuicije o njegovem delovanju, saj nam bo olajšala razumevanje pravil, na katerih algoritem temelji. Naslednjo razlago smo prilagodili iz spletne objave, ki je prvotno predstavila Polonius @matsakisAliasbasedFormulationBorrow. Delovanje bomo ponazorili na @lst:intuition[programu], vendar brez natančnih opisov relacij in množic, ki nastopajo pri dejanski analizi.
 
 #figure(
   ```rust
@@ -393,27 +394,29 @@ Preden formalno predstavimo vse podrobnosti Poloniusa, je pomembno dobiti nekaj 
   caption: [Primer programa za Polonius iz @matsakisAliasbasedFormulationBorrow],
 ) <lst:intuition>
 
-@lst:intuition[Program] ima poleg tipov predpisane še _regije_, kot jih imenuje Polonius, ki si jih lahko predstavljamo kot življenjske dobe. Bolj podrobno pa so to množice _posoj_ #angl[loans], ki jih kasneje definirano natančno, za zdaj pa si jih lahko predstavljamo kot možne "izvore" #angl[origins] referenc (npr. `&x`, `&mut a.b`, itd.). Označene so s številkami `'0`, `'1`, `'2`, itd. Tukaj so prikazane kot del programa (npr. `&'3 mut v'`), vendar to ni veljavna sintaksa Rusta, je pa uporabna za razlago.
+// TODO: celo diplomsko poglej za unikatne / spremenljive reference
 
-Zdaj si oglejmo korake v programu, ki na koncu privedejo do napake :
+@lst:intuition[Program] ima poleg tipov predpisane še _regije_ #angl[regions], kot jih imenuje Polonius, ki si jih lahko predstavljamo kot življenjske dobe. Bolj podrobno pa so to množice _posoj_ #angl[loans], ki jih kasneje natančno definiramo, za zdaj pa si jih lahko predstavljamo kot možne "izvore" #angl[origins] referenc (npr. `&x`, `&mut a.b`, itd.). Reference so označene s številkami `'0`, `'1`, `'2`, itd. Tukaj so prikazane kot del programa, vendar to ni veljavna sintaksa Rusta, je pa uporabna za razlago.
 
-- Vrstica 3: Usvarimo vektor deljenih referenc `v`.
-- Vrstica 4: Ustvarimo spremenljivo referenco `r`, ki kaže na vektor `v`.
-- Vrstici 5 in 6: Deljeno referenco na `x` vstavimo v vektor `v` preko `r`.
-- Vrstici 7 in 8: Poskušamo spremeniti vrednost `x`.
+Oglejmo si korake v @lst:intuition[programu], ki na koncu privedejo do napake :
 
-Vendar v tem trenutku še vedno obstaja aktivna referenca na `x` v vektorju `v`, ki smo jo vstavili na vrstici 6. Vektor `v` še vedno potrebujemo v vrstici 8, torej javimo napako.
+- vrstica 3: Usvarimo vektor deljenih referenc `v`.
+- vrstica 4: Ustvarimo unikatno referenco `r`, ki kaže na vektor `v`.
+- vrstici 5 in 6: Deljeno referenco na `x` vstavimo v vektor `v` preko `r`.
+- vrstici 7 in 8: Poskušamo spremeniti vrednost `x`.
+
+Vendar v vrstici 7 še vedno obstaja aktivna referenca na `x` v vektorju `v`, ki smo jo vstavili na vrstici 6. Vektor `v` še vedno potrebujemo v vrstici 8, torej javimo napako.
 
 #show "'a": `'a`
 #show "'b": `'b`
 
-Oglejmo si, kako se intuitivno razumevanje napake prenese na analizo, ki jo opravi Polonius. Lahko si predstavljamo, da algoritem 3-krat obhodi kodo. To sicer ni povsem res, saj se ti obhodi v implementaciji prekrivajo, vendar je za intuitivno razumevanje koristno.
+Oglejmo si, kako se intuitivno razumevanje napake prenese na analizo, ki jo opravi Polonius. Za lažje razumevanje si lahko predstavljamo, da algoritem trikrat obhodi kodo. To sicer ni povsem res, saj se ti obhodi v implementaciji prekrivajo, vendar je za koristno.
 
-Prvi obhod izračuna dva glavna elementa: vsebovanost regij in pripadnost posoj regijam.
+Prvi obhod izračuna dva glavna elementa: vsebovanost regij med sabo in pripadnost posoj regijam.
 
-Vsebovanost dveh regij se izračuna glede na pravila sklepanja Rustovega sistema tipov in jo zapišemo kot `'a: 'b`, kar pomeni da mora regija 'a vsebovati vse posoje iz regije 'b (intuitivno mora referenca z življenjsko dobo 'b živeti vsaj toliko dolgo kot 'a).
+Vsebovanost dveh regij se izračuna glede na pravila sklepanja Rustovega sistema tipov in jo zapišemo kot `'a: 'b`. To pomeni, da mora regija 'a vsebovati vse posoje iz regije 'b. Intuitivno, referenca z življenjsko dobo 'b mora živeti vsaj toliko dolgo kot 'a.
 
-Pripadnost posoje regijam se določi ob njeni ustvaritvi. V tem kontekstu pripadnost ne pomeni pripadnost množici vrstic, ki sestavljajo regijo v NLL-u, vendar kot dodaten metapodatek regije. Posoje so interne strukture v Rustovem prevajalniku, ki hranijo podatke o ustvarjeni referenci @weissOxideEssenceRust2019. Ko ustvarimo posojo z `&` ali `&mut`, se tej določi pripadnost glede na regijo, ki je del tipa.
+Pripadnost posoje regijam se določi ob ustvaritvi posoje. Posoje so interne strukture v Rustovem prevajalniku, ki hranijo podatke o ustvarjeni referenci @weissOxideEssenceRust2019. V temu kontekstu pripadnost regiji pomeni, da se posoja zapiše kot dodaten metapodatek regije. Ko ustvarimo posojo z `&` ali `&mut`, se tej določi pripadnost glede na regijo, ki je del tipa.
 
 Za boljše razumevanje teh dveh korakov se obrnemo na @lst:intuition2[primer], kjer sta v komentarjih anotirana ta dva koraka.
 
@@ -439,11 +442,11 @@ Za boljše razumevanje teh dveh korakov se obrnemo na @lst:intuition2[primer], k
   caption: [Primer programa za Polonius iz @matsakisAliasbasedFormulationBorrow],
 ) <lst:intuition2>
 
-#remark(title: "Zakaj na vrstici 6 ustvarimo dvosmerno vsebovanost?")[
+#remark(title: "Zakaj na vrstici 6 programa 11 ustvarimo dvosmerno vsebovanost?")[
   Če v vektor pišemo, kot na vrstici 10, morajo elementi "znotraj" reference živeti vsaj tako dolgo kot elementi v prvotnem vektorju. Zato dodamo vsebovanost `'2: '0`. Ker pa lahko iz vektorja tudi beremo, morajo elementi v prvotnem vektorju živeti vsaj tako dolgo kot tisti "znotraj" reference, saj sicer bi lahko brali neveljaven spomin. Tako dobimo še `'0: '2`.
 ]
 
-Drugi obhod propagira vsebovanosti iz prvega obhoda (saj lahko nanje gledamo kot relacijo matematične vsebovanosti, ki je tranzitivna), ter s tem tudi propagira pripadnost posoj. Če sledimo tranzitivnemu zaprtju vsebovanosti, lahko opazimo dve verigi:
+Drugi obhod razširi vsebovanosti iz prvega obhoda (saj lahko nanje gledamo kot relacijo matematične vsebovanosti, ki je tranzitivna), ter s tem tudi dodeli posoje večim regijam. Če sledimo tranzitivnemu zaprtju vsebovanosti, lahko opazimo dve verigi:
 
 - Za posojo `L0`: `'3: '1`
 - Za posojo `L1`: `'4: '5: '2: '0` (`'0: '2` tukaj ni tako pomembno)
@@ -454,7 +457,7 @@ Drugi obhod propagira vsebovanosti iz prvega obhoda (saj lahko nanje gledamo kot
   supplement: "Diagram",
 ) <fig:diagram-vsebovanosti>
 
-Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regije `'0`. Poleg propagiranja vsebovanosti, drugi obhod tudi določi aktivnost regij in posoj, vendar tukaj tega postopka ne bomo opisali. Povedali bomo samo, da Polonius izračuna, da sta regija `'0` in posledično posoja `L1` aktivni na vrstici 12 v @lst:intuition2[programu]. Pojma aktivnosti regij in posoj sta tukaj analogna pojmu aktivnosti spremenljivk pri prevajalnikih.
+Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regije `'0`. Poleg razširitve vsebovanosti, drugi obhod tudi določi aktivnost regij in posoj, vendar tukaj tega postopka ne bomo opisali. Povedali bomo samo, da Polonius izračuna, da sta regija `'0` in posledično posoja `L1` aktivni na vrstici 12 v @lst:intuition2[programu]. Pojma aktivnosti regij in posoj sta tukaj analogna pojmu aktivnosti spremenljivk pri prevajalnikih.
 
 
 #figure(
@@ -464,9 +467,9 @@ Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regije
 ) <fig:aktivnosti-regij>
 
 
-V tretjem obhodu nato javimo napako, ker operacija mutiranja spremenljivke `x` na vrstici 12 v @lst:intuition2[primeru] razveljavi pogoje posoje `L1`, ki je pa na tisti točki v programu še vedno živa. Razveljavitev pogojev posoje na kratko pomeni, da operacija ni dovoljena glede na tip reference. To so lahko npr. mutiranje mesta na katero kaže deljena referenca ali pa ustvarjanje nove reference na mesto, ko že obstaja spremenljiva referenca.
+V tretjem obhodu nato javimo napako, ker operacija mutiranja spremenljivke `x` na vrstici 12 v @lst:intuition2[primeru] razveljavi pogoje posoje `L1`, ki je pa na tisti točki v programu še vedno živa. Razveljavitev pogojev posoje na kratko pomeni, da operacija ni dovoljena glede na tip reference, ki je ustvarila posojo. To so lahko npr. mutiranje mesta na katero kaže deljena referenca ali pa ustvarjanje nove reference na mesto, ko že obstaja unikatna referenca.
 
-V intuitivni razlagi smo izpustili več podrobnosti, kot je izračun aktivnosti regij in posoj, podrobnosti propagacije različnih vsebovanosti skozi program in pogoje za ustvarjanje raznih drugih omejitev #angl[constraints]. Prav tako je pomembno omeniti, da analiza deluje na MIR, ki je osnovan na podatkovni strukturi grafa, ne pa na samih vrsticah v programu.
+V intuitivni razlagi smo izpustili številne podrobnosti, kot so izračun aktivnosti regij in posoj, podrobnosti razširitve različnih vsebovanosti skozi program ter pogoje za ustvarjanje raznih drugih omejitev #angl[constraints]. Pomembno je tudi vedeti, da analiza deluje na MIR, ki je v prevajalniku predstavljen kot graf, ne pa na samih vrsticah v izvorni kodi programa.
 
 == Formalizacija pravil
 
