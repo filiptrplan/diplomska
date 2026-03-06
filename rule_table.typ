@@ -12,7 +12,7 @@
   #codly(display-name: false, display-icon: false, number-format: none)
   #figure(
     kind: table,
-    table(
+    scale(70%, table(
       columns: (1fr, 1fr),
       align: (left, left),
 
@@ -194,7 +194,7 @@
         let z = x.0;
         ```
       },
-    ),
+    )),
     caption: [Pravila preverjevalnika izposoj iz @stjernaModellingRustsReference2020. Pozitivni primeri predstavljajo mesta, kjer preverjevalnik sprejme kodo, negativni pa kjer jo zavrne.],
   ) <tab:borrow-check>
 ]
