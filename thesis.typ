@@ -475,9 +475,9 @@ V intuitivni razlagi smo izpustili številne podrobnosti, kot so izračun aktivn
 
 == Formalizacija pravil
 
-Zaradi pomanjkanja uradne specifikacije pravil se bomo zanesli na delo Amande Stjerne @stjernaModellingRustsReference2020, kjer je opisno in s tabelo predstavila pravila, ki se jih mora preverjevalnik izposoj držati. Njena pravila bomo nadgradili s formalno notacijo, ki je podobna tisti, ki jo bomo uporabljali v razdelkih 4.4 do 4.7.
+Zaradi pomanjkanja uradne specifikacije pravil se bomo oprli na delo Amande Stjerne @stjernaModellingRustsReference2020, kjer je s tabelo in opisom predstavila pravila, ki se jih mora preverjevalnik izposoj upoštevati. Njena pravila bomo nadgradili s formalno notacijo podobno tisti iz razdelkov 4.4 do 4.7.
 
-V @tab:borrow-check[tabeli] imamo podane pozitivne in negativne primere za vsako pravilo, kot jih je zastavila Stjerna. S pomočjo teh primerov in njene razlage bomo osnovali formalni zapis teh pravil. Vsa ta pravila delujejo na nivoju posamezne funkcije, ne pa celotnega programa.
+V @tab:borrow-check[tabeli] imamo podane pozitivne in negativne primere za vsako pravilo, kot jih je zastavila Stjerna. Na podlagi teh primerov in njene razlage bomo formalno zapisali ta pravila. Vsa ta pravila delujejo na ravni posamezne funkcije, ne pa celotnega programa.
 
 #import "rule_table.typ": rule_table
 #rule_table
@@ -485,15 +485,15 @@ V @tab:borrow-check[tabeli] imamo podane pozitivne in negativne primere za vsako
 // reset codly stuff
 #codly(display-name: true, display-icon: true, number-format: numbering.with("1"))
 
-Pravilo Use-Init nam pove, da lahko uporabljamo samo spremenljivke, ki so zagotovo inicializirane na točki v programu, kjer jih uporabljamo. Skupaj s praviloma Move-Deinit, ki pravi da ne smemo uporaljati premaknjenih vrednosti, ter Ref-Live, ki nam onemogoči dostop do sproščenih vrednosti preko referenc, tvori osnovo za sistem lastništva. Ta pravila nam na primer preprečijo vračanje vrednosti, ki je bila ustvarjena na skladu, iz funkcije, saj je vrednost na izhodu iz funkcije sproščena @stjernaModellingRustsReference2020.
+Pravilo Use-Init nam pove, da lahko uporabljamo samo spremenljivke, ki so zagotovo inicializirane na točki v programu, kjer jih uporabljamo. Skupaj s praviloma Move-Deinit, ki pravi da ne smemo uporaljati premaknjenih vrednosti, ter Ref-Live, ki nam onemogoči dostop do sproščenih vrednosti preko referenc, tvori osnovo za sistem lastništva. Ta pravila nam na primer preprečijo vračanje vrednosti, ustvarjeno na skladu, saj je ta na izhodu iz funkcije že sproščena @stjernaModellingRustsReference2020.
 
-Za formalizacijo pravil se bomo zanašali na _graf poteka_ (_angl. CFG - control flow graph_), ki je izračunan v fazah analize kode, ki so opravljene še preden se začne preverjevalnik izposoj. Zgrajen je iz osnovnih blokov, ti pa so zgrajeni iz stavkov. Vozlišča v samem grafu si lahko predstavljamo kot posamezne stavke, vendar jih kasneje v nalogi definiramo bolj podrobno.
+Pri formalizaciji pravil bomo izhajali iz _grafa poteka_ (_angl. CFG - control flow graph_), ki ga prevajalnik konstruira, še preden se začne faza preverjevalnika izposoj. Sestavljen je iz osnovnih blokov, ti pa iz stavkov. Vozlišča v samem grafu si lahko predstavljamo kot posamezne stavke, vendar jih kasneje v nalogi definiramo bolj podrobno.
 
 Da definiramo pravilo Use-Init moramo uvesti še dve množici ter en predikat:
 
-/ $"Poti"(p)$: Ta množica nam poda vse poti skozi graf poteka od začetka funkcije do trenutne točke $p$ v programu oz. grafu poteka. Te poti so statične, t.j. se ne spreminjajo glede na vrednosti spremenljivk med izvajanjem programa. Lahko si jih predstavljamo kot vse možne poti, po katerih bi lahko dosegli trenutno točko, če bi lahko poljubno spreminjali vhodne vrednosti in spremenljivke.
+/ $"Poti"(p)$: Ta množica nam poda vse poti skozi graf poteka od začetka funkcije do trenutne točke $p$ v programu oz. grafu poteka. Te poti so statične -- ne spreminjajo se glede na vrednosti spremenljivk med izvajanjem programa. Predstavljamo si jih kot vse možne poti do trenutne točke ob poljubnih vhodnih vrednostih in spremenljivkah.
 
-/ $"UporabljeneSpremenljivke"(p)$: Množica vsebuje vse spremenljivke, ki jih uporabimo na točki $p$. Uporaba je lahko branje iz ali pisanje v spremenljivko.
+/ $"UporabljeneSpremenljivke"(p)$: Množica vsebuje vse spremenljivke, ki jih uporabimo na točki $p$. Uporaba zajema branje iz spremenljivke ali pisanje vanjo.
 
 / $"Inicializirana"(pi, x, p)$: Predikat velja natanko tedaj, ko je spremenljivka $x$ skozi pot $pi$ definirana na točki $p$.
 
@@ -547,9 +547,9 @@ Da bomo lahko razumeli naslednja pravila, moramo definirati pojem posoje, ki je 
 Pojem izraza izsposoje pogosto uporabljajo Weiss idr. v svojem članku o formalizaciji podmnožice Rust-a. Njihov način uporabe se sklada z našo definicijo, ki se glasi:
 
 / Posoja #angl[loan]: #[
-    je interni konstrukt prevajalnika, ki hrani stanje o referenci in njenemu izvoru @weissOxideEssenceRust2019. V trenutni implementaciji preverjalnika izposoj je izposoja predstavljena kot urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer je:
+    je interni konstrukt prevajalnika, ki hrani podatke o referenci in njenem izvoru @weissOxideEssenceRust2019. V trenutni implementaciji preverjalnika izposoj je izposoja predstavljena kot urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer je:
     - `'a`: življenjska doba za katero je vrednost izposojena. To se nanaša na življenjske dobe kot
-      del Rustovega sistema tipov, ne pa kot množico izposoj, kot jih bomo definirali kasneje.
+      del Rustovega sistema tipov, ne pa na alternativno definicijo kasneje v nalogi, ki razume življenjske dobe kot množico izposoj.
     - `shared|uniq|mut`: tip izposoje
     - `lvalue`: vrednost, ki je bila izposojena
   ]
@@ -560,7 +560,7 @@ Pravili Shared-Readonly in Unique-Write skrbita za veljavnost referenc in omejit
 
 / $"PosojaAktivna"(L,p)$: Predikat velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$.
 
-Poleg predikatov za posojo pa nam še manjkajo predikati, ki opisujejo operacije, ki se izvajajo nad mesti. V prevajalniku je takih tipov operacij več , vendar mi jih bomo zajeli v dve glavni vrsti.
+Poleg predikatov za posojo potrebujemo še predikate, ki opisujejo operacije nad mesti. V prevajalniku je takih tipov operacij več, vendar mi jih bomo zajeli v dve glavni vrsti.
 
 / $"RazveljaviDeljeno"(m,p)$: Predikat velja natanko tedaj, ko se v točki $p$ nad mestom $m$ izvede taka operacija, ki bi lahko razveljavila deljeno posojo, ki si sposoja iz mesta $m$ (to bi bilo pisanje v mesto $m$ ali pa ustvarjanje spremenljive posoje).
 
@@ -595,7 +595,7 @@ $
 
 == Primer in formalizacija
 
-V naslednjih poglavjih se bomo lotili glavnega dela naloge, ki je matematična formalizacija delovanja Poloniusa. Da si bomo lažje predstavljali relacije in množice bomo celotno delovanje ponazorili na primeru iz @chap:intuitivna-razlaga-poloniusa[poglavja], ki ga bomo tukaj še enkrat prikazali.
+V naslednjih poglavjih se bomo lotili glavnega dela naloge, ki je matematična formalizacija delovanja Poloniusa. Da si bomo lažje predstavljali relacije in množice bomo celotno delovanje ponazorili na primeru iz @chap:intuitivna-razlaga-poloniusa[razdelka].
 
 #figure(
   ```rust
