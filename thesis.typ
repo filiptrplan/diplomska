@@ -594,7 +594,7 @@ To preprosto pomeni, da morajo biti vse predpone izvora $O$ aktivne posoje $L$ t
 
 == Primer in formalizacija
 
-V naslednjih poglavjih se bomo lotili glavnega dela naloge, ki je matematična formalizacija delovanja Poloniusa. Da si bomo lažje predstavljali relacije in množice bomo celotno delovanje ponazorili na primeru iz @chap:intuitivna-razlaga-poloniusa[razdelka].
+V naslednjih razdelkih se bomo lotili glavnega dela naloge, matematične formalizacije delovanja Poloniusa. Da si bomo lažje predstavljali relacije in množice, bomo celotno delovanje ponazorili na primeru iz @chap:intuitivna-razlaga-poloniusa[razdelka].
 
 #figure(
   ```rust
@@ -616,12 +616,12 @@ V naslednjih poglavjih se bomo lotili glavnega dela naloge, ki je matematična f
 == Osnovne množice in elementi
 <chap-osnovne-mnozice>
 
-Da sploh lahko matematično govorimo o delovanju Poloniusa, moramo definirati osnovne množice in elemente s katerimi bomo delali.
+Da lahko matematično govorimo o delovanju Poloniusa, moramo definirati osnovne množice in elemente s katerimi bomo delali.
 
 === Množica posoj #posoje
 <chap-mnozica-posoj>
 
-Množico vseh posoj (_angl. loans_) označimo s #posoje. _Pogoji posoje_ so lastnosti, ki morajo držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno. Pravimo, da _razveljavimo pogoje posoje_, če velja ena izmed naslednjih točk:
+Množico vseh posoj označimo s #posoje. _Pogoji posoje_ so lastnosti, ki morajo držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno. Pravimo, da _razveljavimo pogoje posoje_, če velja ena izmed naslednjih točk:
 - Referenca je deljena (_shared_), torej je oblike `&x` in
   - ustvarimo novo spremenljivo referenco _in/ali_
   - pišemo v mesto, ki je bilo izposojeno
@@ -1126,17 +1126,17 @@ Da si lažje predstavljamo kako se različne relacije povezujejo bomo tukaj prik
 
 #chapter("Zaključek")
 
-Ena izmed Rustovih glavnih prednosti je njegovo "brezplačno" #angl[zero-cost] upravljanje s pomnilnikom med izvajanjem programa. To nas sicer stane časa pri prevajanju zaradi preverjevalnika izposoj, ki določa kaj je smatrano kot pomnilniško varno, kaj pa se zavrne, ker bi lahko povzročalo nedoločeno obnašanje #angl[undefined behaviour].
+Ena izmed Rustovih glavnih prednosti je njegovo "brezplačno" #angl[zero-cost] upravljanje s pomnilnikom med izvajanjem programa. To nas sicer stane časa pri prevajanju zaradi preverjevalnika izposoj, ki določa, kaj velja kot pomnilniško varno in kaj se zavrne, ker bi lahko povzročalo nedoločeno obnašanje #angl[undefined behaviour].
 
-Trenutna implementacija preverjevalnika izposoj NLL je preveč konzervativna v nekaterih primerih in posledično zavrne varne programe, ki bi jih lahko sprejeli z bolj natančno analizo. Zato je #cite(<matsakisAliasbasedFormulationBorrow>, form: "author") v svoji spletni objavi zastavil Polonius, ki bolje sledi toku podatkov v programu in lahko sprejme te bolj kompleksne primere.
+Trenutna implementacija preverjevalnika izposoj NLL je v nekaterih primerih preveč konzervativna in posledično zavrne varne programe, ki bi jih lahko sprejeli z bolj natančno analizo @2094nllRustRFC. Zato je #cite(<matsakisAliasbasedFormulationBorrow>, form: "author") v svoji spletni objavi opisal Polonius, ki bolje sledi toku podatkov v programu in lahko sprejme te bolj kompleksne primere @matsakisAliasbasedFormulationBorrow.
 
-V nasprotju z NLL-om, ki je bi dokaj formalno definiran znotraj RFC dokumenta @2094nllRustRFC, je bila Poloniusova definicija že od začetka zelo neformalna in povezana z implementacijo. Napisan je bil v Datalogu, ki je podmnožica Prologa, nato pa v Rustu. Ekipa, ki ga je implementirala, se nikoli ni ukvarjala s točnim opisom njegovega delovanja in do pred kratkim je bil eden izmed edinih virov magistrska naloga Amande Stjerne @stjernaModellingRustsReference2020, ki je ena izmed razvijalcev Rusta. V zadnjem letu se je šele pojavil projekt imenovan `a-mir-formality`, ki hoče sestaviti uradno specifikacijo za Rustov sistem tipov in preverjevalnik izposoj (vključno s Poloniusom) @BorrowCheckingAmirformalityb.
+V nasprotju z NLL-om, ki je formalno definiran znotraj RFC dokumenta @2094nllRustRFC, je bila Poloniusova definicija že od začetka neformalna ter prepletena z implementacijo. Napisan je bil v Datalogu, ki je podmnožica Prologa, nato pa v Rustu. Ekipa, ki ga je implementirala, se nikoli ni ukvarjala s točnim opisom njegovega delovanja in do pred kratkim je bil eden redkih virov formalne specifikacije magistrska naloga Amande Stjerne @stjernaModellingRustsReference2020, ki je ena izmed razvijalcev Rusta. Šele v zadnjem letu se je pojavil projekt `a-mir-formality`, ki želi sestaviti uradno specifikacijo za Rustov sistem tipov in preverjevalnik izposoj (vključno s Poloniusom) @BorrowCheckingAmirformalityb.
 
-Cilj te naloge je bil formulirati alternativo Datalog implementaciji Poloniusa na formalen matematičen način, da bi omogočili lažje razumevanje tega kompleksnega sistema. To smo storili s pomočjo množic in relacij definiranih nad njimi. Osnovne množice, kot so #točke, #regije in #posoje, so predstavljale Rustove strukture v prevajalniku, s pomočjo katerih se definira začetne relacije, ki so dejstva, iz katerih izhaja celotna analiza.
+Cilj te naloge je bil formulirati alternativo Datalog implementaciji Poloniusa na formalen matematičen način, da bi omogočili lažje razumevanje tega kompleksnega sistema. To smo storili s pomočjo množic in relacij, definiranih nad njimi. Osnovne množice so predstavljale Rustove strukture v prevajalniku, s pomočjo katerih se definira začetne relacije, ki so dejstva, iz katerih izhaja celotna analiza.
 
-Te smo nadgradili z izpeljanimi relacijami, ki tvorijo jedro Poloniusovega delovanja. Začetno dejstvo #jevsebovanazacetno smo s pravili propagacije skozi graf in tranzitivnosti razširili v #jevsebovana in s pomočjo relacij, ki določajo aktivnost (#regijaaktivnana, #posojaaktivnana) definirali t.i. "glavno" relacijo #zahteva, ki nam je povedala katera regija kdaj zahteva, da so pogoji posoje veljavni. Vse relacije smo potem združili v končno relacjo #napaka, ki nam pove kje se nahaja napaka v programu (oz. kjer je ni).
+Te smo nadgradili z izpeljanimi relacijami, ki tvorijo jedro Poloniusovega delovanja. Začetna dejstva smo s pomočjo pravil o tranzitivnosti, aktivnosti ter propagaciji skozi graf razširili v končne relacije, s pomočjo katerih smo nazadnje definirali relacijo napake. Ta končna relacija je potem veljala natanko tedaj, ko bi na tisti točki v programu javili napako.
 
-Lahko bi rekli, da je ta formalizacija odveč, saj že Datalog pravila formalno definirajo delovanje Poloniusa. Vendar, če se spustimo v izvorno kodo implementacije, lahko vidimo, da je že začetnih relacij 18 @RustlangPolonius2026. Naša formalizacija poda poenostavljen način razumevanja delovanja algoritma iz matematičnega vidika. Sicer ni dosti močna, da bi lahko z njo dokazevali izreke ali leme, vendar nam poda trdno osnovo iz katere lahko gradimo razumevanje Rustovega preverjevalnika izposoj.
+Lahko bi rekli, da je ta formalizacija odveč, saj že Datalog pravila formalno definirajo delovanje Poloniusa. A če se spustimo v izvorno kodo implementacije, vidimo, da je že začetnih relacij 18 @RustlangPolonius2026. Naša formalizacija poda poenostavljen način razumevanja delovanja algoritma iz matematičnega vidika. Sicer ni dovolj močna, da bi lahko z njo dokazovali izreke ali leme, vendar nam poda trdno osnovo, iz katere lahko gradimo razumevanje Rustovega preverjevalnika izposoj.
 
 
 #pagebreak()
