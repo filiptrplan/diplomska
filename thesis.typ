@@ -127,7 +127,7 @@ V nadaljevanju bomo uporabljali dva podobna pojma. _Varen program_ je program, k
 
 Preverjevalnik izposoj se je med razvojem Rusta bistveno spremenil od svoje prvotne implementacije. Na začetku je bil preprost in zaradi svoje konzervativnosti pri zagotavljanju varnosti veliko varnih programov ni sprejel @2094nllRustRFC. Zato se je čez par let pojavila naslednja različica preverjevalnika, imenovana NLL #angl[non-lexical lifetimes], ki je rešila veliko pogostih problemov s prvotno različico. Vendar NLL še vedno ni sprejemal vseh varnih programov. Da bi to naslovili, so Rustovi razvijalci predlagali najnovejšo različico preverjevalnika, imenovano Polonius, ki drugače zastavi problem lastništva in tako sprejme še večji delež varnih programov @matsakisAliasbasedFormulationBorrow.
 
-NLL je bil natančno opisan v RFC-ju #angl[request for comment], kar je potem vodilo njegov razvoj. Polonius pa je nastal kot predlog na spletnem blogu enega izmed razvijalcev Rusta, kjer se je postopoma razvijal skozi nadaljne objave @PoloniusRevisitedPartb @PoloniusRevisitedPartc @WhatPoloniusPolonius. Celovit centraliziran formalen opis Poloniusa trenutno ne obstaja, imamo le nekaj spletnih objav, delni formalni opis v magistrskem delu enega izmed razvijalcev @stjernaModellingRustsReference2020, nedokončana knjiga na GitHubu @WhatPoloniusPolonius ter trenutna implementacija v Rustovem prevajalniku.
+NLL je bil natančno opisan v RFC-ju #angl[request for comment], kar je potem vodilo njegov razvoj. Polonius pa je nastal kot predlog na spletnem blogu enega izmed razvijalcev Rusta, kjer se je postopoma razvijal skozi nadaljne objave @PoloniusRevisitedPart @PoloniusRevisitedParta @WhatPoloniusPolonius. Celovit centraliziran formalen opis Poloniusa trenutno ne obstaja, imamo le nekaj spletnih objav, delni formalni opis v magistrskem delu enega izmed razvijalcev @stjernaModellingRustsReference2020, nedokončana knjiga na GitHubu @WhatPoloniusPolonius ter trenutna implementacija v Rustovem prevajalniku.
 
 Cilj te naloge je torej na svoj način formalizirati pravila, na katerih temelji Polonius. Najprej raziščemo pretekle poskuse formalizacije Rusta ter sorodne načine upravljanja s pomnilnikom. Sledi intuitivni opis Rustovih pravili izposojanja in nato formalni opis Poloniusovih inferenčnih pravil.
 
@@ -534,7 +534,7 @@ Da bomo lahko razumeli naslednja pravila, moramo definirati pojem posoje, ki je 
     #quote[An Rvalue is an expression that creates a value: in this case, the rvalue is a
       mutable borrow expression, which looks like `&mut <Place>`]
 
-    Rvalue je definiran z enumeratorjem `Rvalue` @RvalueRustc_middleMira. Izraz izposoje pa natančno predstavlja varianta `Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)`, ki ustvari referenco tipa `BorrowKind` na mesto `Place`.
+    Rvalue je definiran z enumeratorjem `Rvalue` @RvalueRustc_middleMir. Izraz izposoje pa natančno predstavlja varianta `Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)`, ki ustvari referenco tipa `BorrowKind` na mesto `Place`.
 
   ]
 
@@ -622,10 +622,10 @@ Da lahko matematično govorimo o delovanju Poloniusa, moramo definirati osnovne 
 <chap-mnozica-posoj>
 
 Množico vseh posoj označimo s #posoje. _Pogoji posoje_ so lastnosti, ki morajo držati v določeni točki programa, da smatramo posojo kot veljavno oz. aktivno. Pravimo, da _razveljavimo pogoje posoje_, če velja ena izmed naslednjih točk:
-- Referenca je deljena (_shared_), torej je oblike `&x` in
-  - ustvarimo novo spremenljivo referenco _in/ali_
+- Referenca je deljena in
+  - ustvarimo novo spremenljivo referenco _ali_
   - pišemo v mesto, ki je bilo izposojeno
-- Referenca je spremenljiva in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
+- Referenca je unikatna in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
 
 Ta pravila načeloma sledijo NLL-u, bolj formalno pa jih opisujejo pravila razveljavljanja posoje #angl[loan killed]. Iz NLL RFC-ja @2094nllRustRFC:
 
