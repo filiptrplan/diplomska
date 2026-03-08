@@ -479,7 +479,7 @@ Da lahko definiramo pravilo Use-Init, moramo uvesti še dve množici ter en pred
 
 Formalno zapisano pravilo se glasi:
 
-$ "Use-Init"(p) <==> \forall pi in "Poti"(p), m in "UporabljenaMesta"(p): "Inicializirana"(pi, m, p) $
+$ "Use-Init"(p) <==> forall pi in "Poti"(p), m in "UporabljenaMesta"(p): "Inicializirana"(pi, m, p) $
 
 Kot vsa druga pravila v tem razdelku ga beremo tako: "Če velja predikat $"Use-Init"(p)$ za vsako točko $p$ v funkciji, potem velja pravilo Use-Init in _ne_ javimo napake."
 
@@ -967,7 +967,7 @@ Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo n
 
 === Relacija aktivnosti posoje
 
-Relacija aktivnosti posoje #angl[loan live at] pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s $posojaaktivnana wsubset.eq posoje times točke$ in jo definiramo takrat, ko velja
+Relacija aktivnosti posoje #angl[loan live at] pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s $posojaaktivnana subset.eq posoje times točke$ in jo definiramo takrat, ko velja
 
 $ exists R in regije: (R, P) in regijaaktivnana and (R, L, P) in zahteva $
 
