@@ -529,11 +529,11 @@
   // --- Osnovni blok bb0 (Vstop in If pogoj) ---
   node((0, 0), [$S(s_1)$], name: <s1s>),
   edge(<s1s>, <s1m>, "-|>"),
-  node((0, 1), [$M(s_1):$ #raw("_2 = 1")], name: <s1m>), // x = 1
+  node((0, 1), [$M(s_1):$ #raw("_2 = const 1_i32")], name: <s1m>), // x = 1
   edge(<s1m>, <s2s>, "-|>"),
   node((0, 2), [$S(s_2)$], name: <s2s>),
   edge(<s2s>, <s2m>, "-|>"),
-  node((0, 3), [$M(s_2):$ #raw("switchInt(pogoj)")], name: <s2m>),
+  node((0, 3), [$M(s_2):$ #raw("switchInt(_1)")], name: <s2m>),
 
   node(
     enclose: (<s1s>, <s2m>),
@@ -548,14 +548,14 @@
   // --- Osnovni blok bb1 (True veja: x = 2) ---
   node((0, 5), [$S(s_3)$], name: <s3s>),
   edge(<s3s>, <s3m>, "-|>"),
-  node((0, 6), [$M(s_3):$ #raw("_2 = 2")], name: <s3m>),
+  node((0, 6), [$M(s_3):$ #raw("_2 = const 2_i32")], name: <s3m>),
   edge(<s3m>, <s4s>, "-|>"),
   node((0, 7), [$S(s_4)$], name: <s4s>),
   edge(<s4s>, <s4m>, "-|>"),
-  node((0, 8), [$M(s_4):$ #raw("goto")], name: <s4m>),
+  node((0, 8), [$M(s_4):$ #raw("goto -> bb2")], name: <s4m>),
 
   node(
-    enclose: (<s3s>, <s4m>),
+    enclose: (<s3s>, <s4m>, <s3m>),
     stroke: black,
     fill: gray.lighten(90%),
     inset: 10pt,
@@ -571,10 +571,14 @@
   edge(<s5m>, <s6s>, "-|>"),
   node((2, 7), [$S(s_6)$], name: <s6s>),
   edge(<s6s>, <s6m>, "-|>"),
-  node((2, 8), [$M(s_6):$ #raw("return")], name: <s6m>),
+  node((2, 8), [$M(s_6):$ #raw("_0 = const ()")], name: <s6m>), // y = x
+  edge(<s6m>, <s7s>, "-|>"),
+  node((2, 9), [$S(s_7)$], name: <s7s>),
+  edge(<s7s>, <s7m>, "-|>"),
+  node((2, 10), [$M(s_7):$ #raw("return")], name: <s7m>),
 
   node(
-    enclose: (<s5s>, <s6m>),
+    enclose: (<s5s>, <s7m>, <s6m>),
     stroke: black,
     fill: gray.lighten(90%),
     inset: 10pt,
