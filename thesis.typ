@@ -451,9 +451,7 @@ Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regije
 
 V tretjem obhodu nato javimo napako, ker operacija spreminjanja vrednosti spremenljivke `x` v vrstici 12 v @lst:intuition2[primeru] razveljavi pogoje posoje `L1`, ki je na tisti točki v programu še vedno živa. Razveljavitev pogojev posoje na kratko pomeni, da operacija ni dovoljena glede na tip reference, ki je ustvarila posojo. To so lahko na primer spreminjanje vrednosti mesta, na katero kaže deljena referenca, ali ustvarjanje nove reference na mesto, kjer že obstaja unikatna referenca.
 
-// TODO: poleg tega omenimo?
-
-V intuitivni razlagi smo izpustili številne podrobnosti, kot so izračun aktivnosti regij in posoj, podrobnosti razširitve različnih vsebovanosti skozi program ter pogoji za ustvarjanje drugih omejitev #angl[constraints]. Poleg tega omenimo, da analiza deluje na MIR, ki je v prevajalniku predstavljen kot graf, ne pa na samih vrsticah izvorne kode programa.
+V intuitivni razlagi smo izpustili številne podrobnosti, kot so izračun aktivnosti regij in posoj, podrobnosti razširitve različnih vsebovanosti skozi program ter pogoji za ustvarjanje drugih omejitev #angl[constraints]. Ob tem velja poudariti, da analiza deluje na MIR, ki je v prevajalniku predstavljen kot graf, ne pa na samih vrsticah izvorne kode programa.
 
 == Formalizacija pravil
 
@@ -523,11 +521,10 @@ Pojem izraza izposoje pogosto uporabljajo Weiss idr. v svojem članku o formaliz
 
 / Posoja #angl[loan]: #[
     Posoja je interni konstrukt prevajalnika, ki hrani podatke o referenci in njenem izvoru @weissOxideEssenceRust2019. V trenutni implementaciji preverjalnika izposoj je posoja predstavljena kot urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer je:
-    - `'a`: življenjska doba, za katero je vrednost izposojena. To se nanaša na življenjske dobe kot
+    - `'a`: Življenjska doba, za katero je vrednost izposojena. To se nanaša na življenjske dobe kot
       del Rustovega sistema tipov, ne pa na alternativno definicijo kasneje v nalogi, ki razume življenjske dobe kot množico izposoj.
-    // TODO: poglej, kaj je razlika med uniq in mut
-    - `shared|uniq|mut`: tip posoje
-    - `lvalue`: leva vrednost, ki je bila izposojena
+    - `shared|uniq|mut`: To je tip posoje. Tipa posoje `uniq` in `mut` sta identična, vendar `uniq` ne pusti spreminjanja svojih referentov. Naša terminologija unikatne reference se sklada s tipom `mut`.
+    - `lvalue`: Leva vrednost, ki je bila izposojena.
   ]
 
 Torej bomo v našem zapisu posoje zapisovali kot $L = (alpha, tau, O)$, kjer bo $tau in {"uniq", "shrd", "mut"}$ predstavljal tip posoje, $O$ pa levo vrednost (oziroma _izvor_ z Rustovsko terminologijo).
@@ -557,8 +554,6 @@ $
 $
 
 Pravilo Shared-Readonly na točki $p$ torej velja, ko ne obstaja taka posoja $L = ("_", tau, O)$, ki je aktivna in katere izvor $O$ se prekriva z mestom $m$, nad katerim smo ravno izvedli operacijo, ki bi razveljavila deljeno posojo. Podobno razložimo pravilo Unique-Write.
-
-// TODO: dropped?
 
 Za zadnje pravilo potrebujemo še en predikat.
 
@@ -760,8 +755,6 @@ Začetno relacijo vsebovanosti #angl[base subset] označimo z $jevsebovanazacetn
 Natančneje, če velja $(R_1, R_2, P) in jevsebovanazacetno$ pomeni, da je $R_1$ podmnožica regije $R_2$ na točki $P$ v programu. Ker so regije potenčne množice posoj, si lahko relacijo razložimo tako, da regija $R_1$ vsebuje vse posoje, ki jih vsebuje $R_2$, zato $R_2$ inducira več omejitev na uporabi mest, ki so sposojena. Relacija mora veljati na sredini stavka ($M("stmt")$), ki inducira njen nastanek. Na primer, zapišemo $('2, '1, P) in jevsebovanazacetno$ na sredini stavka `let a: &'1 i32 = &'2 b;`.
 
 _Opomba:_ Oznaka `<:` predstavlja vsebovanost med tipi (_subtyping relation_).
-
-// TODO: veljavna ali aktivna?
 
 #remark(title: "Povezava z NLL")[
   V NLL so regije predstavljene kot množice točk oziroma stavkov, kjer je vrednost, ki vsebuje regijo v svojem tipu, veljavna. Torej `'a: 'b` pomeni, da mora biti `'a` veljavna vsaj toliko časa kot `'b`. V angleščini bi temu rekli _'a outlives 'b_. Drugače povedano, množica točk 'b bi bila podmnožica 'a, kar pa je ravno obratno zapisano kot v Poloniusu. Ključna razlika je, da so regije v Poloniusu množice posoj, ne pa točk. Intuitivno lahko rečemo, da vsaka nova posoja prinese dodatne omejitve k uporabi in ustvarjanju referenc. Zato je smiselno, da je v Poloniusu regija `'a` podmnožica regije `'b`, saj mora vsebovati _vsaj_ vse omejitve, ki jih mora upoštevati `'b`.
