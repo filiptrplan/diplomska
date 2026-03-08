@@ -397,7 +397,7 @@ Preden formalno opišemo vse podrobnosti Poloniusa, je pomembno pridobiti nekaj 
 
 // TODO: celo diplomsko poglej za unikatne / spremenljive reference
 
-@lst:intuition[Program] ima poleg tipov predpisane še _regije_ #angl[regions], kot jih imenuje Polonius, ki si jih lahko predstavljamo kot življenjske dobe. Bolj podrobno pa so to množice _posoj_ #angl[loans], ki jih kasneje natančno definiramo, za zdaj pa si jih lahko predstavljamo kot možne "izvore" #angl[origins] referenc (npr. `&x`, `&mut a.b`, itd.). Reference so označene s številkami `'0`, `'1`, `'2`, itd. Tukaj so prikazane kot del programa, vendar to ni veljavna sintaksa Rusta, je pa uporabna za razlago.
+@lst:intuition[Program] ima poleg tipov predpisane še _regije_ #angl[regions], ki si jih lahko predstavljamo kot življenjske dobe. Bolj podrobno so to množice _posoj_ #angl[loans], ki jih kasneje natančno definiramo, za zdaj pa si jih lahko predstavljamo kot možne izvore #angl[origins] referenc (npr. `&x`, `&mut a.b`, itd.). Reference so označene s številkami `'0`, `'1`, `'2`, itd. Tukaj so prikazane kot del programa, vendar to ni veljavna sintaksa Rusta, je pa uporabna za razlago.
 
 Oglejmo si korake v @lst:intuition[programu], ki na koncu privedejo do napake :
 
@@ -443,14 +443,14 @@ Za boljše razumevanje teh dveh korakov se obrnemo na @lst:intuition2[primer], k
   caption: [Primer programa za Polonius iz @matsakisAliasbasedFormulationBorrow],
 ) <lst:intuition2>
 
-#remark(title: "Zakaj na vrstici 6 programa 11 ustvarimo dvosmerno vsebovanost?")[
-  Če v vektor pišemo, kot na vrstici 10, morajo elementi "znotraj" reference živeti vsaj tako dolgo kot elementi v prvotnem vektorju. Zato dodamo vsebovanost `'2: '0`. Ker pa lahko iz vektorja tudi beremo, morajo elementi v prvotnem vektorju živeti vsaj tako dolgo kot tisti "znotraj" reference, saj sicer bi lahko brali neveljaven spomin. Tako dobimo še `'0: '2`.
+#remark(title: "Zakaj v vrstici 6 programa 11 ustvarimo dvosmerno vsebovanost?")[
+  Če v vektor pišemo, kot v vrstici 10, morajo elementi "znotraj" reference živeti vsaj tako dolgo kot elementi v prvotnem vektorju. Zato dodamo vsebovanost `'2: '0`. Ker pa lahko iz vektorja tudi beremo, morajo elementi v prvotnem vektorju živeti vsaj tako dolgo kot tisti "znotraj" reference, saj bi sicer lahko brali neveljaven spomin. Tako dobimo še `'0: '2`.
 ]
 
 Drugi obhod razširi vsebovanosti iz prvega obhoda (saj lahko nanje gledamo kot relacijo matematične vsebovanosti, ki je tranzitivna), ter s tem tudi dodeli posoje večim regijam. Če sledimo tranzitivnemu zaprtju vsebovanosti, lahko opazimo dve verigi:
 
-- Za posojo `L0`: `'3: '1`
-- Za posojo `L1`: `'4: '5: '2: '0` (`'0: '2` tukaj ni tako pomembno)
+- Za posojo `L0`: `'3: '1` in
+- za posojo `L1`: `'4: '5: '2: '0` (`'0: '2` tukaj ni tako pomembno).
 
 #figure(
   align(center)[#diagram-vsebovanosti-intuition2],
@@ -458,7 +458,7 @@ Drugi obhod razširi vsebovanosti iz prvega obhoda (saj lahko nanje gledamo kot 
   supplement: "Diagram",
 ) <fig:diagram-vsebovanosti>
 
-Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regije `'0`. Poleg razširitve vsebovanosti, drugi obhod tudi določi aktivnost regij in posoj, vendar tukaj tega postopka ne bomo opisali. Povedali bomo samo, da Polonius izračuna, da sta regija `'0` in posledično posoja `L1` aktivni na vrstici 12 v @lst:intuition2[programu]. Pojma aktivnosti regij in posoj sta tukaj analogna pojmu aktivnosti spremenljivk pri prevajalnikih.
+Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regije `'0`. Poleg razširitve vsebovanosti drugi obhod tudi določi aktivnost regij in posoj, vendar tukaj tega postopka ne bomo opisali. Povedali bomo samo, da Polonius izračuna, da sta regija `'0` in posledično posoja `L1` aktivni v vrstici 12 v @lst:intuition2[programu]. Pojma aktivnosti regij in posoj sta tukaj analogna pojmu aktivnosti spremenljivk pri prevajalnikih.
 
 
 #figure(
@@ -468,17 +468,17 @@ Osredotočimo se na posojo `L1`, ki je na koncu drugega obhoda pripadnica regije
 ) <fig:aktivnosti-regij>
 
 
-V tretjem obhodu nato javimo napako, ker operacija mutiranja spremenljivke `x` na vrstici 12 v @lst:intuition2[primeru] razveljavi pogoje posoje `L1`, ki je pa na tisti točki v programu še vedno živa. Razveljavitev pogojev posoje na kratko pomeni, da operacija ni dovoljena glede na tip reference, ki je ustvarila posojo. To so lahko npr. mutiranje mesta na katero kaže deljena referenca ali pa ustvarjanje nove reference na mesto, ko že obstaja unikatna referenca.
+V tretjem obhodu nato javimo napako, ker operacija spreminjanja vrednosti spremenljivke `x` v vrstici 12 v @lst:intuition2[primeru] razveljavi pogoje posoje `L1`, ki je pa na tisti točki v programu še vedno živa. Razveljavitev pogojev posoje na kratko pomeni, da operacija ni dovoljena glede na tip reference, ki je ustvarila posojo. To so lahko npr. spreminjanje vrednosti mesta, na katero kaže deljena referenca, ali pa ustvarjanje nove reference na mesto, ko že obstaja unikatna referenca.
 
 // TODO: poleg tega omenimo?
 
-V intuitivni razlagi smo izpustili številne podrobnosti, kot so izračun aktivnosti regij in posoj, podrobnosti razširitve različnih vsebovanosti skozi program ter pogoje za ustvarjanje raznih drugih omejitev #angl[constraints]. Poleg tega omenimo, da analiza deluje na MIR, ki je v prevajalniku predstavljen kot graf, ne pa na samih vrsticah v izvorni kodi programa.
+V intuitivni razlagi smo izpustili številne podrobnosti, kot so izračun aktivnosti regij in posoj, podrobnosti razširitve različnih vsebovanosti skozi program ter pogoji za ustvarjanje raznih drugih omejitev #angl[constraints]. Poleg tega omenimo, da analiza deluje na MIR, ki je v prevajalniku predstavljen kot graf, ne pa na samih vrsticah v izvorni kodi programa.
 
 == Formalizacija pravil
 
-Cilj preverjevalnika izposoj je zadostiti pravilom lastništva. Ta pravila so ponavadi podana intuitivno ali pa na primerih, kar je težko rigorozno implementirati v prevajalniku. Zaradi pomanjkanja uradne specifikacije pravil se bomo oprli na delo Amande Stjerne @stjernaModellingRustsReference2020, kjer je s tabelo in opisom predstavila pet pravil.
+Cilj preverjevalnika izposoj je zadostiti pravilom lastništva. Ta pravila so ponavadi opisana intuitivno ali s primeri, kar je v prevajalniku težko formalno zajeti. Zaradi pomanjkanja uradne specifikacije se bomo oprli na delo Amande Stjerne @stjernaModellingRustsReference2020, v katerem pet pravil predstavi s tabelo in razlago.
 
-V @tab:borrow-check[tabeli] imamo podane pozitivne in negativne primere za vsako pravilo, kot jih je zastavila Stjerna. Na podlagi teh primerov in njene razlage bomo formalno zapisali ta pravila z matematično notacijo. Vsa ta pravila delujejo na ravni posamezne funkcije, ne pa celotnega programa.
+V @tab:borrow-check[tabeli] imamo podane pozitivne in negativne primere za vsako pravilo, kot jih je predstavila Stjerna. Na podlagi teh primerov in njene razlage bomo formalno zapisali ta pravila z matematično notacijo. Vsa ta pravila delujejo na ravni posamezne funkcije, ne pa celotnega programa.
 
 #import "rule_table.typ": rule_table
 #rule_table
