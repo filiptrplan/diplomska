@@ -537,7 +537,7 @@ V našem zapisu bomo torej posoje zapisovali kot $L = (alpha, tau, O)$, kjer bo 
 
 Pravili Shared-Readonly in Unique-Write skrbita za veljavnost referenc in omejujeta njihovo uporabo. To sta isti pravili, ki smo ju opisali v @chap:intuitivna-razlaga-poloniusa[razdelku]. Pred opisom pravil moramo definirati še nekaj dodatnih predikatov.
 
-/ $"PosojaAktivna"(L,p)$: Predikat velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$.
+/ $"PosojaAktivna"(L,p)$: Predikat velja natanko tedaj, ko je posoja $L$ aktivna na točki $p$. Intuitivno je posoja aktivna, kadar jo na tej točki še potrebuje neka aktivna regija. Natančno zvezo med regijami in posojami bomo opredelili v @chap-relacija-zahteve[razdelku].
 
 Poleg predikata za aktivnost posoje potrebujemo še predikate, ki opisujejo operacije nad mesti. V prevajalniku je takih tipov operacij več, vendar jih bomo zajeli v dve glavni vrsti.
 
@@ -578,7 +578,7 @@ To preprosto pomeni, da morajo biti vse predpone izvora $O$ aktivne posoje $L$ t
 
 == Primer in formalizacija
 
-V naslednjih razdelkih se bomo lotili glavnega dela naloge, matematične formalizacije delovanja Poloniusa. Da si bomo lažje predstavljali relacije in množice, bomo celotno delovanje ponazorili na primeru iz @chap:intuitivna-razlaga-poloniusa[razdelka].
+V naslednjih razdelkih se bomo lotili glavnega dela naloge, matematične formalizacije delovanja Poloniusa. Da si bomo lažje predstavljali relacije in množice, bomo celotno delovanje ponazorili na @lst:intuition[programu] iz @chap:intuitivna-razlaga-poloniusa[razdelka].
 
 #figure(
   ```rust
@@ -593,7 +593,7 @@ V naslednjih razdelkih se bomo lotili glavnega dela naloge, matematične formali
   }
   fn take(p: T) { .. }
   ```,
-  caption: [Primer programa za Polonius iz @matsakisAliasbasedFormulationBorrow],
+  caption: [Primer programa za Polonius iz @matsakisAliasbasedFormulationBorrow. Ponovno prikazan program 10 za lažjo dostopnost.],
   placement: none,
 ) <lst:main-example>
 
