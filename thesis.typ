@@ -92,7 +92,7 @@
     The thesis provides a mathematical formalization of the new version of Rust's borrow checker using sets and relations in a simple and understandable manner.
   ],
   abstract_sl: [
-    Naloga zastavi matematično formalizacijo Poloniusa, preverjevalnika izposoj za programski jezik Rust. Posebnost Rusta je ta, da zagotovi pomnilniško varnost s pomočjo svojega sistema tipov in preverjevalnika izposoj ter s tem prevajalnik ne vpliva na izvajanje programa. Trenutna implementacija, imenovana NLL, je v nekaterih primerih preveč konzervativna, zato so razvijalci Rusta uvedli novo različico, imenovano Polonius, ki je osnovana na bolj natančni analizi toka podatkov. Polonius sicer nikjer ni uradno definiran, viri o njem so razpršeni, zato je cilj te naloge postaviti matematičen okvir, skozi katerega lahko razumemo to novo različico. Tega se lotimo z uporabo množic in izjav, tako da pravila, ki so bila zastavljena v raznih virih, opišemo s pomočjo predikatov ter pravil sklepanja. Končni izdelek je poenostavljen, vendar formalen, opis Poloniusa.
+    Naloga zastavi matematično formalizacijo Poloniusa, preverjevalnika izposoj za programski jezik Rust. Posebnost Rusta je njegov sistem tipov, ki prevajlniku z ustreznimi pravili o izposojevanju omogoča zagotavljanje pomnilniške varnosti že v času prevajanja. Trenutna implementacija preverjevalnika izposoj, imenovana NLL, je v nekaterih primerih preveč konzervativna, zato so razvijalci Rusta uvedli novo različico, imenovano Polonius, ki je osnovana na bolj natančni analizi toka podatkov. Polonius sicer nikjer ni uradno definiran, viri o njem so razpršeni, zato je cilj te naloge postaviti matematičen okvir, skozi katerega lahko razumemo to novo različico. Tega se lotimo z uporabo množic in izjav, tako da pravila, ki so bila zastavljena v raznih virih, opišemo s pomočjo predikatov ter pravil sklepanja. Končni izdelek je poenostavljen, vendar formalen opis Poloniusa.
   ],
   keywords_sl: "Rust, Polonius, preverjevalnik izposoj, formalizacija",
   abstract_en: [
@@ -120,17 +120,19 @@ Pomnilniška varnost #angl[memory safety] je na področju razvoja programske opr
 
 Eden najbolj razširjenih jezikov je C, kjer je upravljanje s pomnilnikom povsem prepuščeno programerju. Tovrsten pristop, imenovan ročno upravljanje s pomnilnikom, lahko vodi do izredno hitrih programov in krajših časov prevajanja v primerjavi z Rustom @glazarCodingRustBad2023, vendar je obenem tudi pogost vir napak @MemorySafetya.
 
-Alternativni pristop ročnemu upravljanju je avtomatsko upravljanje s pomnilnikom, kjer programski jezik zagotavlja varno dodeljevanje in sproščanje pomnilnika. S tem razbremeni programerja, ki se lahko osredotoči na pisanje programa. Vendar imajo jeziki z avtomatskim upravljanjem pomnilnika dve glavni slabosti: zaradi zakasnjenega sproščanja se pojavi večja poraba pomnilnika, obenem pa prihaja do premorov med izvajanjem programa ali zakasnitev ob vsaki operaciji, da lahko čistilec pomnilnika najde pomnilniške lokacije za sprostitev operaciji @bakerListProcessingReal1978.
+Alternativni pristop ročnemu upravljanju je avtomatsko upravljanje s pomnilnikom, kjer programski jezik zagotavlja varno dodeljevanje in sproščanje pomnilnika. S tem razbremeni programerja, ki se lahko osredotoči na pisanje programa. Vendar imajo jeziki z avtomatskim upravljanjem pomnilnika dve glavni slabosti: zaradi zakasnjenega sproščanja se pojavi večja poraba pomnilnika, obenem pa prihaja do premorov med izvajanjem programa ali zakasnitev ob vsaki operaciji, da lahko čistilec pomnilnika najde pomnilniške lokacije za sprostitev pomnilniških blokov @bakerListProcessingReal1978.
 
 Rust pristopa k upravljanju s pomnilnikom na drugačen način. Veljavnost dostopanja do pomnilniških lokacij se preverja med prevajanjem s pomočjo preverjevalnika izposoj #angl[borrow checker]. To je komponenta Rustovega prevajalnika, ki se ukvarja s tokom podatkov in pomnilniškimi lokacijami. Rust imenuje zbirko pravil, ki opisuje delovanje preverjevalnika izposoj, lastništvo #angl[ownership]. V knjigi _The Rust Programming Language_ avtorji lastništvo opišejo tako: _"Ownership is a set of rules that govern how a Rust program manages memory"_ @klabnikRustProgrammingLanguage2023. Tak pristop ima dve glavni prednosti: zagotavlja, da je program pomnilniško varen kot pri avtomatskem upravljanju s pomnilnikom, ter omogoča hitrost izvajanja programov, ki jo lahko dosežemo z ročnim upravljanjem pomnilnika @klabnikRustProgrammingLanguage2023. Pogosto omenjena slabost Rusta je dolg čas prevajanja @glazarCodingRustBad2023. Ta sicer ni odvisen samo od preverjevalnika izposoj, vendar njegov prispevek ni zanemarljiv.
 
 V nadaljevanju bomo uporabljali dva podobna pojma. _Varen program_ je program, ki ne povzroča pomnilniških napak. _Veljaven program_ pa je program, ki ustreza Rustovim pravilom lastništva in izposojanja. Cilj Rustovega prevajalnika je, da bi bili ti dve množici programov enaki. Ob predpostavki, da so Rustova pravila lastništva in izposojanja pravilna, je vsak veljaven program v Rustu tudi varen, zaradi neizračunljivosti pa žal vsak varen program v Rusti ni veljaven.
 
-Preverjevalnik izposoj, ki je hkrati definicija in implementacija pravil lastništva in izposojanja, se je med razvojem Rusta bistveno spremenil od svoje prvotne implementacije. Na začetku je bil preprost in zaradi svoje konzervativnosti pri zagotavljanju varnosti veliko varnih programov zavrnil @2094nllRustRFC. Zato se je čez nekaj let pojavila naslednja različica preverjevalnika, imenovana NLL #angl[non-lexical lifetimes], ki je rešila veliko pogostih problemov prvotne različice. Vendar NLL še vedno ni sprejemal vseh varnih programov. Da bi to izboljšali, so Rustovi razvijalci predlagali trenutno najnovejšo različico preverjevalnika, imenovano Polonius, ki drugače zastavi problem lastništva in tako sprejme še večji delež varnih programov @matsakisAliasbasedFormulationBorrow.
+Preverjevalnik izposoj, ki je glede na razvoj Rusta hkrati definicija in implementacija pravil lastništva in izposojanja, se je med razvojem Rusta bistveno spremenil od svoje prvotne implementacije. Na začetku je bil preprost in zaradi svoje konzervativnosti pri zagotavljanju varnosti veliko varnih programov zavrnil @2094nllRustRFC. Zato se je čez nekaj let pojavila naslednja različica preverjevalnika, imenovana NLL #angl[non-lexical lifetimes], ki je rešila veliko pogostih problemov prvotne različice. Vendar NLL še vedno ni sprejemal vseh varnih programov. Da bi to izboljšali, so Rustovi razvijalci predlagali trenutno najnovejšo različico preverjevalnika, imenovano Polonius, ki drugače zastavi problem lastništva in tako sprejme še večji delež varnih programov @matsakisAliasbasedFormulationBorrow.
 
 NLL je bil natančno opisan v RFC-ju #angl[request for comment], kar je potem vodilo njegov razvoj, Polonius pa je nastal kot predlog na spletnem blogu enega izmed razvijalcev Rusta, kjer se je postopoma razvijal skozi nadaljnje objave @PoloniusRevisitedPart @PoloniusRevisitedParta @WhatPoloniusPolonius. Celovit centraliziran formalen opis Poloniusa trenutno ne obstaja, imamo le nekaj spletnih objav, delni formalni opis v magistrskem delu enega izmed razvijalcev @stjernaModellingRustsReference2020, nedokončano knjigo na GitHubu @WhatPoloniusPolonius in trenutno implementacijo v Rustovem prevajalniku.
 
 Cilj te naloge je torej na svoj način formalizirati pravila, na katerih temelji Polonius. Najprej raziščemo pretekle poskuse formalizacije Rusta ter sorodne načine upravljanja s pomnilnikom. Sledi intuitivni opis Rustovih pravil izposojanja in nato formalni opis Poloniusovih inferenčnih pravil.
+
+V preostanku naloge od bralca pričakujemo osnovno znanje programskega jezika Rust. Ker Rust nima urardne specifikacije jezika se bomo tudi v prihodnje dostikrat sklicevali na izvorno kodo prevajalnika, ki trenutno služi kot edina avtoriteta o pravilnem delovanju Rusta. V tej nalogi uporabljamo različico prevajalnika `1.94.0`.
 
 == Motivacijski primer <chap:motivacijski-primer>
 
@@ -179,17 +181,17 @@ Za grajenje intuicije o razlikah med trenutno različico preverjevalnika izposoj
   15 | |     } // <-----------------------------------------+
      | |_____- returning this value requires that `*map` is borrowed for `'a`
   ```,
-  caption: [Napaka pri prevajanju primera @listing:mot_ex z NLL-jem],
+  caption: [Obvestilo o napaki pri prevajanju @listing:mot_ex[programa] z NLL-jem],
   supplement: "Izpis",
 ) <listing:mot_ex_err>
 
 Če postopoma sledimo sporočilu o napaki na @listing:mot_ex_err[izpisu], lahko vidimo, kje in zakaj NLL ne sprejme varnega programa. V vrstici 8 kličemo funkcijo `get_mut`, ki vrne unijo z dvema možnostima. Lahko vrne unikatno referenco na vrednost, ki pripada ključu (`Some(value)`), ali pa ne vrne ničesar (`None`). Če vrne vrednost, je spremenljivka `map` začasno izposojena (torej obstaja unikatna referenca na pomnilniško lokacijo z njenimi podatki), kar se zgodi v vrstici 9. Vendar NLL presodi, da je spremenljivka `map` še vedno izposojena, tudi če nismo vrnili njene reference iz funkcije `get_mut` (v vrsticah 11-13). Ko torej poskušamo vstaviti nov par v `map`, nam to preverjevalnik izposoj konzervativno prepreči, saj operacija `insert` zahteva unikatno referenco na spremenljivko `map` (ker jo spreminjamo z vstavljanjem para), dve unikatni referenci na isto mesto pa po pravilih jezika ne smeta obstajati.
 
-V nasprotju z NLL-jem Polonius prevede @listing:mot_ex[program] kot veljaven, saj ima večje zmožnosti sledenja kontrolnemu toku in lahko zgornjo analizo opravi podrobneje. NLL ima omejene zmožnosti obravnavanja kontrolnega toka, ki jih Polonius nadgradi v zameno za hitrost. Amanda Stjerna, ena izmed razvijalcev Poloniusa, je na predstavitvi na konferenci EuroRust omenila, da v prihodnosti načrtujejo dvoslojni preverjevalnik izposoj. Med prevajanjem bi se najprej analiza opravila z NLL-jem, saj je bistveno hitrejši, Polonius pa bi potem obravnaval samo zahtevnejše primere, ki bi jih NLL zavrnil @eurorustFirstSixYears2024 (na 23:15).
+V nasprotju z NLL-jem Polonius prevede @listing:mot_ex[program] kot veljaven, saj ima večje zmožnosti sledenja kontrolnemu toku in lahko zgornjo analizo opravi podrobneje. NLL ima omejene zmožnosti obravnavanja kontrolnega toka, ki jih Polonius nadgradi v zameno za hitrost preverjanja izposoj v času prevajanja. Amanda Stjerna, ena izmed razvijalcev Poloniusa, je na predstavitvi na konferenci EuroRust omenila, da v prihodnosti načrtujejo dvoslojni preverjevalnik izposoj. Med prevajanjem bi se najprej analiza opravila z NLL-jem, saj je bistveno hitrejši, Polonius pa bi potem obravnaval samo zahtevnejše primere, ki bi jih NLL zavrnil @eurorustFirstSixYears2024 (na 23:15).
 
 #chapter[Pregled literature]
 
-Rust je jezik inžinirjev, ne raziskovalcev. Od začetka je bil zasnovan tako, da reši današnje probleme ter se ukvarja s specifikacijami in formalnostjo kasneje. Ta način dela je porodil veliko vprašanj o temu, kako jezik deluje, zakaj deluje in ali sploh deluje pravilno. Čeprav je Rust prišel na svet šele leta 2015 @4YearsRust, je v zadnjem desetletju nastalo vrsto člankov o raznih formalnih pogledih na Rust.
+Rust je jezik inžinirjev, ne raziskovalcev. Od začetka je bil zasnovan tako, da reši današnje probleme ter se ukvarja s specifikacijami in formalnostjo kasneje. Ta način dela je porodil veliko vprašanj o tem, kako jezik deluje, zakaj deluje in ali sploh deluje pravilno. Čeprav je Rust prišel na svet šele leta 2015 @4YearsRust, je v zadnjem desetletju nastalo vrsto člankov o raznih formalnih pogledih na Rust.
 
 V tem poglavju se bomo lotili treh glavnih kategorij raziskav in virov:
 + *Poskusi formalizacije Rusta:* Ogledali si bomo, kako so se raziskovalci lotili problema formalizacije različnih komponent Rusta.
@@ -206,7 +208,7 @@ V nadaljevanju bomo omenili vmesno kodo _MIR_ #angl[Mid-level intermediate repre
 
 Še en pomemben pojem je _zataknjeno stanje_ #angl[stuck state], ki intuitivno pomeni, da program ne more nadaljevati, saj iz trenutnega stanja glede na operacijsko semantiko jezika ni več veljavnega koraka. Torej je stanje glede na definicijo jezika nesmiselno @pierceTypesProgrammingLanguages2002.
 
-Eden izmed ključnih del na področju formalizacije je članek _RustBelt: securing the foundations of the Rust programming language_, v katerem so avtorji zasnovali jezik imenovan lambdaR ter ga opremili s semantičnim modelom imenovanim RustBelt. Jezik lambdaR je sam bolj podoben MIRu kot pa izvirni kodi Rusta. Vsebuje tudi sistem tipov in pravila sklepanja, ki modelirajo MIR. Članek se konča z dokazom, da katerikoli lambdaR program, ki je semantično in tipsko pravilen, ne bo končal v zataknjenem stanju @jungRustBeltSecuringFoundations2018.
+Ena izmed ključnih del na področju formalizacije je članek _RustBelt: securing the foundations of the Rust programming language_, v katerem so avtorji zasnovali jezik imenovan lambdaR ter ga opremili s semantičnim modelom imenovanim RustBelt. Jezik lambdaR je sam bolj podoben MIRu kot pa izvirni kodi Rusta. Vsebuje tudi sistem tipov in pravila sklepanja, ki modelirajo MIR. Članek se konča z dokazom, da katerikoli lambdaR program, ki je semantično in tipsko pravilen, ne bo končal v zataknjenem stanju @jungRustBeltSecuringFoundations2018.
 
 Še en model Rusta je imenovan Oxide @weissOxideEssenceRust2019, kjer avtorji zasnujejo višjenivojski jezik, tokrat bolj podoben izvirni kodi Rusta. V primerjavi z RustBeltom se avtorji bolj osredotočijo na preverjevalnik izposoj, saj niso želeli natančno modelirati operacijske semantike, temveč je bil njihov cilj zajeti bistvo Rusta. Oxidova sintaksa je zelo podobna Rustovi, le da so vsi tipi eksplicitno podani. Avtorji nadaljujejo članek s tem, da podajo pravila sklepanja v tem sistemu tipov in uvedejo pojem _domnevnega izvora_ #angl[approximate provenance], ki je njihov način izražanja regij, kot so zastavljene v NLL-ju. Članek se nadaljuje s semantiko majhnih korakov in konča s formalnim dokazom, da pravilno konstruirani programi v Oxidu ne končajo v zataknjenem stanju. Pri tem članku je še zanimivo, da specifično omenijo Polonius ter povedo, da je Poloniusov model regij zelo podoben njihovim domnevnim izvorom. Omenijo, da kljub temu, da niso raziskali povezave med Poloniusom in Oxidom, lahko na Oxide gledamo kot na formulacijo Poloniusa preko sistema tipov.
 
@@ -214,7 +216,7 @@ Takih podobnih modelov je še mnogo. Članek Crihchtona idr. zastavi poenostavlj
 
 == Modeli sorodni lastništvu
 
-V tem poglavju se bomo osredotočili na _regijsko upravljanje s pomnilnikom_ #angl[region-based memory management] @tofteRegionBasedMemoryManagement1997, ki sta ga prva opisala Tofte in Talpin. Ta model upravljanja s pomnilnikom lahko razumemo skoraj kot neposredni predhodnik lastništva, kot se uporablja v Rustu.
+V tem razdelku se bomo osredotočili na _regijsko upravljanje s pomnilnikom_ #angl[region-based memory management] @tofteRegionBasedMemoryManagement1997, ki sta ga prva opisala Tofte in Talpin. Ta model upravljanja s pomnilnikom lahko razumemo skoraj kot neposredni predhodnik lastništva, kot se uporablja v Rustu.
 
 Njuna poglavitna motivacija je bila, da najdeta kompromis med ročnim upravljanjem s pomnilnikom, kot je to pri C-ju, ter avtomatskim čiščenjem pomnilnika, kot je to pri Javi. Za navdih sta vzela delovanje sklada, kjer se klicni zapis dodeli na začetku izvajanja funkcije ter sprosti na koncu. Tako sta ustvarila koncept regij, ki so dodatne označbe poleg tipov in podajo informacije o tem, kdaj se more vrednost sprostiti.
 
@@ -225,7 +227,7 @@ Rust ni bil prvi jezik, ki je uvedel pomnilniški model soroden regijskemu uprav
 
 == Polonius v akademskem svetu in v praksi
 
-Polonius je bil prvotno formuliran v spletni objavi N. D. Matsakisa, kjer je poljudno pojasnil, kako bi Polonius naslovil problem starega NLL, in podal osnovno formulacijo v Datalogu @matsakisAliasbasedFormulationBorrow. Delo se je nato nadaljevalo v GitHub repozitoriju `rust-lang/polonius` @RustlangPolonius2025, kjer so to originalno formulacijo implementirali v Rustu.
+Polonius je bil prvotno formuliran v spletni objavi N. D. Matsakisa, kjer je ta poljudno pojasnil, kako bi Polonius naslovil problem starega NLL, in podal osnovno formulacijo v Datalogu @matsakisAliasbasedFormulationBorrow. Delo se je nato nadaljevalo v GitHub repozitoriju `rust-lang/polonius` @RustlangPolonius2025, kjer so to originalno formulacijo implementirali v Rustu.
 
 Leta #cite(<stjernaModellingRustsReference2020>, form: "year") je Amanda Stjerna v svojem magistrskem delu podala prvo matematično formulacijo Poloniusa kot sistema tipov @stjernaModellingRustsReference2020. Ta formulacija je bila močno osnovana na Oxidu, saj sta si modela zelo podobna. V svojem delu je opisala tudi pravila za preverjevalnik posoj, ki jih kasneje v nalogi opišemo in formaliziramo. Njeno delo se nadaljuje z natančnejšim opisom Poloniusovega notranjega delovanja z vsemi podrobnostmi, potrebnimi za konkretno implementacijo. Kolikor vemo, je to delo eno izmed najbolj podrobnih in celovitih opisov Poloniusovega delovanja.
 
@@ -265,16 +267,18 @@ Lastništvo je vezano na doseg. Koncept dosega lahko preprosto ponazorimo z leks
   }
   println!("{}", a); // prevajalnik javi napako, ker `a` ni več v dosegu
   ```,
-  caption: [Primer leksičnega dosega],
+  caption: [Primer leksikalnega dosega],
 ) <listing:scope1>
 
-V primerih 3 in 4 nismo opazili bistvene razlike med Rustom in sorodnimi jeziki, kot sta C in C++. Razlika se pojavi pri ustvarjanju referenc ter njihovi delitvi na dva različna tipa. Rustove reference so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da Rustov prevajalnik zagotovi, da referenca vedno kaže na veljavno vrednost pravega tipa -- in to skozi celotno življenjsko dobo te reference @klabnikRustProgrammingLanguage2023. Ta varnostni mehanizem omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: zagotovilo, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
 
-V preostanku naloge ima MIR osrednjo vlogo, saj bistveno poenostavi preverjanje izposoj in omogoča lažjo analizo. Prav tako je v okviru MIRa natančno definiran pojem _mesta_ #angl[place], ki je eden ključnih pojmov pri analizi pomnilniške varnosti programa. Mesto je izraz, ki opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. `oseba`) #footnote[vase vpr: od kod to? odg: samo primer je] ali pa njena projekcija (npr. polje strukture `oseba.starost`) @MIRMidlevelIR.
+Za razliko od C in C++, ki takšnih napak ne zaznata v prevajalniku, Rust lastništvo uveljavlja že v fazi prevajanja. Dodatna razlika se še pojavi pri ustvarjanju referenc ter njihovi delitvi na dva različna tipa. Rustove reference so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da Rustov prevajalnik zagotovi, da referenca vedno kaže na veljavno vrednost pravega tipa -- in to skozi celotno življenjsko dobo te reference @klabnikRustProgrammingLanguage2023. Ta varnostni mehanizem omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: zagotovilo, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
+
+V preostanku naloge ima MIR osrednjo vlogo, saj bistveno poenostavi preverjanje izposoj in omogoča lažjo analizo. V okviru MIRa je tudi definiran naslednji pojem:
+/ Mesto #angl[place]: Mesto je izraz, ki opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. `oseba`) ali pa njena projekcija (npr. polje strukture `oseba.starost`) @MIRMidlevelIR. To je eden ključnih pojmov pri analizi pomnilniške varnosti programa.
 
 Zdaj lahko s pojmom mesta opredelimo dve glavni vrsti referenc @crichtonGroundedConceptualModel2023 @yanovskiGhostCellSeparatingPermissions2021 @weissOxideEssenceRust2019. Delimo jih lahko na dveh oseh: spremenljive ali nespremenljive in unikatne ali deljene. Ker slednja delitev bolje ponazori omejitve pri ustvarjanju referenc, bomo uporabljali naslednjo terminologijo:
 
-/ Deljene reference #angl[shared references]: To so reference, ki nam omogočajo, da ustvarimo več referenc na isto mesto hkrati. Zato morajo biti tudi zato _nespremenljive_ #angl[immutable], kar pomeni, da podatkov na referenciranem mestu ne smemo spreminjati. To pravilo mora veljati, da je uporaba tovrstnih referenc varna.
+/ Deljene reference #angl[shared references]: To so reference, ki nam omogočajo, da ustvarimo več referenc na isto mesto hkrati. Zato morajo biti tudi _nespremenljive_ #angl[immutable], kar pomeni, da podatkov na referenciranem mestu ne smemo spreminjati. To pravilo mora veljati, da je uporaba tovrstnih referenc varna.
 
 / Unikatne reference #angl[unique references]: To so reference, ki zagotovijo, da obstaja samo ena referenca na mesto hkrati. Občasno želimo tudi spreminjati vrednost, na katero kaže referenca preko te reference. Zato uvedemo unikatne reference, ki so posledično _spremenljive_ #angl[mutable]. Pravilo, ki ohranja pomnilniško varnost, se glasi: če obstaja unikatna referenca na pomnilniško mesto, na to mesto ne sme kazati nobena druga aktivna referenca (deljena ali unikatna). Aktivnost reference tukaj pomeni isto kot aktivnost spremenljivke.
 
@@ -329,9 +333,9 @@ V programih 7 in 8 prav tako opazimo, da če bi poskusili izpisati spremenljivko
   caption: [Napačna uporaba unikatne reference -- hkratna uporaba lastnika],
 ) <lst:napacnaspremenljiva>
 
-To razmerje med obema vrstama referenc -- večkratne nespremenljive ali ena sama spremenljiva -- lahko strnemo v načelo, ki ga v angleščini imenujemo _aliasing XOR mutability_. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več mestih hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo; bodisi pa jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le ena referenca. Model tako na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov @yanovskiGhostCellSeparatingPermissions2021.
+To razmerje med obema vrstama referenc -- večkratne nespremenljive ali ena sama spremenljiva -- lahko strnemo v načelo, ki ga v angleščini imenujemo _aliasing XOR mutability_. Ideja tega načela je preprosta: podatkovne strukture so lahko bodisi dostopne na več mestih hkrati (torej imajo več imen oziroma referenc), vendar jih lahko samo beremo, bodisi jih smemo aktivno spreminjati, vendar z zagotovilom, da ima v tistem trenutku do njih dostop le ena referenca. Model tako na zelo eleganten način povezuje podatke z naborom dovoljenih operacij in to počne prek samega sistema tipov @yanovskiGhostCellSeparatingPermissions2021.
 
-Še ena podrobnost, ki je pomembna za razumevanje lastništva, so _življenjske dobe_ #angl[lifetimes], ki so v Rustu sestavni del tipov. Kot sami tipi v Rustu so ponavadi izpeljane, vendar se pogosto pri podpisu funkcije zgodi, da jih moramo eksplicitno pripisati. Dejanski tip reference na niz ni `&String`, ampak `&'a String`, kjer je `'a` življenjska doba. Življenjske dobe so sicer del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer mora biti ta referenca veljavna @klabnikRustProgrammingLanguage2023. Koncept življenjskih dob kot nabor vrstic predstavimo s @lst:lifetime-annotate[programom].
+/ Življenjske dobe #angl[lifetimes]: Še ena podrobnost, ki je pomembna za razumevanje lastništva, so življenjske dobe, ki so v Rustu sestavni del tipov. Kot sami tipi v Rustu so ponavadi izpeljane, vendar se pogosto pri podpisu funkcije zgodi, da jih moramo eksplicitno pripisati. Dejanski tip reference na niz ni `&String`, ampak `&'a String`, kjer je `'a` življenjska doba. Življenjske dobe so sicer del tipa samo takrat, ko ta predstavlja referenco. Intuitivno si jih lahko predstavljamo kot nabor vrstic v programu, kjer mora biti ta referenca veljavna @klabnikRustProgrammingLanguage2023. Koncept življenjskih dob kot nabor vrstic predstavimo s @lst:lifetime-annotate[programom].
 
 #figure(
   ```rust
@@ -349,7 +353,7 @@ To razmerje med obema vrstama referenc -- večkratne nespremenljive ali ena sama
   caption: [Pripisane življenjske dobe],
 ) <lst:lifetime-annotate>
 
-Prevajalnik nam pri @lst:lifetime-annotate[programu] vrne napako, saj je spremenljivka `x` veljavna samo za življenjsko dobo `'b`, vendar prevajalnik zahteva, da je veljavna za `'a`, saj se uporabi pri izpisu na zaslon. V gnezdenem bloku dodelimo tipu `&'a i32` vrednost tipa `&'b i32`, vendar slednja ni podtip prve, saj je nabor vrstic `'b` stroga podmnožica nabora `'a`. Izračun življenjskih dob je odvisen od implementacije preverjevalnika izposoj, vendar si jih lahko intuitivno predstavljamo kot najmanjšo množico vrstic, kjer bo ta spremenljivka oziroma mesto še uporabljeno.
+Prevajalnik nam pri @lst:lifetime-annotate[programu] vrne napako, saj je spremenljivka `x` veljavna samo za življenjsko dobo `'b`, vendar prevajalnik ugotovi, da mora biti veljavna za `'a`, saj se uporabi pri izpisu na zaslon. V gnezdenem bloku dodelimo tipu `&'a i32` vrednost tipa `&'b i32`, vendar slednja ni podtip prve, saj je nabor vrstic `'b` stroga podmnožica nabora `'a`. Izračun življenjskih dob je odvisen od implementacije preverjevalnika izposoj, vendar si jih lahko intuitivno predstavljamo kot najmanjšo množico vrstic, kjer bo ta spremenljivka oziroma mesto še uporabljeno.
 
 // intuicija glede 2015 verzije borrow checkerja pred NLL: https://youtu.be/uCN_LRcswts?si=S2Ii5VHYF4X7HDo-&t=515
 // tukaj razlozim kako gre iz primitivnega do NLL do Poloniusa
@@ -427,7 +431,7 @@ Za boljše razumevanje teh dveh korakov si oglejmo @lst:intuition2[primer], kjer
 ) <lst:intuition2>
 
 #remark(title: "Zakaj v vrstici 6 programa 11 ustvarimo dvosmerno vsebovanost?")[
-  Če v vektor pišemo kot v vrstici 10, morajo elementi "znotraj" reference živeti vsaj tako dolgo kot elementi v prvotnem vektorju. Zato dodamo vsebovanost `'2: '0`. Ker pa lahko iz vektorja tudi beremo, morajo elementi v prvotnem vektorju živeti vsaj tako dolgo kot tisti "znotraj" reference, saj bi sicer lahko brali neveljaven spomin. Tako dobimo še `'0: '2`.
+  Če v vektor pišemo kot v vrstici 10, morajo elementi "znotraj" reference živeti vsaj tako dolgo kot elementi v prvotnem vektorju. Zato dodamo vsebovanost `'2: '0`. Ker pa lahko iz vektorja tudi beremo, morajo elementi v prvotnem vektorju živeti vsaj tako dolgo kot tisti "znotraj" reference, saj bi sicer lahko brali neveljaven pomnilnik. Tako dobimo še `'0: '2`.
 ]
 
 Drugi obhod razširi vsebovanosti iz prvega obhod, saj lahko nanje gledamo kot na relacijo matematične vsebovanosti, ki je tranzitivna. S tem dodeli posoje več regijam. Če sledimo tranzitivnemu zaprtju vsebovanosti, opazimo dve verigi:
@@ -455,7 +459,7 @@ V intuitivni razlagi smo izpustili številne podrobnosti, kot so izračun aktivn
 
 == Formalizacija pravil
 
-Cilj preverjevalnika izposoj je zadostiti pravilom lastništva. Ta pravila so običajno opisana intuitivno ali s primeri, kar je v prevajalniku težko formalno zajeti. Zaradi pomanjkanja uradne specifikacije se bomo oprli na delo Amande Stjerne @stjernaModellingRustsReference2020, ki pet pravil predstavi s tabelo in razlago.
+Cilj preverjevalnika izposoj je zadostiti pravilom lastništva. Ta pravila so običajno opisana intuitivno ali s primeri, kar je v prevajalniku težko formalno zajeti. Zaradi pomanjkanja uradne specifikacije se bomo oprli na delo Amande Stjerne @stjernaModellingRustsReference2020, ki zastavi pet pravil v @tab:borrow-check[tabeli] in jih pojasni z razlago. To niso ista pravila, ki tvorijo osnovo za lastništvo, predstavljena v poglavju 3.
 
 V @tab:borrow-check[tabeli] so podani pozitivni in negativni primeri za vsako pravilo, kot jih je predstavila Stjerna. Na podlagi teh primerov in njene razlage bomo formalno zapisali ta pravila z matematično notacijo. Vsa ta pravila delujejo na ravni posamezne funkcije, ne pa celotnega programa.
 
@@ -467,21 +471,23 @@ V @tab:borrow-check[tabeli] so podani pozitivni in negativni primeri za vsako pr
 
 Pravilo Use-Init določa, da lahko uporabljamo samo mesta, ki so zagotovo inicializirana na točki v funkciji, kjer jih uporabljamo. Skupaj s praviloma Move-Deinit, ki pravi, da ne smemo uporabljati mest, katerih vrednost je bila premaknjena, ter Ref-Live, ki nam onemogoči dostop do sproščenih vrednosti preko referenc, tvori osnovo za sistem lastništva. Ta pravila nam na primer preprečijo vračanje vrednosti, ustvarjene na skladu, saj je ta na izhodu iz funkcije že sproščena @stjernaModellingRustsReference2020.
 
+Pravilo Unique-Write nam zagotavlja, da je lahko hkrati aktivna samo ena unikatna referenca ter pravilo Shared-Readonly podobno zagotavlja, da ne moremo pisati v oz. premikati iz mesta na katerega kaže deljena referenca. Te dve pravili nam omogočita, da prevajalnik zagotovi pravilno uporabo dveh vrst referenc, ki obstajata v Rustu.
+
 Pri formalizaciji pravil bomo izhajali iz _grafa poteka_ #angl[CFG - control flow graph], ki ga prevajalnik konstruira, še preden se začne faza preverjevalnika izposoj. Sestavljen je iz osnovnih blokov, ti pa iz stavkov. Vozlišča v samem grafu si lahko predstavljamo kot posamezne stavke, vendar jih kasneje v nalogi definiramo bolj podrobno.
 
 Da lahko definiramo pravilo Use-Init, moramo uvesti še dve množici ter en predikat:
 
 / $"Poti"(p)$: Množica $"Poti"(p)$ poda vse poti skozi graf poteka od začetka funkcije do trenutne točke $p$ v grafu poteka funkcije. Te poti so statične -- ne spreminjajo se glede na vrednosti spremenljivk med izvajanjem programa. Predstavljamo si jih kot vse možne poti do trenutne točke ob poljubnih vhodnih vrednostih in spremenljivkah.
 
-/ $"UporabljenaMesta"(p)$: To je množica vseh mest, ki jih uporabimo na točki $p$. Uporaba je lahko branje iz mesta ali pisanje v mesto, uporaba projekcij (npr. komponent struktur), branje mesta preko reference itd. Bolj natančno jo definiramo s pomočjo interne strukture MIRa. Mesto se šteje kot uporabljeno, če nastopa kot operand ali ciljno mesto kjerkoli v stavku. Za podrobnejši pregled, kaj vse uporaba vključuje, si lahko ogledate unijo `StatementKind` @StatementKindRustc_middleMir.
+/ $"UporabljenaMesta"(p)$: To je množica vseh mest, ki jih uporabimo na točki $p$. Uporaba je lahko branje iz mesta ali pisanje v mesto, uporaba projekcij (npr. komponent struktur), branje mesta preko reference itd. Bolj natančno jo definiramo s pomočjo interne strukture MIRa. Mesto se šteje kot uporabljeno, če nastopa kot operand ali ciljno mesto kjerkoli v stavku. Za podrobnejši pregled, kaj vse uporaba vključuje, si lahko ogledate unijo `StatementKind` v izvorni kodi prevajalnika @StatementKindRustc_middleMir.
 
 / $"Inicializirana"(pi, m, p)$: Predikat $"Inicializirana"(pi, m, p)$ velja natanko tedaj, ko je mesto $m$ skozi pot $pi$ inicializirano na točki $p$.
 
-Formalno zapisano pravilo se glasi:
+Pravilo Use-Init pravi, da za vsako točko $p$ velja
 
-$ "Use-Init"(p) <==> \ forall pi in "Poti"(p), m in "UporabljenaMesta"(p): "Inicializirana"(pi, m, p) $
+$ forall pi in "Poti"(p), m in "UporabljenaMesta"(p): "Inicializirana"(pi, m, p) $
 
-Kot vsa druga pravila v tem razdelku, bomo brali pravilo tako: "Če obstaja točka $p$, za katero ne velja $"Use-Init"(p)$", kršimo pravilo Use-Init in zato mora prevajalnik javiti napako."
+Če obstaja točka $p$, za katero to ne velja, mora prevajalnik javiti napako. Podobno bomo brali tudi ostala pravila v tem razdelku.
 
 Pred nadaljevanjem definiramo še pojem predpone, ki ga NLL RFC opiše tako @2094nllRustRFC:
 
@@ -498,10 +504,10 @@ Pravilo Move-Deinit nam prepreči, da uporabimo vezavo, iz katere je bila vredno
 
 / $"Premaknjen"(pi, m, p)$: Predikat velja natanko tedaj, ko je bila vrednost iz mesta $m$ premaknjena pred točko $p$ na poti $pi$. Premik vrednosti iz mesta v prevajalniku pomeni, da mesto $m$ ni več v množici inicializiranih mest, torej ga prevajalnik iz nje odstrani. Intuitivno to pomeni, da mesto po premiku ni več inicializirano in ga ne moremo več uporabljati, dokler mu ne dodelimo nove vrednosti in posledično mesto dodamo nazaj v množico inicializiranih mest @TrackingMovesInitialization.
 
-Torej pravilo Move-Deinit zapišemo tako:
+Torej pravilo Move-Deinit pravi da mora za vsako točko $p$ veljati
 
 $
-  "Move-Deinit"(p) <==> \ exists.not pi in "Poti"(p), m_1 in "UporabljenaMesta"(p), m_2: \ "Prekrivanje"(m_1, m_2) and "Premaknjen"(pi, m_2, p)
+  exists.not pi in "Poti"(p), m_1 in "UporabljenaMesta"(p), m_2: \ "Prekrivanje"(m_1, m_2) and "Premaknjen"(pi, m_2, p)
 $
 
 Z besedami povedano, pravilo Move-Deinit na neki točki $p$ velja, ko ne obstaja nobena pot $pi$ do $p$, na kateri smo premaknili vrednost iz mesta $m_2$, ki je predpona uporabljenega mesta $m_1$.
@@ -513,21 +519,21 @@ Da bomo lahko razumeli naslednja pravila, moramo definirati pojem posoje, ki je 
     #quote[An Rvalue is an expression that creates a value: in this case, the rvalue is a
       mutable borrow expression, which looks like `&mut `]
 
-    Rvalue je definiran z unijo `Rvalue` @RvalueRustc_middleMir. Izraz izposoje natančno predstavlja varianta `Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)`, ki ustvari referenco tipa `BorrowKind` na mesto `Place`.
+    V izvorni kodi prevajalnika je Rvalue definiran z unijo `Rvalue` @RvalueRustc_middleMir. Izraz izposoje natančno predstavlja varianta `Rvalue::ref(Region<'tcx>, BorrowKind, Place<'tcx>)`, ki ustvari referenco tipa `BorrowKind` na mesto `Place`.
 
   ]
 
-Pojem izraza izposoje pogosto uporabljajo Weiss idr. v svojem članku o formalizaciji podmnožice Rusta. Njihov način uporabe se sklada z našo definicijo, ki se glasi:
+Pojem izraza izposoje pogosto uporabljajo Weiss idr. v svojem članku o formalizaciji podmnožice Rusta @weissOxideEssenceRust2019. Njihov način uporabe se sklada z našo definicijo, ki se glasi:
 
 / Posoja #angl[loan]: #[
-    Posoja je interni konstrukt prevajalnika, ki hrani podatke o referenci in njenem izvoru @weissOxideEssenceRust2019. V trenutni implementaciji preverjalnika izposoj je posoja predstavljena kot urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer je:
+    Posoja je interni konstrukt prevajalnika, ki hrani podatke o referenci in njenem izvoru @weissOxideEssenceRust2019. V trenutni implementaciji preverjalnika izposoj je posoja predstavljena kot urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer velja naslednje:
     - `'a`: Življenjska doba, za katero je vrednost izposojena. To se nanaša na življenjske dobe kot
       del Rustovega sistema tipov, ne pa na alternativno definicijo kasneje v nalogi, ki razume življenjske dobe kot množico posoj.
     - `shared|uniq|mut`: To je tip posoje. Tipa posoje `uniq` in `mut` sta identična, vendar `uniq` ne pusti spreminjanja svojih referentov. Naša terminologija unikatne reference se sklada s tipom `mut`.
     - `lvalue`: Leva vrednost, ki je bila izposojena.
   ]
 
-Torej bomo v našem zapisu posoje zapisovali kot $L = (alpha, tau, O)$, kjer bo $tau in {"uniq", "shrd", "mut"}$ predstavljal tip posoje, $O$ pa levo vrednost (oziroma _izvor_ z Rustovsko terminologijo).
+V našem zapisu bomo torej posoje zapisovali kot $L = (alpha, tau, O)$, kjer bo $tau in {"uniq", "shrd", "mut"}$ predstavljal tip posoje, $O$ pa levo vrednost (oziroma _izvor_ z Rustovsko terminologijo).
 
 Pravili Shared-Readonly in Unique-Write skrbita za veljavnost referenc in omejujeta njihovo uporabo. To sta isti pravili, ki smo ju opisali v @chap:intuitivna-razlaga-poloniusa[razdelku]. Pred opisom pravil moramo definirati še nekaj dodatnih predikatov.
 
@@ -539,18 +545,20 @@ Poleg predikata za aktivnost posoje potrebujemo še predikate, ki opisujejo oper
 
 / $"RazveljaviUnikatno"(m,p)$: Predikat velja, ko operacija razveljavi unikatno posojo mesta $m$ (ustvarjanje kakršnekoli nove posoje, pisanje v mesto, branje iz mesta).
 
-Zdaj lahko sestavimo naslednji dve pravili:
+Zdaj lahko sestavimo naslednji dve pravili. Pravilo Shared-Readonly pravi, da mora za vsako točko $p$ veljati
 
 $
-  "Shared-Readonly"(p) & <==> exists.not L = ("_", tau, O), m: \
-  "PosojaAktivna"(L,p) & and tau = "shrd" and \
-   "Prekrivanje"(m, O) & and "RazveljaviDeljeno"(m,p)
+  exists.not L = ("_", tau, O), m: \
+              "PosojaAktivna"(L,p) & and tau = "shrd" and \
+               "Prekrivanje"(m, O) & and "RazveljaviDeljeno"(m,p)
 $
 
+in pri pravilu Unique-Write mora veljati
+
 $
-     "Unique-Write"(p) & <==> exists.not L = ("_", tau, O), m: \
-  "PosojaAktivna"(L,p) & and tau in {"uniq", "mut"} and \
-   "Prekrivanje"(m, O) & and "RazveljaviUnikatno"(m,p)
+  exists.not L = ("_", tau, O), m: \
+              "PosojaAktivna"(L,p) & and tau in {"uniq", "mut"} and \
+               "Prekrivanje"(m, O) & and "RazveljaviUnikatno"(m,p)
 $
 
 Pravilo Shared-Readonly na točki $p$ torej velja, ko ne obstaja taka posoja $L = ("_", tau, O)$, ki je aktivna in katere izvor $O$ se prekriva z mestom $m$, nad katerim smo ravno izvedli operacijo, ki bi razveljavila deljeno posojo. Podobno razložimo pravilo Unique-Write.
@@ -559,10 +567,10 @@ Za zadnje pravilo potrebujemo še en predikat.
 
 / $"MestoAktivno"(m,p)$: Predikat velja natanko tedaj, ko je mesto $m$ še aktivno na točki $p$. Aktivnost mesta pomeni, da na tej točki v grafu poteka funkcije še ni bilo sproščeno #angl[dropped].
 
-Potem lahko pravilo Ref-Live zapišemo tako:
+Potem more za Ref-Live na vsaki točki $p$ veljati:
 
 $
-         "Ref-Live"(p) & <==> exists.not L = ("_", "_", O), m: \
+          exists.not L & = ("_", "_", O), m: \
   "PosojaAktivna"(L,p) & and "Prekrivanje"(m, O) and not "MestoAktivno"(m,p)
 $
 

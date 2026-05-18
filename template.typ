@@ -159,7 +159,10 @@
     #large[#smallcaps[Univerza v Ljubljani #parbreak() #faculty]]
     #v(10em)
     #autfont(author) #parbreak()
-    #titfont(title) #parbreak()
+
+    #par(justify: false)[
+      #titfont(title) #parbreak()
+    ]
     #v(1.5em)
     #smallcaps[DIPLOMSKO DELO]
     #v(5mm)
