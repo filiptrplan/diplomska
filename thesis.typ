@@ -92,7 +92,7 @@
     The thesis provides a mathematical formalization of the new version of Rust's borrow checker using sets and relations in a simple and understandable manner.
   ],
   abstract_sl: [
-    Naloga zastavi matematično formalizacijo Poloniusa, preverjevalnika izposoj za programski jezik Rust. Posebnost Rusta je njegov sistem tipov, ki prevajlniku z ustreznimi pravili o izposojevanju omogoča zagotavljanje pomnilniške varnosti že v času prevajanja. Trenutna implementacija preverjevalnika izposoj, imenovana NLL, je v nekaterih primerih preveč konzervativna, zato so razvijalci Rusta uvedli novo različico, imenovano Polonius, ki je osnovana na bolj natančni analizi toka podatkov. Polonius sicer nikjer ni uradno definiran, viri o njem so razpršeni, zato je cilj te naloge postaviti matematičen okvir, skozi katerega lahko razumemo to novo različico. Tega se lotimo z uporabo množic in izjav, tako da pravila, ki so bila zastavljena v raznih virih, opišemo s pomočjo predikatov ter pravil sklepanja. Končni izdelek je poenostavljen, vendar formalen opis Poloniusa.
+    Naloga zastavi matematično formalizacijo Poloniusa, preverjevalnika izposoj za programski jezik Rust. Posebnost Rusta je njegov sistem tipov, ki prevajalniku z ustreznimi pravili o izposojevanju omogoča zagotavljanje pomnilniške varnosti že v času prevajanja. Trenutna implementacija preverjevalnika izposoj, imenovana NLL, je v nekaterih primerih preveč konzervativna, zato so razvijalci Rusta uvedli novo različico, imenovano Polonius, ki je osnovana na bolj natančni analizi toka podatkov. Polonius sicer nikjer ni uradno definiran, viri o njem so razpršeni, zato je cilj te naloge postaviti matematičen okvir, skozi katerega lahko razumemo to novo različico. Tega se lotimo z uporabo množic in izjav, tako da pravila, ki so bila zastavljena v raznih virih, opišemo s pomočjo predikatov ter pravil sklepanja. Končni izdelek je poenostavljen, vendar formalen opis Poloniusa.
   ],
   keywords_sl: "Rust, Polonius, preverjevalnik izposoj, formalizacija",
   abstract_en: [
@@ -132,7 +132,7 @@ NLL je bil natančno opisan v RFC-ju #angl[request for comment], kar je potem vo
 
 Cilj te naloge je torej na svoj način formalizirati pravila, na katerih temelji Polonius. Najprej raziščemo pretekle poskuse formalizacije Rusta ter sorodne načine upravljanja s pomnilnikom. Sledi intuitivni opis Rustovih pravil izposojanja in nato formalni opis Poloniusovih inferenčnih pravil.
 
-V preostanku naloge od bralca pričakujemo osnovno znanje programskega jezika Rust. Ker Rust nima urardne specifikacije jezika se bomo tudi v prihodnje dostikrat sklicevali na izvorno kodo prevajalnika, ki trenutno služi kot edina avtoriteta o pravilnem delovanju Rusta. V tej nalogi uporabljamo različico prevajalnika `1.94.0`.
+V preostanku naloge od bralca pričakujemo osnovno znanje programskega jezika Rust. Ker Rust nima uradne specifikacije jezika se bomo tudi v prihodnje dostikrat sklicevali na izvorno kodo prevajalnika, ki trenutno služi kot edina avtoriteta o pravilnem delovanju Rusta. V tej nalogi uporabljamo različico prevajalnika `1.94.0`.
 
 == Motivacijski primer <chap:motivacijski-primer>
 
@@ -651,7 +651,7 @@ V @listing:loans[programu] vidimo, kako se posoje ustvarjajo tekom programa. Kon
 
 === Množica regij #regije
 
-V trenutni implementaciji preverjevalnika izposoj NLL se posoje spremljajo s pomočjo življenjskih dob. Tu smo življenjske dobe poimenovali regije #angl[regions]. Množica regij je označena z $regije subset 2^posoje$. Na primeru so že označene z `'1`, `'2`, `'3`, itd. Pripadnost posoj regijam bomo kasneje določili z relacijo.
+V trenutni implementaciji preverjevalnika izposoj NLL se posoje spremljajo s pomočjo življenjskih dob. Tu smo življenjske dobe poimenovali regije #angl[regions]. Množica regij je označena z $regije$. Na primeru so že označene z `'1`, `'2`, `'3`, itd. Pripadnost posoj regijam bomo kasneje določili z relacijo. Posamezno regijo si lahko predstavljamo kot množico posoj, vendar to ni povsem natančno, saj je tudi pripadnost posoje regiji odvisna od točke, je pa koristna intuitivna predstava.
 
 === Graf poteka in množica stavkov #stavki
 
@@ -979,7 +979,7 @@ Opazimo, da pri relaciji vsebovanosti #jevsebovanazacetno in pri relaciji zahtev
 
 Relacija aktivnosti posoje #angl[loan live at] pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s $posojaaktivnana subset.eq posoje times točke$ in velja:
 
-$ (L,P) in regije <==> \ exists R in regije: (R, P) in regijaaktivnana and (R, L, P) in zahteva $
+$ (L,P) in posojaaktivnana <==> \ exists R in regije: (R, P) in regijaaktivnana and (R, L, P) in zahteva $
 
 To pomeni, da je posoja aktivna, če jo na isti točki zahteva neka aktivna regija.
 
