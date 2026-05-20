@@ -762,7 +762,7 @@ _Začetne_ #angl[input] relacije so tiste, ki izhajajo že iz prejšnjih faz ana
 
 Začetno relacijo vsebovanosti #angl[base subset] označimo z $jevsebovanazacetno subset regije times regije times točke$. To je relacija, ki povezuje dve regiji na določeni točki v programu. Za intuicijo, zakaj je ta relacija pomembna, si lahko bralec ponovno prebere @chap:intuitivna-razlaga-poloniusa[razdelek].
 
-Natančneje, če velja $(R_1, R_2, P) in jevsebovanazacetno$ pomeni, da je $R_1$ podmnožica regije $R_2$ na točki $P$ v programu. Ker so regije potenčne množice posoj, si lahko relacijo razložimo tako, da regija $R_1$ vsebuje vse posoje, ki jih vsebuje $R_2$, zato $R_2$ inducira več omejitev na uporabi mest, ki so izposojena. Relacija mora veljati na sredini stavka ($M("stmt")$), ki inducira njen nastanek. Na primer, zapišemo $('2, '1, P) in jevsebovanazacetno$ na sredini stavka `let a: &'1 i32 = &'2 b;`.
+Natančneje, če velja $(R_1, R_2, P) in jevsebovanazacetno$ pomeni, da je $R_1$ podmnožica regije $R_2$ na točki $P$ v programu. Ker so regije konceptualno potenčne množice posoj na posamezni točki, si lahko relacijo razložimo tako, da regija $R_1$ vsebuje vse posoje, ki jih vsebuje $R_2$, zato $R_2$ inducira več omejitev na uporabi mest, ki so izposojena. Relacija mora veljati na sredini stavka ($M("stmt")$), ki inducira njen nastanek. Na primer, zapišemo $('2, '1, P) in jevsebovanazacetno$ na sredini stavka `let a: &'1 i32 = &'2 b;`.
 
 _Opomba:_ V primerih programov bomo uporabljali oznako `<:`, ki predstavlja vsebovanost med tipi #angl[subtyping relation].
 
@@ -1043,7 +1043,7 @@ Da si lažje predstavljamo, kako se različne relacije povezujejo, bomo v tem ra
     x += 1;
     // Tukaj se razveljavi posoja L1: (L1) inn `posoja_razveljavljena_na`.
     // Da se javi napaka, mora biti ta posoja aktivna (L1) inn posoja_aktivna_na.
-    // Torej jo mora zahtevati neka aktivna regija, na trenutni točki pa je aktivna regija r2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš vektor `v`. Elementi vektorja imajo regijo r2, ki je del posoje L1.
+    // Torej jo mora zahtevati neka aktivna regija, na trenutni točki pa je aktivna regija r2, ker jo lahko uporabimo v funkciji `take`, ki sprejme naš vektor `v`. Elementi vektorja imajo regijo r2, ki zahteva posojo L1.
     // Torej, ker smo razveljavili posojo L1, medtem ko je bila aktivna regija, ki jo ta posoja zahteva, javimo napako.
 
     take::<Vec<&'6 i32>>(v);
