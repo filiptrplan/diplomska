@@ -605,29 +605,17 @@ Da lahko matematično govorimo o delovanju Poloniusa, moramo definirati osnovne 
 === Množica posoj #posoje
 <chap-mnozica-posoj>
 
-Množico vseh posoj označimo s #posoje. _Pogoji posoje_ so lastnosti, ki morajo držati v določeni točki programa, da posojo smatramo za veljavno oziroma aktivno. Pravimo, da _razveljavimo pogoje posoje_, če velja ena izmed naslednjih točk:
-- Referenca je deljena in
-  - ustvarimo novo unikatno referenco _ali_
-  - pišemo v mesto, ki je bilo izposojeno
-- Referenca je unikatna in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
+Množico vseh posoj označimo s #posoje. _Pogoji posoje_ so lastnosti, ki morajo držati v določeni točki programa, da posojo smatramo za veljavno oziroma aktivno. V literaturi ali izvorni kodi prevajalnika nikjer niso definirano eksplicitno, vendar se pa pojavi implicitna definicija preko razveljavitev pogojev posoje.
 
-Zgornja pravila bolj formalno opisujejo pravila razveljavljanja posoje #angl[loan killed]. Iz NLL RFC-ja @2094nllRustRFC:
-
-#quote[For a statement at point P in the graph, we define the "transfer function" – that is,
-  which loans it brings into or out of scope – as follows:
-  - ...
-  - if this is an assignment `lv = `, then any loan for some path P of which `lv` is a prefix is killed.
-]
-
-// TODO: prevedena verzija?
-
-Prevedena verzija(profesor, povejte kaj se vam zdi boljse):
-
-#quote[
-  Za stavek na točki P v grafu definiramo "funkcijo prenosa" -- torej, katere posoje prinesemo v ali iz obsega. Funkcija je definirana tako:
-  - ... ostala pravila
-  - Če je stavek dodelitev `lv = `, potem je vsaka posoja poti P, katere `lv` je predpona, razveljavljena.
-]
+/ Razveljavitev pogojev posoje: #[Pravimo, da _razveljavimo pogoje posoje_, če velja ena izmed naslednjih točk:
+    - Referenca je deljena in
+      - ustvarimo novo unikatno referenco _ali_
+      - pišemo v mesto, ki je bilo izposojeno
+    - Referenca je unikatna in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
+  ]
+Zgornja pravila bolj formalno opisujejo pravila razveljavljanja posoje #angl[loan killed]. Skratka, NLL RFC pravi, da za stavek na točki P v grafu definiramo "funkcijo prenosa" -- torej, katere posoje prinesemo v ali iz obsega @2094nllRustRFC . Funkcija je definirana tako:
+- _nekaj za nas nerelevatnih pravil_
+- Če je stavek dodelitev `lv = `, potem je vsaka posoja poti P, katere `lv` je predpona, razveljavljena.
 
 #show: subst-env((
   L0: $"L"_0$,
@@ -663,13 +651,13 @@ V @listing:loans[programu] vidimo, kako se posoje ustvarjajo tekom programa. Kon
 
 === Množica regij #regije
 
-V trenutni implementaciji preverjevalnika izposoj NLL se posoje spremljajo s pomočjo življenjskih dob. V tej formulaciji pa je avtor življenjske dobe poimenoval regije #angl[regions]. Množica regij je označena z $regije subset 2^posoje$. Na primeru so že označene z `'1`, `'2`, `'3`, itd. Pripadnost posoj regijam bomo kasneje določili z relacijo.
+V trenutni implementaciji preverjevalnika izposoj NLL se posoje spremljajo s pomočjo življenjskih dob. Tu smo življenjske dobe poimenovali regije #angl[regions]. Množica regij je označena z $regije subset 2^posoje$. Na primeru so že označene z `'1`, `'2`, `'3`, itd. Pripadnost posoj regijam bomo kasneje določili z relacijo.
 
 === Graf poteka in množica stavkov #stavki
 
 Graf poteka je že izračunan v prejšnjih fazah analize kode. Zgrajen je iz osnovnih blokov, ti pa iz stavkov. Množico vseh stavkov v MIRu označimo s #stavki.
 
-Graf spremlja tudi nekaj dodatnih metapodatkov. Ti so izračunani tekom analize poteka podatkov #angl[dataflow analysis] @MIRDataflowRust. Graf poteka označimo s $C = (točke, povezave)$, kjer je #točke množica vozlišč in #povezave množica povezav. Uporabljamo izraz točke namesto vozlišča, ker se v literaturi večinoma uporablja izraz _point_, ne pa _node_.
+Graf spremlja tudi nekaj dodatnih metapodatkov. Ti so izračunani med analizo poteka podatkov #angl[dataflow analysis] @MIRDataflowRust. Graf poteka označimo s $C = (točke, povezave)$, kjer je #točke množica vozlišč in #povezave množica povezav. Uporabljamo izraz točke namesto vozlišča, ker se v literaturi večinoma uporablja izraz _point_, ne pa _node_.
 
 Elementi množice #točke so lahko dveh tipov:
 
@@ -693,7 +681,8 @@ _Opomba:_ To je zgolj matematična formulacija predstavitve grafa poteka; v prev
 
 ==== Primer grafa
 
-Za lažjo predstavo grafa poteka ga konstruiramo za @ex-cfg-example-code[program] in njegov prevod v MIR (@ex-cfg-example-mir[program]). MIR bomo tukaj ponazorili s psevdokodo, vendar je sam MIR skupek struktur v Rustovem prevajalniku.
+Za lažjo predstavo grafa poteka konstruiramo graf za @ex-cfg-example-code[program] in njegov prevod v MIR (@ex-cfg-example-mir[program]). MIR bomo tukaj ponazorili s psevdokodo, vendar je sam MIR skupek struktur v Rustovem prevajalniku.
+
 
 #figure(
   [
@@ -710,6 +699,15 @@ Za lažjo predstavo grafa poteka ga konstruiramo za @ex-cfg-example-code[program
   caption: "Primer za graf poteka",
 ) <ex-cfg-example-code>
 
+Konkretna sintaksa MIR je zasnovana izključno za pedagoške namene, zato se v njene podrobnosti ne bomo spuščali. Izpostavimo le naslednje:
+- Spremenljivke izgubijo imena in se oštevilčijo (`_1`, `_2`, `_3`)
+- Osnovni bloki so označeni z `bb`.
+- `switchInt` je tip terminatorja, definiran v Rustovem prevajalniku @TerminatorKindRustc_middleMir.
+
+S tem razumevanjem lahko zdaj program ponazorimo na @ex-cfg-example-graph[sliki].
+
+#pagebreak()
+#v(1fr)
 #figure(
   [
     ```rust
@@ -739,16 +737,20 @@ Za lažjo predstavo grafa poteka ga konstruiramo za @ex-cfg-example-code[program
     }
     ```],
   caption: [MIR za @ex-cfg-example-code[program]],
+  placement: none,
 ) <ex-cfg-example-mir>
+#v(1fr)
 
-Konkretna sintaksa MIR je zasnovana izključno za pedagoške namene, zato se v njene podrobnosti ne bomo spuščali. Izpostavimo le naslednje:
-- Spremenljivke izgubijo imena in se oštevilčijo (`_1`, `_2`, `_3`)
-- Osnovni bloki so označeni z `bb`.
-- `switchInt` je tip terminatorja, definiran v Rustovem prevajalniku @TerminatorKindRustc_middleMir.
 
-S tem razumevanjem lahko zdaj program ponazorimo v grafu.
-
-#figure(cfg-example, caption: [Graf poteka za @ex-cfg-example-code[program]], placement: none)
+#pagebreak()
+#v(1fr)
+#figure(
+  cfg-example,
+  caption: [Graf poteka za @ex-cfg-example-code[program]],
+  placement: none,
+)<ex-cfg-example-graph>
+#v(1fr)
+#pagebreak()
 
 == Začetne relacije
 
@@ -758,14 +760,14 @@ _Začetne_ #angl[input] relacije so tiste, ki izhajajo že iz prejšnjih faz ana
 
 === Začetna relacija vsebovanosti
 
-Začetno relacijo vsebovanosti #angl[base subset] označimo z $jevsebovanazacetno subset regije times regije times točke$. To je relacija, ki povezuje dve regiji na določeni točki v programu. Za intuicijo, zakaj je ta relacija pomembna, si lahko ogledate @chap:intuitivna-razlaga-poloniusa[razdelek].
+Začetno relacijo vsebovanosti #angl[base subset] označimo z $jevsebovanazacetno subset regije times regije times točke$. To je relacija, ki povezuje dve regiji na določeni točki v programu. Za intuicijo, zakaj je ta relacija pomembna, si lahko bralec ponovno prebere @chap:intuitivna-razlaga-poloniusa[razdelek].
 
 Natančneje, če velja $(R_1, R_2, P) in jevsebovanazacetno$ pomeni, da je $R_1$ podmnožica regije $R_2$ na točki $P$ v programu. Ker so regije potenčne množice posoj, si lahko relacijo razložimo tako, da regija $R_1$ vsebuje vse posoje, ki jih vsebuje $R_2$, zato $R_2$ inducira več omejitev na uporabi mest, ki so izposojena. Relacija mora veljati na sredini stavka ($M("stmt")$), ki inducira njen nastanek. Na primer, zapišemo $('2, '1, P) in jevsebovanazacetno$ na sredini stavka `let a: &'1 i32 = &'2 b;`.
 
-_Opomba:_ Oznaka `<:` predstavlja vsebovanost med tipi (_subtyping relation_).
+_Opomba:_ V primerih programov bomo uporabljali oznako `<:`, ki predstavlja vsebovanost med tipi #angl[subtyping relation].
 
 #remark(title: "Povezava z NLL")[
-  V NLL so regije predstavljene kot množice točk oziroma stavkov, kjer je vrednost, ki vsebuje regijo v svojem tipu, veljavna. Torej `'a: 'b` pomeni, da mora biti `'a` veljavna vsaj toliko časa kot `'b`. V angleščini bi temu rekli _'a outlives 'b_. Drugače povedano, množica točk 'b bi bila podmnožica 'a, kar pa je ravno obratno zapisano kot v Poloniusu. Ključna razlika je, da so regije v Poloniusu množice posoj, ne pa točk. Intuitivno lahko rečemo, da vsaka nova posoja prinese dodatne omejitve k uporabi in ustvarjanju referenc. Zato je smiselno, da je v Poloniusu regija `'a` podmnožica regije `'b`, saj mora vsebovati _vsaj_ vse omejitve, ki jih mora upoštevati `'b`.
+  V NLL so regije predstavljene kot množice točk oziroma stavkov, kjer je vrednost, ki vsebuje regijo v svojem tipu, veljavna. Torej `'a: 'b` pomeni, da mora biti `'a` veljavna vsaj toliko časa kot `'b`. V angleščini bi temu rekli _'a preživi_ #angl[outlives] _'b_. Drugače povedano, množica točk 'b bi bila podmnožica 'a, kar pa je ravno obratno zapisano kot v Poloniusu. Ključna razlika je, da so regije v Poloniusu množice posoj, ne pa točk. Intuitivno lahko rečemo, da vsaka nova posoja prinese dodatne omejitve k uporabi in ustvarjanju referenc. Zato je smiselno, da je v Poloniusu regija `'a` podmnožica regije `'b`, saj mora vsebovati _vsaj_ vse omejitve, ki jih mora upoštevati `'b`.
 ]
 
 #figure(

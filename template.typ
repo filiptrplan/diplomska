@@ -131,27 +131,30 @@
 
 
   // typical latex sizes for chapters/section
-  #show heading.where(level: 1): it => [
+  #show heading.where(level: 1): it => block(sticky: true)[
     #set par(first-line-indent: (amount: 0pt))
     #huge[
       #it.body
       #v(1em)
     ]
   ]
-  #show heading.where(level: 2): it => [
+  #show heading.where(level: 2): it => block(sticky: true)[
     #v(1em)
     #set par(first-line-indent: (amount: 0pt))
     #Large[#counter(heading).display() #it.body]
+    #v(1em)
   ]
-  #show heading.where(level: 3): it => [
+  #show heading.where(level: 3): it => block(sticky: true)[
     #v(0.8em)
     #set par(first-line-indent: (amount: 0pt))
     #large[#counter(heading).display() #it.body]
+    #v(1em)
   ]
-  #show heading.where(level: 4): it => [
+  #show heading.where(level: 4): it => block(sticky: true)[
     #v(0.6em)
     #set par(first-line-indent: (amount: 0pt))
     #text(size: 12pt)[#counter(heading).display() #it.body]
+    #v(1em)
   ]
 
   #align(center)[
