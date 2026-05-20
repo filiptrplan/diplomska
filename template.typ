@@ -129,7 +129,6 @@
     },
   )
 
-
   // typical latex sizes for chapters/section
   #show heading.where(level: 1): it => block(sticky: true)[
     #set par(first-line-indent: (amount: 0pt))

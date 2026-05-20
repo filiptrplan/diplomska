@@ -889,17 +889,17 @@ V tem poglavju bomo opisali relacije, ki jih izpeljemo iz začetnih. V primerih 
 === Relacija vsebovanosti
 
 Začetno relacijo vsebovanosti razširimo v relacijo vsebovanosti #angl[subset], ki jo označimo z
-$jevsebovana subset.eq regije times regije times točke$. Definirana je z zaprtjem naslednjih pravil:
+$jevsebovana subset.eq regije times regije times točke$. Definirana je z naslednjimi pravili:
 
 + *Začetna relacija:* Če velja $(R_1, R_2, P) in jevsebovanazacetno$, potem velja $(R_1, R_2, P) in jevsebovana$. Torej se vse trojice iz začetne relacije pojavijo tudi v razširjeni.
 + *Tranzitivnost:* Če veljata $(R_1, R_2, P) in jevsebovana$ in $(R_2, R_3, P) in jevsebovana$, potem sledi $(R_1, R_3, P) in jevsebovana$. Relacija vsebovanosti na isti točki v programu je tranzitivna.
-+ *Propagacija:* Če velja vse izmed naštetega:
-  + $(R_1, R_2, P) in jevsebovana$
-  + $(P, Q) in povezave$: Točki si sledita v grafu poteka.
-  + $(R_1, Q) in regijaaktivnana$: Regija 1 je aktivna na naslednji točki.
-  + $(R_2, Q) in regijaaktivnana$: Regija 2 je aktivna na naslednji točki.
++ *Propagacija:* Če velja:
+  + $(R_1, R_2, P) in jevsebovana$ _in_
+  + $(P, Q) in povezave$: (točki si sledita v grafu poteka) _in_
+  + $(R_1, Q) in regijaaktivnana$: (regija 1 je aktivna na naslednji točki) _in_
+  + $(R_2, Q) in regijaaktivnana$: (regija 2 je aktivna na naslednji točki)
 
-  potem sledi $(R_1, R_2, Q) in jevsebovana$. To pomeni, da se relacija propagira čez graf poteka, če sta obe regiji aktivni na naslednji točki v grafu. Pogoj za aktivnost nam pride prav kasneje.
+  tedaj velja $(R_1, R_2, Q) in jevsebovana$. To pomeni, da se relacija propagira čez graf poteka, če sta obe regiji aktivni na naslednji točki v grafu. Pogoj za aktivnost nam pride prav kasneje.
 
 Primeru pripišemo te relacije v @listing:subsetRelations[programu].
 
@@ -938,18 +938,18 @@ Primeru pripišemo te relacije v @listing:subsetRelations[programu].
 === Relacija zahteve
 <chap-relacija-zahteve>
 
-Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Označimo jo z $zahteva subset.eq regije times posoje times točke$ in je definirana z zaprtjem naslednjih pravil:
+Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Označimo jo z $zahteva subset.eq regije times posoje times točke$ in je definirana z naslednjimi pravili:
 
 + *Začetna relacija:* Če velja $(R, L, P) in regijaposojena$, potem velja $(R, L, P) in zahteva$. To nam pove, da če se trojica nahaja v relaciji posoje regij, se nahaja tudi v #zahteva.
 + *Vsebovanost:* Če veljata $(R_1, L, P) in zahteva$ in $(R_1, R_2, P) in jevsebovana$, potem sledi $(R_2, L, P) in zahteva$. To nam pove, da če neka regija $R_1$, ki je podmnožica večje regije $R_2$, na točki $P$ zahteva posojo $L$, potem tudi $R_2$ zahteva isto posojo.
-+ *Propagacija:* Če veljajo vse:
-  + $(R, L, P) in zahteva$: Regija $R$ zahteva posojo $L$ na $P$.
-  + $(L, P) in.not posojaprekinjenana$: Posoja $L$ ni prekinjena na $P$.
-  + $(P, Q) in povezave$: Točka $Q$ sledi $P$ v grafu poteka.
-  + $(R, Q) in regijaaktivnana$: Regija $R$ je aktivna na točki $Q$.
++ *Propagacija:* Če veljajo :
+  + $(R, L, P) in zahteva$: (regija $R$ zahteva posojo $L$ na $P$) _in_
+  + $(L, P) in.not posojaprekinjenana$: (posoja $L$ ni prekinjena na $P$) _in_
+  + $(P, Q) in povezave$: (točka $Q$ sledi $P$ v grafu poteka) _in_
+  + $(R, Q) in regijaaktivnana$: (regija $R$ je aktivna na točki $Q$)
   potem sledi $(R, L, Q) in zahteva$.
 
-~ Opazimo, da pri relaciji vsebovanosti #jevsebovanazacetno in pri relaciji zahteve #zahteva mora biti regija pri pravilu za propagacijo aktivna na naslednji točki $Q$. S @listing:reqRelation[programom] ponazorimo zakaj je to pomembna omejitev.
+Opazimo, da pri relaciji vsebovanosti #jevsebovanazacetno in pri relaciji zahteve #zahteva mora biti regija pri pravilu za propagacijo aktivna na naslednji točki $Q$. S @listing:reqRelation[programom] ponazorimo zakaj je to pomembna omejitev.
 
 #figure(
   ```rust
@@ -977,9 +977,9 @@ Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo n
 
 === Relacija aktivnosti posoje
 
-Relacija aktivnosti posoje #angl[loan live at] pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s $posojaaktivnana subset.eq posoje times točke$ in jo definiramo takrat, ko velja
+Relacija aktivnosti posoje #angl[loan live at] pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s $posojaaktivnana subset.eq posoje times točke$ in velja:
 
-$ exists R in regije: (R, P) in regijaaktivnana and (R, L, P) in zahteva $
+$ (L,P) in regije <==> \ exists R in regije: (R, P) in regijaaktivnana and (R, L, P) in zahteva $
 
 To pomeni, da je posoja aktivna, če jo na isti točki zahteva neka aktivna regija.
 
@@ -993,7 +993,7 @@ Za lažjo predstavo v tem razdelku vizualiziramo glavne relacije na primeru. Naj
   supplement: "Diagram",
 ) <ex-graph-active>
 
-Nato vizualno ponazorimo razširjeno relacijo #jevsebovana, ki že upošteva pravila tranzitivnosti in propagacije. To prikazuje @ex-graph-subset[diagram].
+Nato vizualno ponazorimo razširjeno relacijo #jevsebovana, ki že upošteva pravila tranzitivnosti in propagacije. To prikazuje @ex-graph-subset[diagram]. Iz diagrama za #jevsebovana konstruiramo @ex-graph-zahteva[diagram] za #zahteva, tako da sledimo pravilom, opisanim v @chap-relacija-zahteve[razdelku].
 
 #figure(
   scale(90%, final-example-graph-subset),
@@ -1001,7 +1001,6 @@ Nato vizualno ponazorimo razširjeno relacijo #jevsebovana, ki že upošteva pra
   supplement: "Diagram",
 ) <ex-graph-subset>
 
-Iz diagrama za #jevsebovana nato izhajamo in konstruiramo @ex-graph-zahteva[diagram] za #zahteva, tako da sledimo pravilom, opisanim v @chap-relacija-zahteve[razdelku].
 
 #figure(
   scale(85%, final-example-graph-zahteva),
@@ -1011,14 +1010,20 @@ Iz diagrama za #jevsebovana nato izhajamo in konstruiramo @ex-graph-zahteva[diag
 
 == Javljanje napake
 
-S pomočjo prejšnjih relacij lahko na koncu definiramo, kje v programu javimo napako (v obsegu preverjalnika posoj). Ponovno si pomagamo z relacijo, ki jo tokrat poimenujemo _relacija napake_ #angl[error] in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu. Definiramo jo, ko velja:
+S pomočjo prejšnjih relacij lahko na koncu definiramo, kje v programu javimo napako (v obsegu preverjalnika posoj). Ponovno si pomagamo z relacijo, ki jo tokrat poimenujemo _relacija napake_#footnote[vase vpr: zakaj italics odg: zdi se mi pametno poudariti pa se mi je zdelo tezko napisati z nasim formatom za definicije ki je DEF: definicija] #angl[error] in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu in velja:
 
-$ exists L in posoje: \(P, L) in posojarazveljavljenana and (L, P) in posojaaktivnana $
+$ P in napaka <==> \ exists L in posoje: \(P, L) in posojarazveljavljenana and (L, P) in posojaaktivnana $
 
 Napaka se torej javi natanko tedaj, ko neko dejanje na točki $P$ razveljavi pogoje posoje $L$, ki je hkrati tudi aktivna na točki $P$.
 
 Poglejmo še, kako se napaka dokončno javi na @listing:error[programu]. Če je kakšen korak nejasen, si lahko pomagate z diagrami v prejšnjem poglavju.
 
+== Vizualna reprezentacija delovanja Poloniusa
+
+Da si lažje predstavljamo, kako se različne relacije povezujejo, bomo v tem razdelku prikazali diagram vseh relacij in povezav med njimi. Graf je zelo podoben tistemu iz @stjernaModellingRustsReference2020, vendar poenostavljen, saj se naša naloga ukvarja samo z bistvom Poloniusa in ne z njegovo implementacijo. Puščica, ki kaže iz prve relacije v drugo, pomeni, da se za izpeljavo druge relacije zanašamo na prvo.
+
+#pagebreak()
+#v(1fr)
 #figure(
   ```rust
   fn main() {
@@ -1049,10 +1054,8 @@ Poglejmo še, kako se napaka dokončno javi na @listing:error[programu]. Če je 
   caption: [Napaka v programu],
   placement: none,
 ) <listing:error>
-
-== Vizualna reprezentacija delovanja Poloniusa
-
-Da si lažje predstavljamo, kako se različne relacije povezujejo, bomo v tem razdelku prikazali diagram vseh relacij in povezav med njimi. Graf je zelo podoben tistemu iz @stjernaModellingRustsReference2020, vendar poenostavljen, saj se naša naloga ukvarja samo z bistvom Poloniusa in ne z njegovo implementacijo. Puščica, ki kaže iz prve relacije v drugo, pomeni, da se za izpeljavo druge relacije zanašamo na prvo.
+#v(1fr)
+#pagebreak()
 
 #figure(
   scale(80%, polonius-diagram),
@@ -1068,7 +1071,9 @@ Trenutna implementacija preverjevalnika izposoj NLL je v nekaterih primerih prev
 
 V nasprotju z NLL, ki je formalno definiran znotraj RFC dokumenta @2094nllRustRFC, je bila Poloniusova definicija od začetka neformalna in prepletena z implementacijo. Polonius je bil napisan v Datalogu, ki je podmnožica Prologa, nato pa v Rustu. Ekipa, ki ga je implementirala, se nikoli ni ukvarjala s točnim opisom njegovega delovanja in do pred kratkim je bil eden redkih virov formalne specifikacije magistrska naloga Amande Stjerne @stjernaModellingRustsReference2020, ki je ena izmed razvijalcev Rusta. Šele v zadnjem letu se je pojavil projekt `a-mir-formality`, ki želi sestaviti uradno specifikacijo za Rustov sistem tipov in preverjevalnik izposoj (vključno s Poloniusom) @BorrowCheckingAmirformalityb.
 
-Cilj te naloge je bil formulirati alternativo Datalog implementaciji Poloniusa na formalen matematičen način, da bi omogočili lažje razumevanje tega kompleksnega sistema. To smo storili s pomočjo množic in relacij, definiranih nad njimi. Osnovne množice so predstavljale Rustove strukture v prevajalniku, s pomočjo katerih se definirajo začetne relacije, ki so dejstva, iz katerih izhaja celotna analiza.
+Cilj te naloge je bil formulirati alternativo Datalog implementaciji Poloniusa na formalen matematičen način, da bi omogočili lažje razumevanje tega kompleksnega sistema. Datalog implementacija Poloniusa je bila prvotna formulacija Poloniusa v @RustlangPolonius2026a in je idejno sledila prvotni spletni objavi N.D. Matsakisa. Kasneje se je Polonius premaknil v glavno vejo Rustovega prevajalnika in trenutno se v njemu nahaja v prilagojeni obliki, ki zamenja nekaj moči preverjanja pravilnosti za hitrost prevajanja. Naša formulacija se v načinu delovanja ujema z Datalog implentacija, vendar je za razumevanje nekoliko poenostavljena.
+
+Formulacijo smo oblikovali s pomočjo množic in relacij, definiranih nad njimi. Osnovne množice so predstavljale Rustove strukture v prevajalniku, s pomočjo katerih se definirajo začetne relacije, ki so dejstva, iz katerih izhaja celotna analiza.
 
 Te smo nadgradili z izpeljanimi relacijami, ki tvorijo jedro Poloniusovega delovanja. Začetna dejstva smo s pomočjo pravil o tranzitivnosti, aktivnosti ter propagaciji skozi graf razširili v končne relacije, s katerimi smo nazadnje definirali relacijo napake. Ta končna relacija velja natanko tedaj, ko bi na tisti točki v programu javili napako.
 
