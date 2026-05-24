@@ -231,7 +231,7 @@ Polonius je bil prvotno formuliran v spletni objavi N. D. Matsakisa, kjer je ta 
 
 Leta #cite(<stjernaModellingRustsReference2020>, form: "year") je Amanda Stjerna v svojem magistrskem delu podala prvo matematično formulacijo Poloniusa kot sistema tipov @stjernaModellingRustsReference2020. Ta formulacija je bila močno osnovana na Oxidu, saj sta si modela zelo podobna. V svojem delu je opisala tudi pravila za preverjevalnik posoj, ki jih kasneje v nalogi opišemo in formaliziramo. Njeno delo se nadaljuje z natančnejšim opisom Poloniusovega notranjega delovanja z vsemi podrobnostmi, potrebnimi za konkretno implementacijo. Kolikor vemo, je to delo eno izmed najbolj podrobnih in celovitih opisov Poloniusovega delovanja.
 
-Trenutno še ne obstaja uradna specifikacija za Polonius, vendar se stanje počasi spreminja. Leta 2025 je bil Polonius implementiran v glavni veji Rustovega prevajalnika in je trenutno na zahtevo dostopen v nočni #angl[nighlty] različici @ScalablePoloniusSupporta. V izvorni kodi prevajalnika sta prisotni dve različici Poloniusa @RustlangRust2026: osnovna #angl[legacy] različica, podobna prvotni implementaciji iz @RustlangPolonius2025, ter razvojna #angl[alpha] različica, ki je nastala kot odgovor na počasno izvajanje prve. Slednja je napisana neposredno v Rustu in ne emulira Dataloga, a zato tudi ne podpira vseh zmogljivosti, ki jih ponuja osnovna različica @ScalablePoloniusSupporta.
+Trenutno še ne obstaja uradna specifikacija za Polonius, vendar se stanje počasi spreminja. Leta 2025 je bil Polonius implementiran v glavni veji Rustovega prevajalnika in je trenutno na zahtevo dostopen v nočni #angl[nightly] različici @ScalablePoloniusSupporta. V izvorni kodi prevajalnika sta prisotni dve različici Poloniusa @RustlangRust2026: osnovna #angl[legacy] različica, podobna prvotni implementaciji iz @RustlangPolonius2025, ter razvojna #angl[alpha] različica, ki je nastala kot odgovor na počasno izvajanje prve. Slednja je napisana neposredno v Rustu in ne emulira Dataloga, a zato tudi ne podpira vseh zmogljivosti, ki jih ponuja osnovna različica @ScalablePoloniusSupporta.
 
 #show "amir": `a-mir-formality`
 
@@ -471,7 +471,7 @@ V @tab:borrow-check[tabeli] so podani pozitivni in negativni primeri za vsako pr
 
 Pravilo Use-Init določa, da lahko uporabljamo samo mesta, ki so zagotovo inicializirana na točki v funkciji, kjer jih uporabljamo. Skupaj s praviloma Move-Deinit, ki pravi, da ne smemo uporabljati mest, katerih vrednost je bila premaknjena, ter Ref-Live, ki nam onemogoči dostop do sproščenih vrednosti preko referenc, tvori osnovo za sistem lastništva. Ta pravila nam na primer preprečijo vračanje vrednosti, ustvarjene na skladu, saj je ta na izhodu iz funkcije že sproščena @stjernaModellingRustsReference2020.
 
-Pravilo Unique-Write nam zagotavlja, da je lahko hkrati aktivna samo ena unikatna referenca ter pravilo Shared-Readonly podobno zagotavlja, da ne moremo pisati v oz. premikati iz mesta na katerega kaže deljena referenca. Te dve pravili nam omogočita, da prevajalnik zagotovi pravilno uporabo dveh vrst referenc, ki obstajata v Rustu.
+Pravilo Unique-Write nam zagotavlja, da je lahko hkrati aktivna samo ena unikatna referenca ter pravilo Shared-Readonly podobno zagotavlja, da ne moremo pisati v oz. premikati iz mesta na katerega kaže deljena referenca. Ti dve pravili nam omogočita, da prevajalnik zagotovi pravilno uporabo dveh vrst referenc, ki obstajata v Rustu.
 
 Pri formalizaciji pravil bomo izhajali iz _grafa poteka_ #angl[CFG - control flow graph], ki ga prevajalnik konstruira, še preden se začne faza preverjevalnika izposoj. Sestavljen je iz osnovnih blokov, ti pa iz stavkov. Vozlišča v samem grafu si lahko predstavljamo kot posamezne stavke, vendar jih kasneje v nalogi definiramo bolj podrobno.
 
@@ -1010,7 +1010,7 @@ Nato vizualno ponazorimo razširjeno relacijo #jevsebovana, ki že upošteva pra
 
 == Javljanje napake
 
-S pomočjo prejšnjih relacij lahko na koncu definiramo, kje v programu javimo napako (v obsegu preverjalnika posoj). Ponovno si pomagamo z relacijo, ki jo tokrat poimenujemo _relacija napake_ #angl[error] in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu in velja
+S pomočjo prejšnjih relacij lahko na koncu definiramo, kje v programu javimo napako (v obsegu preverjevalnika posoj). Ponovno si pomagamo z relacijo, ki jo tokrat poimenujemo _relacija napake_ #angl[error] in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu in velja
 
 $ P in napaka <==> \ exists L in posoje: \(P, L) in posojarazveljavljenana and (L, P) in posojaaktivnana $
 
@@ -1071,7 +1071,7 @@ Trenutna implementacija preverjevalnika izposoj NLL je v nekaterih primerih prev
 
 V nasprotju z NLL, ki je formalno definiran znotraj RFC dokumenta @2094nllRustRFC, je bila Poloniusova definicija od začetka neformalna in prepletena z implementacijo. Polonius je bil napisan v Datalogu, ki je podmnožica Prologa, nato pa v Rustu. Ekipa, ki ga je implementirala, se nikoli ni ukvarjala s točnim opisom njegovega delovanja in do pred kratkim je bil eden redkih virov formalne specifikacije magistrska naloga Amande Stjerne @stjernaModellingRustsReference2020, ki je ena izmed razvijalcev Rusta. Šele v zadnjem letu se je pojavil projekt `a-mir-formality`, ki želi sestaviti uradno specifikacijo za Rustov sistem tipov in preverjevalnik izposoj (vključno s Poloniusom) @BorrowCheckingAmirformalityb.
 
-Cilj te naloge je bil formulirati alternativo Datalog implementaciji Poloniusa na formalen matematičen način, da bi omogočili lažje razumevanje tega kompleksnega sistema. Datalog implementacija Poloniusa je bila prvotna formulacija Poloniusa v @RustlangPolonius2026a in je idejno sledila prvotni spletni objavi N.D. Matsakisa. Kasneje se je Polonius premaknil v glavno vejo Rustovega prevajalnika in trenutno se v njem nahaja v prilagojeni obliki, ki zamenja nekaj moči preverjanja pravilnosti za hitrost prevajanja. Naša formulacija se v načinu delovanja ujema z Datalog implentacijo, vendar je za razumevanje nekoliko poenostavljena.
+Cilj te naloge je bil formulirati alternativo Datalog implementaciji Poloniusa na formalen matematičen način, da bi omogočili lažje razumevanje tega kompleksnega sistema. Datalog implementacija Poloniusa je bila prvotna formulacija Poloniusa v @RustlangPolonius2026a in je idejno sledila prvotni spletni objavi N.D. Matsakisa. Kasneje se je Polonius premaknil v glavno vejo Rustovega prevajalnika in trenutno se v njem nahaja v prilagojeni obliki, ki zamenja nekaj moči preverjanja pravilnosti za hitrost prevajanja. Naša formulacija se v načinu delovanja ujema z Datalog implementacijo, vendar je za razumevanje nekoliko poenostavljena.
 
 Formulacijo smo oblikovali s pomočjo množic in relacij, definiranih nad njimi. Osnovne množice so predstavljale Rustove strukture v prevajalniku, s pomočjo katerih se definirajo začetne relacije, ki so dejstva, iz katerih izhaja celotna analiza.
 
