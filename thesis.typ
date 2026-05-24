@@ -118,9 +118,9 @@
 #chapter(breakpage: false)[Uvod]
 Pomnilniška varnost #angl[memory safety] je na področju razvoja programske opreme vedno aktualna tema. Razvijalci pri Microsoftu so pokazali, da so napake pri upravljanju s pomnilnikom najpogostejši tip napak @Microsoft70Percent. Pri projektu Chromium, na katerem temelji Google Chrome, so ugotovili, da približno 70 odstotkov hroščev povzročijo tovrstne napake @MemorySafetya. Če bi se lahko znebili te kategorije napak, bi se izognili precejšnjemu delu hroščev. Posledično so se razvijalci programskih jezikov pomnilniške varnosti lotili na različne načine.
 
-Eden najbolj razširjenih jezikov je C, kjer je upravljanje s pomnilnikom povsem prepuščeno programerju. Tovrsten pristop, imenovan ročno upravljanje s pomnilnikom, lahko vodi do izredno hitrih programov in krajših časov prevajanja v primerjavi z Rustom @glazarCodingRustBad2023, vendar je obenem tudi pogost vir napak @MemorySafetya.
+Eden najbolj razširjenih jezikov je C, kjer je upravljanje pomnilnika povsem prepuščeno programerju. Tovrsten pristop, imenovan ročno upravljanje pomnilnika, lahko vodi do izredno hitrih programov in krajših časov prevajanja v primerjavi z Rustom @glazarCodingRustBad2023, vendar je obenem tudi pogost vir napak @MemorySafetya.
 
-Alternativni pristop ročnemu upravljanju je avtomatsko upravljanje s pomnilnikom, kjer programski jezik zagotavlja varno dodeljevanje in sproščanje pomnilnika. S tem razbremeni programerja, ki se lahko osredotoči na pisanje programa. Vendar imajo jeziki z avtomatskim upravljanjem pomnilnika dve glavni slabosti: zaradi zakasnjenega sproščanja se pojavi večja poraba pomnilnika, obenem pa prihaja do premorov med izvajanjem programa ali zakasnitev ob vsaki operaciji, da lahko čistilec pomnilnika najde pomnilniške lokacije za sprostitev pomnilniških blokov @bakerListProcessingReal1978.
+Alternativni pristop ročnemu upravljanju je avtomatsko upravljanje pomnilnika, kjer programski jezik zagotavlja varno dodeljevanje in sproščanje pomnilnika. S tem razbremeni programerja, ki se lahko osredotoči na pisanje programa. Vendar imajo jeziki z avtomatskim upravljanjem pomnilnika dve glavni slabosti: zaradi zakasnjenega sproščanja se pojavi večja poraba pomnilnika, obenem pa prihaja do premorov med izvajanjem programa ali zakasnitev ob vsaki operaciji, da lahko čistilec pomnilnika najde pomnilniške lokacije za sprostitev pomnilniških blokov @bakerListProcessingReal1978.
 
 Rust pristopa k upravljanju s pomnilnikom na drugačen način. Veljavnost dostopanja do pomnilniških lokacij se preverja med prevajanjem s pomočjo preverjevalnika izposoj #angl[borrow checker]. To je komponenta Rustovega prevajalnika, ki se ukvarja s tokom podatkov in pomnilniškimi lokacijami. Rust imenuje zbirko pravil, ki opisuje delovanje preverjevalnika izposoj, lastništvo #angl[ownership]. V knjigi _The Rust Programming Language_ avtorji lastništvo opišejo tako: _"Ownership is a set of rules that govern how a Rust program manages memory"_ @klabnikRustProgrammingLanguage2023. Tak pristop ima dve glavni prednosti: zagotavlja, da je program pomnilniško varen kot pri avtomatskem upravljanju s pomnilnikom, ter omogoča hitrost izvajanja programov, ki jo lahko dosežemo z ročnim upravljanjem pomnilnika @klabnikRustProgrammingLanguage2023. Pogosto omenjena slabost Rusta je dolg čas prevajanja @glazarCodingRustBad2023. Ta sicer ni odvisen samo od preverjevalnika izposoj, vendar njegov prispevek ni zanemarljiv.
 
@@ -132,7 +132,7 @@ NLL je bil natančno opisan v RFC-ju #angl[request for comment], kar je potem vo
 
 Cilj te naloge je torej na svoj način formalizirati pravila, na katerih temelji Polonius. Najprej raziščemo pretekle poskuse formalizacije Rusta ter sorodne načine upravljanja s pomnilnikom. Sledi intuitivni opis Rustovih pravil izposojanja in nato formalni opis Poloniusovih inferenčnih pravil.
 
-V preostanku naloge od bralca pričakujemo osnovno znanje programskega jezika Rust. Ker Rust nima uradne specifikacije jezika se bomo tudi v prihodnje dostikrat sklicevali na izvorno kodo prevajalnika, ki trenutno služi kot edina avtoriteta o pravilnem delovanju Rusta. V tej nalogi uporabljamo različico prevajalnika `1.94.0`.
+V preostanku naloge od bralca pričakujemo osnovno znanje programskega jezika Rust. Ker Rust nima uradne specifikacije jezika, se bomo tudi v prihodnje dostikrat sklicevali na izvorno kodo prevajalnika, ki trenutno služi kot edini vir, ki določa delovanje Rusta #angl[specification as implementation]. V tej nalogi uporabljamo različico prevajalnika `1.94.0`.
 
 == Motivacijski primer <chap:motivacijski-primer>
 
@@ -208,7 +208,7 @@ V nadaljevanju bomo omenili vmesno kodo _MIR_ #angl[Mid-level intermediate repre
 
 Še en pomemben pojem je _zataknjeno stanje_ #angl[stuck state], ki intuitivno pomeni, da program ne more nadaljevati, saj iz trenutnega stanja glede na operacijsko semantiko jezika ni več veljavnega koraka. Torej je stanje glede na definicijo jezika nesmiselno @pierceTypesProgrammingLanguages2002.
 
-Ena izmed ključnih del na področju formalizacije je članek _RustBelt: securing the foundations of the Rust programming language_, v katerem so avtorji zasnovali jezik imenovan lambdaR ter ga opremili s semantičnim modelom imenovanim RustBelt. Jezik lambdaR je sam bolj podoben MIRu kot pa izvirni kodi Rusta. Vsebuje tudi sistem tipov in pravila sklepanja, ki modelirajo MIR. Članek se konča z dokazom, da katerikoli lambdaR program, ki je semantično in tipsko pravilen, ne bo končal v zataknjenem stanju @jungRustBeltSecuringFoundations2018.
+Eno izmed ključnih del na področju formalizacije je članek _RustBelt: securing the foundations of the Rust programming language_, v katerem so avtorji zasnovali jezik imenovan lambdaR ter ga opremili s semantičnim modelom imenovanim RustBelt. Jezik lambdaR je sam bolj podoben MIRu kot pa izvirni kodi Rusta. Vsebuje tudi sistem tipov in pravila sklepanja, ki modelirajo MIR. Članek se konča z dokazom, da katerikoli lambdaR program, ki je semantično in tipsko pravilen, ne bo končal v zataknjenem stanju @jungRustBeltSecuringFoundations2018.
 
 Še en model Rusta je imenovan Oxide @weissOxideEssenceRust2019, kjer avtorji zasnujejo višjenivojski jezik, tokrat bolj podoben izvirni kodi Rusta. V primerjavi z RustBeltom se avtorji bolj osredotočijo na preverjevalnik izposoj, saj niso želeli natančno modelirati operacijske semantike, temveč je bil njihov cilj zajeti bistvo Rusta. Oxidova sintaksa je zelo podobna Rustovi, le da so vsi tipi eksplicitno podani. Avtorji nadaljujejo članek s tem, da podajo pravila sklepanja v tem sistemu tipov in uvedejo pojem _domnevnega izvora_ #angl[approximate provenance], ki je njihov način izražanja regij, kot so zastavljene v NLL-ju. Članek se nadaljuje s semantiko majhnih korakov in konča s formalnim dokazom, da pravilno konstruirani programi v Oxidu ne končajo v zataknjenem stanju. Pri tem članku je še zanimivo, da specifično omenijo Polonius ter povedo, da je Poloniusov model regij zelo podoben njihovim domnevnim izvorom. Omenijo, da kljub temu, da niso raziskali povezave med Poloniusom in Oxidom, lahko na Oxide gledamo kot na formulacijo Poloniusa preko sistema tipov.
 
@@ -216,14 +216,14 @@ Takih podobnih modelov je še mnogo. Članek Crihchtona idr. zastavi poenostavlj
 
 == Modeli sorodni lastništvu
 
-V tem razdelku se bomo osredotočili na _regijsko upravljanje s pomnilnikom_ #angl[region-based memory management] @tofteRegionBasedMemoryManagement1997, ki sta ga prva opisala Tofte in Talpin. Ta model upravljanja s pomnilnikom lahko razumemo skoraj kot neposredni predhodnik lastništva, kot se uporablja v Rustu.
+V tem razdelku se bomo osredotočili na _regijsko upravljanje pomnilnika_ #angl[region-based memory management] @tofteRegionBasedMemoryManagement1997, ki sta ga prva opisala Tofte in Talpin. Ta model upravljanja s pomnilnikom lahko razumemo skoraj kot neposredni predhodnik lastništva, kot se uporablja v Rustu.
 
 Njuna poglavitna motivacija je bila, da najdeta kompromis med ročnim upravljanjem s pomnilnikom, kot je to pri C-ju, ter avtomatskim čiščenjem pomnilnika, kot je to pri Javi. Za navdih sta vzela delovanje sklada, kjer se klicni zapis dodeli na začetku izvajanja funkcije ter sprosti na koncu. Tako sta ustvarila koncept regij, ki so dodatne označbe poleg tipov in podajo informacije o tem, kdaj se more vrednost sprostiti.
 
 
 Ker bi bilo anotiranje vsake vrednosti z regijami nepraktično, sta uvedla način avtomatskega izračuna regij, podoben tistemu, ki izračuna življenjske dobe v Rustu. V delu definirata visokonivojski jezik `SExp`, podoben SML-u, skupaj s sistemom ML tipov in semantiko majhnih korakov. Nato uvedeta jezik `TExp`, v katerega se `SExp` pretvori. Ključna razlika med njima je, da ima `TExp` regijske anotacije, `SExp` pa ne. Delo nadaljujeta s sistemom za avtomatično izpeljevanje teh regij, osnovanem na Milnerjevem sistemu tipov. Zaključita z dokazi o pravilnosti njunega sistema in pravilnosti prevoda med `SExp` in `TExp`.
 
-Rust ni bil prvi jezik, ki je uvedel pomnilniški model soroden regijskemu upravljanju s pomnilnikom (poleg seveda akademskega jezika, predstavljenega v izvornem delu). Eden izmed najbolj znanih jezikov, ki so v praksi uporabili regijsko upravljanje s pomnilnikom, je Cyclone @grossmanRegionBasedMemoryManagement. Ustvarjen je bil kot dopolnilo C-ju z raznimi naprednimi tipi. Kasneje so dodali regijsko upravljanje s pomnilnikom, ki ga lahko programer doda C programu z nekaj dodatnimi regijskimi anotacijami. Prva implementacija sicer ni bila popolna in je še vedno včasih povzročila puščanje pomnilnika #angl[memory leaks], zato so kasnejše različice jezika z linearnimi regijami to poskušale popraviti @fluetLinearRegionsAre2006.
+Rust ni bil prvi jezik, ki je uvedel pomnilniški model soroden regijskemu upravljanju s pomnilnikom (poleg seveda akademskega jezika, predstavljenega v izvornem delu). Eden izmed najbolj znanih jezikov, ki so v praksi uporabili regijsko upravljanje pomnilnika, je Cyclone @grossmanRegionBasedMemoryManagement. Ustvarjen je bil kot dopolnilo C-ju z raznimi naprednimi tipi. Kasneje so dodali regijsko upravljanje pomnilnika, ki ga lahko programer doda C programu z nekaj dodatnimi regijskimi anotacijami. Prva implementacija sicer ni bila popolna in je še vedno včasih povzročila puščanje pomnilnika #angl[memory leaks], zato so kasnejše različice jezika z linearnimi regijami to poskušale popraviti @fluetLinearRegionsAre2006.
 
 == Polonius v akademskem svetu in v praksi
 
@@ -271,7 +271,7 @@ Lastništvo je vezano na doseg. Koncept dosega lahko preprosto ponazorimo z leks
 ) <listing:scope1>
 
 
-Za razliko od C in C++, ki takšnih napak ne zaznata v prevajalniku, Rust lastništvo uveljavlja že v fazi prevajanja. Dodatna razlika se še pojavi pri ustvarjanju referenc ter njihovi delitvi na dva različna tipa. Rustove reference so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da Rustov prevajalnik zagotovi, da referenca vedno kaže na veljavno vrednost pravega tipa -- in to skozi celotno življenjsko dobo te reference @klabnikRustProgrammingLanguage2023. Ta varnostni mehanizem omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: zagotovilo, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
+Za razliko od C in C++, ki takšnih napak ne zaznata v času prevajanja, Rust lastništvo uveljavlja že v fazi prevajanja. Dodatna razlika se še pojavi pri ustvarjanju referenc ter njihovi delitvi na dva različna tipa. Rustove reference so na prvi pogled podobne kazalcem, kakršne poznamo iz drugih programskih jezikov. Ključna razlika je v tem, da Rustov prevajalnik zagotovi, da referenca vedno kaže na veljavno vrednost pravega tipa -- in to skozi celotno življenjsko dobo te reference @klabnikRustProgrammingLanguage2023. Ta varnostni mehanizem omogoča nekaj, kar je v mnogih drugih jezikih bistveno težje doseči: zagotovilo, da reference "ne visijo v prazno" in da ne dostopamo do podatkov, ki morda sploh več ne obstajajo.
 
 V preostanku naloge ima MIR osrednjo vlogo, saj bistveno poenostavi preverjanje izposoj in omogoča lažjo analizo. V okviru MIRa je tudi definiran naslednji pojem:
 / Mesto #angl[place]: Mesto je izraz, ki opredeli lokacijo v pomnilniku. To je lahko lokalna spremenljivka (npr. `oseba`) ali pa njena projekcija (npr. polje strukture `oseba.starost`) @MIRMidlevelIR. To je eden ključnih pojmov pri analizi pomnilniške varnosti programa.
@@ -504,7 +504,7 @@ Pravilo Move-Deinit nam prepreči, da uporabimo vezavo, iz katere je bila vredno
 
 / $"Premaknjen"(pi, m, p)$: Predikat velja natanko tedaj, ko je bila vrednost iz mesta $m$ premaknjena pred točko $p$ na poti $pi$. Premik vrednosti iz mesta v prevajalniku pomeni, da mesto $m$ ni več v množici inicializiranih mest, torej ga prevajalnik iz nje odstrani. Intuitivno to pomeni, da mesto po premiku ni več inicializirano in ga ne moremo več uporabljati, dokler mu ne dodelimo nove vrednosti in posledično mesto dodamo nazaj v množico inicializiranih mest @TrackingMovesInitialization.
 
-Torej pravilo Move-Deinit pravi da mora za vsako točko $p$ veljati
+Torej pravilo Move-Deinit pravi, da mora za vsako točko $p$ veljati
 
 $
   exists.not pi in "Poti"(p), m_1 in "UporabljenaMesta"(p), m_2: \ "Prekrivanje"(m_1, m_2) and "Premaknjen"(pi, m_2, p)
@@ -605,7 +605,7 @@ Da lahko matematično govorimo o delovanju Poloniusa, moramo definirati osnovne 
 === Množica posoj #posoje
 <chap-mnozica-posoj>
 
-Množico vseh posoj označimo s #posoje. _Pogoji posoje_ so lastnosti, ki morajo držati v določeni točki programa, da posojo smatramo za veljavno oziroma aktivno. V literaturi ali izvorni kodi prevajalnika nikjer niso definirano eksplicitno, vendar se pa pojavi implicitna definicija preko razveljavitev pogojev posoje.
+Množico vseh posoj označimo s #posoje. _Pogoji posoje_ so lastnosti, ki morajo držati v določeni točki programa, da posojo smatramo za veljavno oziroma aktivno. V literaturi ali izvorni kodi prevajalnika nikjer niso definirani eksplicitno, vendar se pa pojavi implicitna definicija preko razveljavitev pogojev posoje.
 
 / Razveljavitev pogojev posoje: #[Pravimo, da _razveljavimo pogoje posoje_, če velja ena izmed naslednjih točk:
     - Referenca je deljena in
@@ -762,7 +762,7 @@ _Začetne_ #angl[input] relacije so tiste, ki izhajajo že iz prejšnjih faz ana
 
 Začetno relacijo vsebovanosti #angl[base subset] označimo z $jevsebovanazacetno subset regije times regije times točke$. To je relacija, ki povezuje dve regiji na določeni točki v programu. Za intuicijo, zakaj je ta relacija pomembna, si lahko bralec ponovno prebere @chap:intuitivna-razlaga-poloniusa[razdelek].
 
-Natančneje, če velja $(R_1, R_2, P) in jevsebovanazacetno$ pomeni, da je $R_1$ podmnožica regije $R_2$ na točki $P$ v programu. Ker so regije konceptualno potenčne množice posoj na posamezni točki, si lahko relacijo razložimo tako, da regija $R_1$ vsebuje vse posoje, ki jih vsebuje $R_2$, zato $R_2$ inducira več omejitev na uporabi mest, ki so izposojena. Relacija mora veljati na sredini stavka ($M("stmt")$), ki inducira njen nastanek. Na primer, zapišemo $('2, '1, P) in jevsebovanazacetno$ na sredini stavka `let a: &'1 i32 = &'2 b;`.
+Natančneje, če velja $(R_1, R_2, P) in jevsebovanazacetno$ pomeni, da je $R_1$ podmnožica regije $R_2$ na točki $P$ v programu. Ker so regije konceptualno potenčne množice posoj na posamezni točki, si lahko relacijo razložimo tako, da regija $R_1$ vsebuje vse posoje, ki jih vsebuje $R_2$, zato $R_2$ inducira več omejitev na uporabi mest, ki so izposojena. Relacija mora veljati na sredini stavka ($M("stmt")$), ki inducira njen nastanek. Na primer, na sredini stavka `let a: &'1 i32 = &'2 b;` zapišemo $('2, '1, P) in jevsebovanazacetno$ .
 
 _Opomba:_ V primerih programov bomo uporabljali oznako `<:`, ki predstavlja vsebovanost med tipi #angl[subtyping relation].
 
@@ -893,11 +893,11 @@ $jevsebovana subset.eq regije times regije times točke$. Definirana je z nasled
 
 + *Začetna relacija:* Če velja $(R_1, R_2, P) in jevsebovanazacetno$, potem velja $(R_1, R_2, P) in jevsebovana$. Torej se vse trojice iz začetne relacije pojavijo tudi v razširjeni.
 + *Tranzitivnost:* Če veljata $(R_1, R_2, P) in jevsebovana$ in $(R_2, R_3, P) in jevsebovana$, potem sledi $(R_1, R_3, P) in jevsebovana$. Relacija vsebovanosti na isti točki v programu je tranzitivna.
-+ *Propagacija:* Če velja:
-  + $(R_1, R_2, P) in jevsebovana$ _in_
-  + $(P, Q) in povezave$: (točki si sledita v grafu poteka) _in_
-  + $(R_1, Q) in regijaaktivnana$: (regija 1 je aktivna na naslednji točki) _in_
-  + $(R_2, Q) in regijaaktivnana$: (regija 2 je aktivna na naslednji točki)
++ *Propagacija:* Če velja
+  + $(R_1, R_2, P) in jevsebovana$ in
+  + $(P, Q) in povezave$: (točki si sledita v grafu poteka) in
+  + $(R_1, Q) in regijaaktivnana$: (regija 1 je aktivna na naslednji točki) in
+  + $(R_2, Q) in regijaaktivnana$: (regija 2 je aktivna na naslednji točki),
 
   tedaj velja $(R_1, R_2, Q) in jevsebovana$. To pomeni, da se relacija propagira čez graf poteka, če sta obe regiji aktivni na naslednji točki v grafu. Pogoj za aktivnost nam pride prav kasneje.
 
@@ -940,13 +940,13 @@ Primeru pripišemo te relacije v @listing:subsetRelations[programu].
 
 Relacija zahteve nam pove, da regija $R$ zahteva, da pogoji posoje $L$ veljajo na točki $P$. Označimo jo z $zahteva subset.eq regije times posoje times točke$ in je definirana z naslednjimi pravili:
 
-+ *Začetna relacija:* Če velja $(R, L, P) in regijaposojena$, potem velja $(R, L, P) in zahteva$. To nam pove, da če se trojica nahaja v relaciji posoje regij, se nahaja tudi v #zahteva.
++ *Začetna relacija:* Če velja $(R, L, P) in regijaposojena$, potem velja $(R, L, P) in zahteva$. To nam pove, da če se trojica nahaja v relaciji posoje regij, se nahaja tudi v relaciji #zahteva.
 + *Vsebovanost:* Če veljata $(R_1, L, P) in zahteva$ in $(R_1, R_2, P) in jevsebovana$, potem sledi $(R_2, L, P) in zahteva$. To nam pove, da če neka regija $R_1$, ki je podmnožica večje regije $R_2$, na točki $P$ zahteva posojo $L$, potem tudi $R_2$ zahteva isto posojo.
-+ *Propagacija:* Če veljajo :
-  + $(R, L, P) in zahteva$: (regija $R$ zahteva posojo $L$ na $P$) _in_
-  + $(L, P) in.not posojaprekinjenana$: (posoja $L$ ni prekinjena na $P$) _in_
-  + $(P, Q) in povezave$: (točka $Q$ sledi $P$ v grafu poteka) _in_
-  + $(R, Q) in regijaaktivnana$: (regija $R$ je aktivna na točki $Q$)
++ *Propagacija:* Če velja
+  + $(R, L, P) in zahteva$: (regija $R$ zahteva posojo $L$ na $P$) in
+  + $(L, P) in.not posojaprekinjenana$: (posoja $L$ ni prekinjena na $P$) in
+  + $(P, Q) in povezave$: (točka $Q$ sledi $P$ v grafu poteka) in
+  + $(R, Q) in regijaaktivnana$: (regija $R$ je aktivna na točki $Q$),
   potem sledi $(R, L, Q) in zahteva$.
 
 Opazimo, da pri relaciji vsebovanosti #jevsebovanazacetno in pri relaciji zahteve #zahteva mora biti regija pri pravilu za propagacijo aktivna na naslednji točki $Q$. S @listing:reqRelation[programom] ponazorimo zakaj je to pomembna omejitev.
@@ -977,11 +977,11 @@ Opazimo, da pri relaciji vsebovanosti #jevsebovanazacetno in pri relaciji zahtev
 
 === Relacija aktivnosti posoje
 
-Relacija aktivnosti posoje #angl[loan live at] pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s $posojaaktivnana subset.eq posoje times točke$ in velja:
+Relacija aktivnosti posoje #angl[loan live at] pomeni, da je posoja $L$ aktivna na točki $P$. Označimo jo s $posojaaktivnana subset.eq posoje times točke$ in velja
 
 $ (L,P) in posojaaktivnana <==> \ exists R in regije: (R, P) in regijaaktivnana and (R, L, P) in zahteva $
 
-To pomeni, da je posoja aktivna, če jo na isti točki zahteva neka aktivna regija.
+To pomeni, da je posoja aktivna, natanko tedaj, ko jo na točki zahteva neka aktivna regija.
 
 === Vizualizacija na primeru
 
@@ -1010,7 +1010,7 @@ Nato vizualno ponazorimo razširjeno relacijo #jevsebovana, ki že upošteva pra
 
 == Javljanje napake
 
-S pomočjo prejšnjih relacij lahko na koncu definiramo, kje v programu javimo napako (v obsegu preverjalnika posoj). Ponovno si pomagamo z relacijo, ki jo tokrat poimenujemo _relacija napake_#footnote[vase vpr: zakaj italics odg: zdi se mi pametno poudariti pa se mi je zdelo tezko napisati z nasim formatom za definicije ki je DEF: definicija] #angl[error] in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu in velja:
+S pomočjo prejšnjih relacij lahko na koncu definiramo, kje v programu javimo napako (v obsegu preverjalnika posoj). Ponovno si pomagamo z relacijo, ki jo tokrat poimenujemo _relacija napake_#footnote[vase vpr: zakaj italics odg: zdi se mi pametno poudariti pa se mi je zdelo tezko napisati z nasim formatom za definicije ki je DEF: definicija] #angl[error] in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu in velja
 
 $ P in napaka <==> \ exists L in posoje: \(P, L) in posojarazveljavljenana and (L, P) in posojaaktivnana $
 
@@ -1065,7 +1065,7 @@ Da si lažje predstavljamo, kako se različne relacije povezujejo, bomo v tem ra
 
 #chapter("Zaključek")
 
-Ena izmed glavnih prednosti Rusta je njegovo "brezplačno" #angl[zero-cost] upravljanje s pomnilnikom med izvajanjem programa. To sicer zahteva več časa pri prevajanju zaradi preverjevalnika izposoj, ki določa, kaj velja za pomnilniško varno in kaj se zavrne.
+Ena izmed glavnih prednosti Rusta je njegovo "brezplačno" #angl[zero-cost] upravljanje pomnilnika med izvajanjem programa. To sicer zahteva več časa pri prevajanju zaradi preverjevalnika izposoj, ki določa, kaj velja za pomnilniško varno in kaj se zavrne.
 
 Trenutna implementacija preverjevalnika izposoj NLL je v nekaterih primerih preveč konzervativna in posledično zavrne varne programe, ki bi jih lahko sprejeli z bolj natančno analizo @2094nllRustRFC. Zato je #cite(<matsakisAliasbasedFormulationBorrow>, form: "author") v svoji spletni objavi opisal Polonius, ki bolje sledi toku podatkov v programu in lahko sprejme te bolj kompleksne primere @matsakisAliasbasedFormulationBorrow.
 
