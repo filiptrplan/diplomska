@@ -471,7 +471,7 @@ V @tab:borrow-check[tabeli] so podani pozitivni in negativni primeri za vsako pr
 
 Pravilo Use-Init določa, da lahko uporabljamo samo mesta, ki so zagotovo inicializirana na točki v funkciji, kjer jih uporabljamo. Skupaj s praviloma Move-Deinit, ki pravi, da ne smemo uporabljati mest, katerih vrednost je bila premaknjena, ter Ref-Live, ki nam onemogoči dostop do sproščenih vrednosti preko referenc, tvori osnovo za sistem lastništva. Ta pravila nam na primer preprečijo vračanje vrednosti, ustvarjene na skladu, saj je ta na izhodu iz funkcije že sproščena @stjernaModellingRustsReference2020.
 
-Pravilo Unique-Write nam zagotavlja, da je lahko hkrati aktivna samo ena unikatna referenca ter pravilo Shared-Readonly podobno zagotavlja, da ne moremo pisati v oz. premikati iz mesta na katerega kaže deljena referenca. Ti dve pravili nam omogočita, da prevajalnik zagotovi pravilno uporabo dveh vrst referenc, ki obstajata v Rustu.
+Pravilo Unique-Write nam zagotavlja, da je lahko hkrati aktivna samo ena unikatna referenca ter pravilo Shared-Readonly podobno zagotavlja, da ne moremo pisati v oz. premikati iz mesta, na katerega kaže deljena referenca. Ti dve pravili nam omogočita, da prevajalnik zagotovi pravilno uporabo dveh vrst referenc, ki obstajata v Rustu.
 
 Pri formalizaciji pravil bomo izhajali iz _grafa poteka_ #angl[CFG - control flow graph], ki ga prevajalnik konstruira, še preden se začne faza preverjevalnika izposoj. Sestavljen je iz osnovnih blokov, ti pa iz stavkov. Vozlišča v samem grafu si lahko predstavljamo kot posamezne stavke, vendar jih kasneje v nalogi definiramo bolj podrobno.
 
@@ -614,7 +614,7 @@ Množico vseh posoj označimo s #posoje. _Pogoji posoje_ so lastnosti, ki morajo
     - Referenca je unikatna in jo spreminjamo na kakršen koli način (ustvarjanje nove reference, pisanje, premikanje)
   ]
 Zgornja pravila bolj formalno opisujejo pravila razveljavljanja posoje #angl[loan killed]. Skratka, NLL RFC pravi, da za stavek na točki P v grafu definiramo "funkcijo prenosa" -- torej, katere posoje prinesemo v ali iz obsega @2094nllRustRFC . Funkcija je definirana tako:
-- _nekaj za nas nerelevatnih pravil_
+- _nekaj za nas nerelevantnih pravil_
 - Če je stavek dodelitev `lv = `, potem je vsaka posoja poti P, katere `lv` je predpona, razveljavljena.
 
 #show: subst-env((

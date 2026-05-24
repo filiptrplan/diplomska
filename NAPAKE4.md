@@ -1,0 +1,75 @@
+# NAPAKE4
+
+- Vrstica 189: »ena izmed razvijalcev Poloniusa« — napačna sklanjatev/spol; bolje »ena izmed razvijalk Poloniusa«.
+- Vrstica 195: »je v zadnjem desetletju nastalo vrsto člankov« — slovnično napačno; bolje »je ... nastala vrsta člankov« ali »je ... nastalo veliko člankov«.
+- Vrstica 201: »Modeli sorodni lastništvu« — manjka vejica oziroma ustrezna oblika: »Modeli, sorodni lastništvu«.
+- Vrstica 211: »Jezik lambdaR je sam bolj podoben MIRu« — manjka vezaj pri kratici; bolje »MIR-u«.
+- Vrstica 211: »katerikoli lambdaR program« — zapis skupaj je vprašljiv; v knjižni slovenščini bolje »kateri koli program lambdaR« ali »poljuben program lambdaR«.
+- Vrstica 220: naslov »Modeli sorodni lastništvu« — enaka napaka kot prej; bolje »Modeli, sorodni lastništvu«.
+- Vrstica 230: »sistemom za avtomatično izpeljevanje teh regij, osnovanem na ...« — napačna sklonska oblika; bolje »..., osnovanim na ...«.
+- Vrstica 232: »doda C programu« — manjkajoča/nerodna vezava; bolje »doda programu C« ali »C-programu«.
+- Vrstica 239: »pod amir« — pri imenu projekta bi bilo bolje »v okviru amir« / »v okviru projekta amir«.
+- Vrstica 273: »Za razliko od C in C++« — napačna/skopa sklanjatev; bolje »Za razliko od C-ja in C++« (oziroma ustrezno sklanjano).
+- Vrstica 275: »V okviru MIRa« — manjka vezaj; bolje »MIR-a«.
+- Vrstica 281: »referenca preko te reference« — slogovno in jezikovno bolje »prek te reference«.
+- Vrstica 286: »delimo na deljene ter nespremenljive reference« — verjetno napačna beseda; glede na kontekst bi moralo biti »deljene ter spremenljive« ali »deljene in unikatne«.
+- Vrstica 290: v komentarju »dovoljenjimi operacijami« — napačno črkovanje; bolje »dovoljenimi operacijami«.
+- Vrstica 337: »Kot sami tipi v Rustu so ponavadi izpeljane« — nerodna/napačna zveza; bolje »Tako kot sami tipi v Rustu so po navadi izpeljane«.
+- Vrstica 337: »ponavadi« — priporočljivejši zapis je »po navadi«.
+- Vrstica 337: »Koncept življenjskih dob kot nabor vrstic« — napačna sklonska ujemalnost; bolje »Koncept življenjskih dob kot nabora vrstic«.
+- Vrstica 393: »preko `r`« — bolje »prek `r`«.
+- Vrstica 397: »zato javimo napako« — nejasen osebek; bolje »zato prevajalnik javi napako« ali »zato se javi napaka«.
+- Vrstica 405: »Pripadnost posoje regijam« — napačno število; glede na nadaljevanje bolje »Pripadnost posoj regijam«.
+- Vrstica 456: »nato javimo napako« — nejasen osebek; bolje »prevajalnik javi napako« ali »se javi napaka«.
+- Vrstica 458: »na MIRu« — manjka vezaj; bolje »na MIR-u«.
+- Vrstica 472: »preko referenc« — bolje »prek referenc«.
+- Vrstica 474: »ter pravilo Shared-Readonly podobno zagotavlja« — manjka vejica ali preoblikovanje; bolje »..., pravilo Shared-Readonly pa podobno zagotavlja ...«.
+- Vrstica 474: »iz mesta na katerega kaže« — manjka vejica: »iz mesta, na katerega kaže«.
+- Vrstica 482: »branje mesta preko reference« — bolje »prek reference«.
+- Vrstica 482: »interne strukture MIRa« — manjka vezaj; bolje »interne/notranje strukture MIR-a«.
+- Vrstica 482: »kjerkoli« — priporočljivejši zapis je »kjer koli«.
+- Vrstica 501: »mesta iz MIRa« — manjka vezaj; bolje »MIR-a«.
+- Vrstica 506: »Torej $"Prekrivanje"(...)$ bi veljalo« — napačen besedni red; bolje »Torej bi $"Prekrivanje"(...)$ veljalo«.
+- Vrstica 526: »Posoja je interni konstrukt« — tujka/nerodna beseda; bolje »notranji konstrukt«.
+- Vrstica 536: »z Rustovsko terminologijo« — nekonsistentna velika začetnica; bolje »z rustovsko terminologijo« ali »v Rustovi terminologiji«.
+- Vrstica 544: »ko se v točki $p$« — bolje »na točki $p$«.
+- Vrstica 546: »kakršnekoli nove posoje« — priporočljivejši zapis je »kakršne koli nove posoje«.
+- Vrstica 608: »da posojo smatramo za veljavno« — bolje slovensko »da posojo štejemo za veljavno«.
+- Vrstica 608: »vendar se pa pojavi« — odvečen »pa«; bolje »vendar se pojavi«.
+- Vrstica 608: »preko razveljavitev« — bolje »prek razveljavitev«.
+- Vrstica 618: »@2094nllRustRFC .« — odvečen presledek pred piko; pravilno »@2094nllRustRFC.«.
+- Vrstica 619: »nerelevatnih« — napačno črkovanje; pravilno »nerelevantnih«.
+- Vrstica 648: »tekom programa« — bolje »med potekom programa« ali »skozi program«.
+- Vrstica 654: »`'1`, `'2`, `'3`, itd.« — odvečna vejica pred »itd.«.
+- Vrstica 658: »v MIRu« — manjka vezaj; bolje »v MIR-u«.
+- Vrstica 660: »uporabljamo izraz točke namesto vozlišča« — napačno število; bolje »izraz točke namesto vozlišč«.
+- Vrstica 664: »tik preden« — manjka vejica: »tik, preden«.
+- Vrstica 671: »tik preden« — manjka vejica: »tik, preden«.
+- Vrstica 672: »Torej za prirejanje `A = B`« — bolje »Torej bi bila pri prirejanju `A = B` ...«.
+- Vrstica 758: »analize MIRa« — manjka vezaj; bolje »analize MIR-a«.
+- Vrstica 764: »če velja ..., pomeni« — manjka vejica za pogojnim odvisnikom; bolje »če velja ..., to pomeni, da ...«.
+- Vrstica 764: »omejitev na uporabi mest« — napačna vezava; bolje »omejitev pri uporabi mest«.
+- Vrstica 764: »$...$ .« — odvečen presledek pred piko.
+- Vrstica 770: »množica točk 'b« — manjka označitev/člen; bolje »množica točk `'b`«.
+- Vrstica 770: »omejitve k uporabi« — bolje »omejitve pri uporabi«.
+- Vrstica 802: naslov »Začetna relacija posoje regij« — verjetno napačen sklon/število; bolje »Začetna relacija posoj regijam« ali »Začetna relacija med posojami in regijami«.
+- Vrstica 804: »relacijo posoje regij« — enaka težava kot v naslovu; bolje »relacijo posoj regijam«.
+- Vrstica 810: »tekom programa« — bolje »med potekom programa« ali »skozi program«.
+- Vrstica 810: »kdaj javimo napako« — nejasen osebek; bolje »kdaj prevajalnik javi napako« ali »kdaj se javi napaka«.
+- Vrstica 888: »na nivoju MIRa« — bolje »na ravni MIR-a«.
+- Vrstica 953: »pri relaciji ... in pri relaciji ... mora biti« — ujemanje; bolje »morata biti« oziroma stavek preoblikovati.
+- Vrstica 953: »ponazorimo zakaj« — manjka vejica: »ponazorimo, zakaj«.
+- Vrstica 973: »takoj že zavrgel« — odvečna podvojitev; bolje »takoj zavrgel«.
+- Vrstica 1014: »kje v programu javimo napako« — nejasen osebek; bolje »kje ... se javi napaka« ali »kje prevajalnik javi napako«.
+- Vrstica 1014: »v obsegu preverjevalnika posoj« — bolje »v okviru preverjevalnika izposoj« (tudi terminološko: drugje uporabljaš »izposoj«).
+- Vrstica 1014: »Ta relacija nam pove, da javimo napako« — nejasen osebek; bolje »da se napaka javi« / »da prevajalnik javi napako«.
+- Vrstica 1037: »relacije, ki so ustvarjene tukaj niso« — manjka vejica: »relacije, ki so ustvarjene tukaj, niso«.
+- Vrstica 1047: »javimo napako« — nejasen osebek; bolje »se javi napaka« ali »prevajalnik javi napako«.
+- Vrstica 1047: »regija, ki jo ta posoja zahteva« — obrnjeno razmerje; glede na terminologijo bolje »regija, ki zahteva to posojo«.
+- Vrstica 1069: »V nasprotju z NLL« — bolje sklanjano »V nasprotju z NLL-jem«.
+- Vrstica 1069: »znotraj RFC dokumenta« — bolje »v dokumentu RFC« ali »znotraj dokumenta RFC«.
+- Vrstica 1069: »ena izmed razvijalcev Rusta« — napačna sklanjatev/spol; bolje »ena izmed razvijalk Rusta«.
+- Vrstica 1071: »Datalog implementaciji« — bolje »implementaciji v Datalogu« ali »Datalog-implementaciji«.
+- Vrstica 1071: »N.D. Matsakisa« — manjkata presledka med inicialkami; bolje »N. D. Matsakisa«.
+- Vrstica 1071: »z Datalog implementacijo« — bolje »z implementacijo v Datalogu« ali »z Datalog-implementacijo«.
+- Vrstica 1077: »ko bi na tisti točki v programu javili napako« — nejasen osebek; bolje »ko bi se na tisti točki ... javila napaka« ali »ko bi prevajalnik ... javil napako«.
