@@ -124,7 +124,7 @@ Alternativni pristop ročnemu upravljanju je avtomatsko upravljanje pomnilnika, 
 
 Rust pristopa k upravljanju s pomnilnikom na drugačen način. Veljavnost dostopanja do pomnilniških lokacij se preverja med prevajanjem s pomočjo preverjevalnika izposoj #angl[borrow checker]. To je komponenta Rustovega prevajalnika, ki se ukvarja s tokom podatkov in pomnilniškimi lokacijami. Rust imenuje zbirko pravil, ki opisuje delovanje preverjevalnika izposoj, lastništvo #angl[ownership]. V knjigi _The Rust Programming Language_ avtorji lastništvo opišejo tako: _"Ownership is a set of rules that govern how a Rust program manages memory"_ @klabnikRustProgrammingLanguage2023. Tak pristop ima dve glavni prednosti: zagotavlja, da je program pomnilniško varen kot pri avtomatskem upravljanju s pomnilnikom, ter omogoča hitrost izvajanja programov, ki jo lahko dosežemo z ročnim upravljanjem pomnilnika @klabnikRustProgrammingLanguage2023. Pogosto omenjena slabost Rusta je dolg čas prevajanja @glazarCodingRustBad2023. Ta sicer ni odvisen samo od preverjevalnika izposoj, vendar njegov prispevek ni zanemarljiv.
 
-V nadaljevanju bomo uporabljali dva podobna pojma. _Varen program_ je program, ki ne povzroča pomnilniških napak. _Veljaven program_ pa je program, ki ustreza Rustovim pravilom lastništva in izposojanja. Cilj Rustovega prevajalnika je, da bi bili ti dve množici programov enaki. Ob predpostavki, da so Rustova pravila lastništva in izposojanja pravilna, je vsak veljaven program v Rustu tudi varen, zaradi neizračunljivosti pa žal vsak varen program v Rusti ni veljaven.
+V nadaljevanju bomo uporabljali dva podobna pojma. _Varen program_ je program, ki ne povzroča pomnilniških napak. _Veljaven program_ pa je program, ki ustreza Rustovim pravilom lastništva in izposojanja. Cilj Rustovega prevajalnika je, da bi bili ti dve množici programov enaki. Ob predpostavki, da so Rustova pravila lastništva in izposojanja pravilna, je vsak veljaven program v Rustu tudi varen, zaradi neizračunljivosti pa žal vsak varen program v Rustu ni veljaven.
 
 Preverjevalnik izposoj, ki je glede na razvoj Rusta hkrati definicija in implementacija pravil lastništva in izposojanja, se je med razvojem Rusta bistveno spremenil od svoje prvotne implementacije. Na začetku je bil preprost in zaradi svoje konzervativnosti pri zagotavljanju varnosti veliko varnih programov zavrnil @2094nllRustRFC. Zato se je čez nekaj let pojavila naslednja različica preverjevalnika, imenovana NLL #angl[non-lexical lifetimes], ki je rešila veliko pogostih problemov prvotne različice. Vendar NLL še vedno ni sprejemal vseh varnih programov. Da bi to izboljšali, so Rustovi razvijalci predlagali trenutno najnovejšo različico preverjevalnika, imenovano Polonius, ki drugače zastavi problem lastništva in tako sprejme še večji delež varnih programov @matsakisAliasbasedFormulationBorrow.
 
@@ -191,7 +191,7 @@ V nasprotju z NLL-jem Polonius prevede @listing:mot_ex[program] kot veljaven, sa
 
 #chapter[Pregled literature]
 
-Rust je jezik inžinirjev, ne raziskovalcev. Od začetka je bil zasnovan tako, da reši današnje probleme ter se ukvarja s specifikacijami in formalnostjo kasneje. Ta način dela je porodil veliko vprašanj o tem, kako jezik deluje, zakaj deluje in ali sploh deluje pravilno. Čeprav je Rust prišel na svet šele leta 2015 @4YearsRust, je v zadnjem desetletju nastalo vrsto člankov o raznih formalnih pogledih na Rust.
+Rust je jezik inženirjev, ne raziskovalcev. Od začetka je bil zasnovan tako, da reši današnje probleme ter se ukvarja s specifikacijami in formalnostjo kasneje. Ta način dela je porodil veliko vprašanj o tem, kako jezik deluje, zakaj deluje in ali sploh deluje pravilno. Čeprav je Rust prišel na svet šele leta 2015 @4YearsRust, je v zadnjem desetletju nastalo vrsto člankov o raznih formalnih pogledih na Rust.
 
 V tem poglavju se bomo lotili treh glavnih kategorij raziskav in virov:
 + *Poskusi formalizacije Rusta:* Ogledali si bomo, kako so se raziskovalci lotili problema formalizacije različnih komponent Rusta.
@@ -231,7 +231,7 @@ Polonius je bil prvotno formuliran v spletni objavi N. D. Matsakisa, kjer je ta 
 
 Leta #cite(<stjernaModellingRustsReference2020>, form: "year") je Amanda Stjerna v svojem magistrskem delu podala prvo matematično formulacijo Poloniusa kot sistema tipov @stjernaModellingRustsReference2020. Ta formulacija je bila močno osnovana na Oxidu, saj sta si modela zelo podobna. V svojem delu je opisala tudi pravila za preverjevalnik posoj, ki jih kasneje v nalogi opišemo in formaliziramo. Njeno delo se nadaljuje z natančnejšim opisom Poloniusovega notranjega delovanja z vsemi podrobnostmi, potrebnimi za konkretno implementacijo. Kolikor vemo, je to delo eno izmed najbolj podrobnih in celovitih opisov Poloniusovega delovanja.
 
-Trenutno še ne obstaja uradna specifikacija za Polonius, vendar se stanje počasi spreminja. Leta 2025 je bil Polonius implementiran v glavni veji Rustovega prevajalnika in je trenutno na zahtevo dostopen v nočni #angl[niglty] različici @ScalablePoloniusSupporta. V izvorni kodi prevajalnika sta prisotni dve različici Poloniusa @RustlangRust2026: osnovna #angl[legacy] različica, podobna prvotni implementaciji iz @RustlangPolonius2025, ter razvojna #angl[alpha] različica, ki je nastala kot odgovor na počasno izvajanje prve. Slednja je napisana neposredno v Rustu in ne emulira Dataloga, a zato tudi ne podpira vseh zmogljivosti, ki jih ponuja osnovna različica @ScalablePoloniusSupporta.
+Trenutno še ne obstaja uradna specifikacija za Polonius, vendar se stanje počasi spreminja. Leta 2025 je bil Polonius implementiran v glavni veji Rustovega prevajalnika in je trenutno na zahtevo dostopen v nočni #angl[nighlty] različici @ScalablePoloniusSupporta. V izvorni kodi prevajalnika sta prisotni dve različici Poloniusa @RustlangRust2026: osnovna #angl[legacy] različica, podobna prvotni implementaciji iz @RustlangPolonius2025, ter razvojna #angl[alpha] različica, ki je nastala kot odgovor na počasno izvajanje prve. Slednja je napisana neposredno v Rustu in ne emulira Dataloga, a zato tudi ne podpira vseh zmogljivosti, ki jih ponuja osnovna različica @ScalablePoloniusSupporta.
 
 #show "amir": `a-mir-formality`
 
@@ -434,7 +434,7 @@ Za boljše razumevanje teh dveh korakov si oglejmo @lst:intuition2[primer], kjer
   Če v vektor pišemo kot v vrstici 10, morajo elementi "znotraj" reference živeti vsaj tako dolgo kot elementi v prvotnem vektorju. Zato dodamo vsebovanost `'2: '0`. Ker pa lahko iz vektorja tudi beremo, morajo elementi v prvotnem vektorju živeti vsaj tako dolgo kot tisti "znotraj" reference, saj bi sicer lahko brali neveljaven pomnilnik. Tako dobimo še `'0: '2`.
 ]
 
-Drugi obhod razširi vsebovanosti iz prvega obhod, saj lahko nanje gledamo kot na relacijo matematične vsebovanosti, ki je tranzitivna. S tem dodeli posoje več regijam. Če sledimo tranzitivnemu zaprtju vsebovanosti, opazimo dve verigi:
+Drugi obhod razširi vsebovanosti iz prvega obhoda, saj lahko nanje gledamo kot na relacijo matematične vsebovanosti, ki je tranzitivna. S tem dodeli posoje več regijam. Če sledimo tranzitivnemu zaprtju vsebovanosti, opazimo dve verigi:
 
 - za posojo `L0`: `'3: '1` in
 - za posojo `L1`: `'4: '5: '2: '0` (`'0: '2` tukaj ni tako pomembno).
@@ -526,7 +526,7 @@ Da bomo lahko razumeli naslednja pravila, moramo definirati pojem posoje, ki je 
 Pojem izraza izposoje pogosto uporabljajo Weiss idr. v svojem članku o formalizaciji podmnožice Rusta @weissOxideEssenceRust2019. Njihov način uporabe se sklada z našo definicijo, ki se glasi:
 
 / Posoja #angl[loan]: #[
-    Posoja je interni konstrukt prevajalnika, ki hrani podatke o referenci in njenem izvoru @weissOxideEssenceRust2019. V trenutni implementaciji preverjalnika izposoj je posoja predstavljena kot urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer velja naslednje:
+    Posoja je interni konstrukt prevajalnika, ki hrani podatke o referenci in njenem izvoru @weissOxideEssenceRust2019. V trenutni implementaciji preverjevalnika izposoj je posoja predstavljena kot urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer velja naslednje:
     - `'a`: Življenjska doba, za katero je vrednost izposojena. To se nanaša na življenjske dobe kot
       del Rustovega sistema tipov, ne pa na alternativno definicijo kasneje v nalogi, ki razume življenjske dobe kot množico posoj.
     - `shared|uniq|mut`: To je tip posoje. Tipa posoje `uniq` in `mut` sta identična, vendar `uniq` ne pusti spreminjanja svojih referentov. Naša terminologija unikatne reference se sklada s tipom `mut`.
@@ -567,7 +567,7 @@ Za zadnje pravilo potrebujemo še en predikat.
 
 / $"MestoAktivno"(m,p)$: Predikat velja natanko tedaj, ko je mesto $m$ še aktivno na točki $p$. Aktivnost mesta pomeni, da na tej točki v grafu poteka funkcije še ni bilo sproščeno #angl[dropped].
 
-Potem more za Ref-Live na vsaki točki $p$ veljati:
+Potem mora za Ref-Live na vsaki točki $p$ veljati
 
 $
           exists.not L & = ("_", "_", O), m: \
@@ -1010,7 +1010,7 @@ Nato vizualno ponazorimo razširjeno relacijo #jevsebovana, ki že upošteva pra
 
 == Javljanje napake
 
-S pomočjo prejšnjih relacij lahko na koncu definiramo, kje v programu javimo napako (v obsegu preverjalnika posoj). Ponovno si pomagamo z relacijo, ki jo tokrat poimenujemo _relacija napake_#footnote[vase vpr: zakaj italics odg: zdi se mi pametno poudariti pa se mi je zdelo tezko napisati z nasim formatom za definicije ki je DEF: definicija] #angl[error] in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu in velja
+S pomočjo prejšnjih relacij lahko na koncu definiramo, kje v programu javimo napako (v obsegu preverjalnika posoj). Ponovno si pomagamo z relacijo, ki jo tokrat poimenujemo _relacija napake_ #angl[error] in jo označimo z #napaka. Ta relacija nam pove, da javimo napako na točki $P$ v programu in velja
 
 $ P in napaka <==> \ exists L in posoje: \(P, L) in posojarazveljavljenana and (L, P) in posojaaktivnana $
 
@@ -1071,7 +1071,7 @@ Trenutna implementacija preverjevalnika izposoj NLL je v nekaterih primerih prev
 
 V nasprotju z NLL, ki je formalno definiran znotraj RFC dokumenta @2094nllRustRFC, je bila Poloniusova definicija od začetka neformalna in prepletena z implementacijo. Polonius je bil napisan v Datalogu, ki je podmnožica Prologa, nato pa v Rustu. Ekipa, ki ga je implementirala, se nikoli ni ukvarjala s točnim opisom njegovega delovanja in do pred kratkim je bil eden redkih virov formalne specifikacije magistrska naloga Amande Stjerne @stjernaModellingRustsReference2020, ki je ena izmed razvijalcev Rusta. Šele v zadnjem letu se je pojavil projekt `a-mir-formality`, ki želi sestaviti uradno specifikacijo za Rustov sistem tipov in preverjevalnik izposoj (vključno s Poloniusom) @BorrowCheckingAmirformalityb.
 
-Cilj te naloge je bil formulirati alternativo Datalog implementaciji Poloniusa na formalen matematičen način, da bi omogočili lažje razumevanje tega kompleksnega sistema. Datalog implementacija Poloniusa je bila prvotna formulacija Poloniusa v @RustlangPolonius2026a in je idejno sledila prvotni spletni objavi N.D. Matsakisa. Kasneje se je Polonius premaknil v glavno vejo Rustovega prevajalnika in trenutno se v njemu nahaja v prilagojeni obliki, ki zamenja nekaj moči preverjanja pravilnosti za hitrost prevajanja. Naša formulacija se v načinu delovanja ujema z Datalog implentacija, vendar je za razumevanje nekoliko poenostavljena.
+Cilj te naloge je bil formulirati alternativo Datalog implementaciji Poloniusa na formalen matematičen način, da bi omogočili lažje razumevanje tega kompleksnega sistema. Datalog implementacija Poloniusa je bila prvotna formulacija Poloniusa v @RustlangPolonius2026a in je idejno sledila prvotni spletni objavi N.D. Matsakisa. Kasneje se je Polonius premaknil v glavno vejo Rustovega prevajalnika in trenutno se v njem nahaja v prilagojeni obliki, ki zamenja nekaj moči preverjanja pravilnosti za hitrost prevajanja. Naša formulacija se v načinu delovanja ujema z Datalog implentacijo, vendar je za razumevanje nekoliko poenostavljena.
 
 Formulacijo smo oblikovali s pomočjo množic in relacij, definiranih nad njimi. Osnovne množice so predstavljale Rustove strukture v prevajalniku, s pomočjo katerih se definirajo začetne relacije, ki so dejstva, iz katerih izhaja celotna analiza.
 
