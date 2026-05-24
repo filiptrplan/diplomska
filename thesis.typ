@@ -684,20 +684,30 @@ _Opomba:_ To je zgolj matematična formulacija predstavitve grafa poteka; v prev
 Za lažjo predstavo grafa poteka konstruiramo graf za @ex-cfg-example-code[program] in njegov prevod v MIR (@ex-cfg-example-mir[program]). MIR bomo tukaj ponazorili s psevdokodo, vendar je sam MIR skupek struktur v Rustovem prevajalniku.
 
 
-#figure(
+#{
+  show figure.caption: it => {
+    v(0.4em)
+    it
+    v(-5mm)
+  }
+
   [
-    ```rust
-    fn primer(pogoj: bool) {
-        let mut x = 1;
-        if pogoj {
-            x = 2;
+    #figure(
+      [
+        ```rust
+        fn primer(pogoj: bool) {
+            let mut x = 1;
+            if pogoj {
+                x = 2;
+            }
+            let y = x;
         }
-        let y = x;
-    }
-    ```
-  ],
-  caption: "Primer za graf poteka",
-) <ex-cfg-example-code>
+        ```
+      ],
+      caption: "Primer za graf poteka",
+    )<ex-cfg-example-code>
+  ]
+}
 
 Konkretna sintaksa MIR je zasnovana izključno za pedagoške namene, zato se v njene podrobnosti ne bomo spuščali. Izpostavimo le naslednje:
 - Spremenljivke izgubijo imena in se oštevilčijo (`_1`, `_2`, `_3`)
@@ -806,22 +816,29 @@ Začetno relacijo posoje regij #angl[borrow region] označimo z $regijaposojena 
 
 To je ključna relacija, ki poveže regije, ki so del Rustovih tipov, in posoje, ki so metapodatki v Rustovem prevajalniku. S pomočjo te relacije lahko povežemo določene reference z regijami, sledimo, kje so aktivne tekom programa, in ugotovimo, kdaj javimo napako.
 
-#figure(
-  ```rust
-  fn main() {
-    let mut x: i32 = 22;
-    let mut v: Vec<&'0 i32> = vec![];
-    let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
-    // (r3, L0, P) inn regija_posojena
-    let p: &'5 i32 = &'4 x;
-    // (r4, L1, P) inn regija_posojena
-    r.push(p);
-    x += 1;
-    take::<Vec<&'6 i32>>(v);
+#[
+  #show figure.caption: it => {
+    v(0.4em)
+    it
+    v(-5mm)
   }
-  ```,
-  caption: [Začetna relacija posoje regij],
-)<ex-relacija-posoje-regij>
+  #figure(
+    ```rust
+    fn main() {
+      let mut x: i32 = 22;
+      let mut v: Vec<&'0 i32> = vec![];
+      let r: &'1 mut Vec<&'2 i32> = &'3 mut v;
+      // (r3, L0, P) inn regija_posojena
+      let p: &'5 i32 = &'4 x;
+      // (r4, L1, P) inn regija_posojena
+      r.push(p);
+      x += 1;
+      take::<Vec<&'6 i32>>(v);
+    }
+    ```,
+    caption: [Začetna relacija posoje regij],
+  )<ex-relacija-posoje-regij>
+]
 
 Z relacijama #jevsebovanazacetno in #regijaposojena lahko sestavimo @diagram-vsebovanosti-zacetna[diagram vsebovanosti]. Pričakovali bi, da bi veljala tranzitivnost, kot pri vsebovanosti v teoriji množic, vendar gre le za začetna dejstva, zato se druge lastnosti upoštevajo kasneje v analizi.
 
@@ -1022,6 +1039,12 @@ Poglejmo še, kako se napaka dokončno javi na @listing:error[programu]. Če je 
 
 Da si lažje predstavljamo, kako se različne relacije povezujejo, bomo v tem razdelku prikazali diagram vseh relacij in povezav med njimi. Graf je zelo podoben tistemu iz @stjernaModellingRustsReference2020, vendar poenostavljen, saj se naša naloga ukvarja samo z bistvom Poloniusa in ne z njegovo implementacijo. Puščica, ki kaže iz prve relacije v drugo, pomeni, da se za izpeljavo druge relacije zanašamo na prvo.
 
+
+#figure(
+  scale(80%, polonius-diagram),
+  supplement: "Diagram",
+  caption: "Relacije Poloniusa. Z rdečo so označene začetne relacije, z vijolično pa izpeljane.",
+)
 #pagebreak()
 #v(1fr)
 #figure(
@@ -1055,13 +1078,6 @@ Da si lažje predstavljamo, kako se različne relacije povezujejo, bomo v tem ra
   placement: none,
 ) <listing:error>
 #v(1fr)
-#pagebreak()
-
-#figure(
-  scale(80%, polonius-diagram),
-  supplement: "Diagram",
-  caption: "Relacije Poloniusa. Z rdečo so označene začetne relacije, z vijolično pa izpeljane.",
-)
 
 #chapter("Zaključek")
 
