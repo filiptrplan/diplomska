@@ -121,6 +121,18 @@ moramo še razjasniti dva pojma.
 
 = Preverjevalnik izposoj
 
+== Lastništvo
+
+Rustovo upravljanje pomnilnika temelji na treh pravilih:
+
+- Vsaka vrednost ima svojega *lastnika* #pause
+- Za vsako vrednost lahko obstaja le en lastnik hkrati #pause
+- Ko lastnik zapusti doseg, se vrednost sprosti
+
+#pause
+
+Lastnik je torej leva vrednost, na katero je vrednost trenutno vezana.
+
 == Deljene reference
 
 Obstajata dve vrsti referenc (zapis `&x`):
@@ -200,7 +212,6 @@ println!("{}", a); // NAPAKA
 
 == Motivacija
 
-
 #[
 
   #show raw: set text(size: 14pt)
@@ -250,8 +261,67 @@ println!("{}", a); // NAPAKA
   ```
 ]
 
-== Pravila
+== Graf poteka
 
+== Pravila preverjevalnika izposoj
 
+- Pravila veljajo na ravni posamezne funkcije
+- Osnovana na grafu poteka programa
+- Niso ista kot pravila lastništva ampak jih zagotavljajo
+- Prvotno zastavila Amanda Stjerna
+- Pet pravil:
+  - Use-Init
+  - Move-Deinit
+  - Shared-Readonly
+  - Unique-Write
+  - Ref-Live
+
+== Use-Init in Move-Deinit
+
+#text(size: 15pt)[*Use-Init*]
+$
+  forall pi in "Poti"(p), m in "UporabljenaMesta"(p): "Inicializirana"(pi, m, p)
+$
+Pravilo zagotavlja, da uporabljamo samo mesta, ki so na dani točki zagotovo inicializirana.
+
+#pause
+
+#text(size: 15pt)[*Move-Deinit*]
+$
+  exists.not pi in "Poti"(p), m_1 in "UporabljenaMesta"(p), m_2: \
+  "Prekrivanje"(m_1, m_2) and "Premaknjen"(pi, m_2, p)
+$
+Pravilo prepove uporabo mesta, iz katerega je bila vrednost že premaknjena.
+
+== Shared-Readonly in Unique-Write
+
+Pravili o uporabi dveh vrst referenc
+
+#text(size: 15pt)[*Shared-Readonly*]
+$
+  exists.not L = ("_", tau, O), m: \
+  "PosojaAktivna"(L,p) and tau = "shrd" and \
+  "Prekrivanje"(m, O) and "RazveljaviDeljeno"(m,p)
+$
+Pravilo pove, da skozi aktivno deljeno referenco mesto lahko le beremo, ne pa tudi spreminjamo.
+
+#pagebreak()
+
+#text(size: 15pt)[*Unique-Write*]
+$
+  exists.not L = ("_", tau, O), m: \
+  "PosojaAktivna"(L,p) and tau in {"uniq", "mut"} and \
+  "Prekrivanje"(m, O) and "RazveljaviUnikatno"(m,p)
+$
+Pravilo zagotavlja, da je ob aktivni unikatni posoji dostop do mesta izključen za vse druge reference.
+
+== Ref-Live
+
+#text(size: 15pt)[*Ref-Live*]
+$
+  exists.not L = ("_", "_", O), m: \
+  "PosojaAktivna"(L,p) and "Prekrivanje"(m, O) and not "MestoAktivno"(m,p)
+$
+Pravilo zahteva, da aktivna referenca nikoli ne kaže na mesto, ki je bilo že sproščeno.
 
 == Diagram relacij
