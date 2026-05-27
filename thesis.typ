@@ -82,7 +82,7 @@
   author: "Filip Trplan",
   study_program: [INTERDISCIPLINARNI UNIVERZITETNI \ ŠTUDIJSKI PROGRAM PRVE STOPNJE \ RAČUNALNIŠTVO IN MATEMATIKA],
   mentor: "doc. dr. Boštjan Slivnik",
-  year: "2025",
+  year: "2026",
   faculty: "Fakulteta za računalništvo in informatiko",
   description: [
     Naloga matematično formalizira novo različico Rustovega preverjevalnika izposoj s pomočjo množic in relacij na preprost in razumljiv način.
@@ -130,7 +130,7 @@ Preverjevalnik izposoj, ki je glede na razvoj Rusta hkrati definicija in impleme
 
 NLL je bil natančno opisan v RFC-ju #angl[request for comment], kar je potem vodilo njegov razvoj, Polonius pa je nastal kot predlog na spletnem blogu enega izmed razvijalcev Rusta, kjer se je postopoma razvijal skozi nadaljnje objave @PoloniusRevisitedPart @PoloniusRevisitedParta @WhatPoloniusPolonius. Celovit centraliziran formalen opis Poloniusa trenutno ne obstaja, imamo le nekaj spletnih objav, delni formalni opis v magistrskem delu enega izmed razvijalcev @stjernaModellingRustsReference2020, nedokončano knjigo na GitHubu @WhatPoloniusPolonius in trenutno implementacijo v Rustovem prevajalniku.
 
-Cilj te naloge je torej na svoj način formalizirati pravila, na katerih temelji Polonius. Najprej raziščemo pretekle poskuse formalizacije Rusta ter sorodne načine upravljanja s pomnilnikom. Sledi intuitivni opis Rustovih pravil izposojanja in nato formalni opis Poloniusovih inferenčnih pravil.
+Cilj te naloge je torej na svoj način formalizirati pravila, na katerih temelji Polonius. Najprej raziščemo pretekle poskuse formalizacije Rusta ter sorodne načine upravljanja pomnilnika. Sledi intuitivni opis Rustovih pravil izposojanja in nato formalni opis Poloniusovih inferenčnih pravil.
 
 V preostanku naloge od bralca pričakujemo osnovno znanje programskega jezika Rust. Ker Rust nima uradne specifikacije jezika, se bomo tudi v prihodnje dostikrat sklicevali na izvorno kodo prevajalnika, ki trenutno služi kot edini vir, ki določa delovanje Rusta #angl[specification as implementation]. V tej nalogi uporabljamo različico prevajalnika `1.94.0`.
 
@@ -235,7 +235,7 @@ Trenutno še ne obstaja uradna specifikacija za Polonius, vendar se stanje poča
 
 #show "amir": `a-mir-formality`
 
-Pomanjkanje uradne specifikacije je problem, ki ga trenutno rešuje Rustova ekipa za tipe v okviru projekta, imenovanega amir @BorrowCheckingAmirformalityb @RustlangAmirformality2026. Želijo ustvariti uradno izvedljivo specifikacijo za Rust, s katero se bo potem preverjalo pravilno delovanje Rustovega prevajalnika. "Izvedljiva" v tem kontekstu pomeni, da ji lahko kot vhod damo Rust program (oziroma trenutno MiniRust, ki je bolj podoben MIRu @MinirustMinirust2026), specifikacija pa ga nato sprejme ali zavrne, glede na to, ali je pravilno tipiziran in pomnilniško varen. V drugi polovici leta 2025 se je začelo delo na specifikaciji za prilagojeno različico Poloniusa, ki je v času pisanja na začetku 2026 že skoraj končana. Če se delo pod amir nadaljuje, bo lahko Rust končno dobil uradno specifikacijo, ki mu že od spočetja manjka.
+Pomanjkanje uradne specifikacije je problem, ki ga trenutno rešuje Rustova ekipa za tipe v okviru projekta, imenovanega amir @BorrowCheckingAmirformalityb @RustlangAmirformality2026. Želijo ustvariti uradno izvedljivo specifikacijo za Rust, s katero se bo potem preverjalo pravilno delovanje Rustovega prevajalnika. "Izvedljiva" v tem kontekstu pomeni, da ji lahko kot vhod damo Rust program (oziroma trenutno MiniRust, ki je bolj podoben MIRu @MinirustMinirust2026), specifikacija pa ga nato sprejme ali zavrne, glede na to, ali je pravilno tipiziran in pomnilniško varen. V drugi polovici leta 2025 se je začelo delo na specifikaciji za razvojno različico Poloniusa, ki je v času pisanja na začetku 2026 že skoraj končana. Če se delo pod amir nadaljuje, bo lahko Rust končno dobil uradno specifikacijo, ki mu že od spočetja manjka.
 
 #chapter[Rustov model upravljanja s pomnilnikom -- lastništvo]
 
@@ -247,7 +247,7 @@ Knjiga _The Rust Programming Language_, neuradni priročnik za Rust, pojasnjuje,
 + Za vsako vrednost lahko obstaja le en lastnik hkrati.
 + Ko lastnik ni več v dosegu, je vrednost sproščena #angl[dropped].
 
-Lastnik se tukaj nanaša na spremenljivko (natančneje lvalue), na katero je ta vrednost vezana. V @listing:ownership1[programu] opazimo, da vrednost `"hello"` enkrat zamenja lastnika, torej njen prvotni lastnik `a` potem ne vsebuje več vrednosti, saj je ta zdaj v lasti `b`. Če želimo uporabiti `a` potem, ko ni več lastnik vrednosti, nam prevajalnik javi napako.
+Lastnik se tukaj nanaša na spremenljivko (natančneje lvalue oy. levo vrednost), na katero je ta vrednost vezana. V @listing:ownership1[programu] opazimo, da vrednost `"hello"` enkrat zamenja lastnika, torej njen prvotni lastnik `a` potem ne vsebuje več vrednosti, saj je ta zdaj v lasti `b`. Če želimo uporabiti `a` potem, ko ni več lastnik vrednosti, nam prevajalnik javi napako.
 
 #figure(
   ```rust
@@ -402,7 +402,7 @@ Oglejmo si, kako se intuitivno razumevanje napake prenese na analizo, ki jo opra
 
 Prvi obhod izračuna dva glavna elementa: vsebovanost regij med seboj in pripadnost posoj regijam.
 
-Vsebovanost dveh regij se izračuna glede na pravila sklepanja Rustovega sistema tipov in jo zapišemo kot `'a: 'b`. To pomeni, da mora regija 'a vsebovati vse posoje iz regije 'b. Intuitivno mora referenca z življenjsko dobo 'b živeti vsaj tako dolgo kot 'a.
+Vsebovanost dveh regij se izračuna glede na pravila sklepanja Rustovega sistema tipov in jo zapišemo kot `'a: 'b`. To pomeni, da mora regija 'a vsebovati vse posoje iz regije 'b. Intuitivno mora referenca z življenjsko dobo 'a živeti vsaj tako dolgo kot 'b.
 
 Pripadnost posoje regijam se določi ob ustvaritvi posoje. Posoje so interne strukture v Rustovem prevajalniku, ki hranijo podatke o ustvarjeni referenci @weissOxideEssenceRust2019. V tem kontekstu pripadnost regiji pomeni, da se posoja zapiše kot dodaten metapodatek regije. Ko ustvarimo posojo z `&` ali `&mut`, se tej določi pripadnost glede na regijo, ki je del tipa.
 
@@ -523,7 +523,7 @@ Da bomo lahko razumeli naslednja pravila, moramo definirati pojem posoje, ki je 
 
   ]
 
-Pojem izraza izposoje pogosto uporabljajo Weiss idr. v svojem članku o formalizaciji podmnožice Rusta @weissOxideEssenceRust2019. Njihov način uporabe se sklada z našo definicijo, ki se glasi:
+Pojma izraza izposoje in posoje pogosto uporabljajo Weiss idr. v svojem članku o formalizaciji podmnožice Rusta @weissOxideEssenceRust2019. Njihov način uporabe se sklada z našo definicijo, ki se glasi:
 
 / Posoja #angl[loan]: #[
     Posoja je interni konstrukt prevajalnika, ki hrani podatke o referenci in njenem izvoru @weissOxideEssenceRust2019. V trenutni implementaciji preverjevalnika izposoj je posoja predstavljena kot urejena trojica @2094nllRustRFC `('a, shared|uniq|mut, lvalue)`, kjer velja naslednje:
@@ -772,12 +772,12 @@ _Začetne_ #angl[input] relacije so tiste, ki izhajajo že iz prejšnjih faz ana
 
 Začetno relacijo vsebovanosti #angl[base subset] označimo z $jevsebovanazacetno subset regije times regije times točke$. To je relacija, ki povezuje dve regiji na določeni točki v programu. Za intuicijo, zakaj je ta relacija pomembna, si lahko bralec ponovno prebere @chap:intuitivna-razlaga-poloniusa[razdelek].
 
-Natančneje, če velja $(R_1, R_2, P) in jevsebovanazacetno$ pomeni, da je $R_1$ podmnožica regije $R_2$ na točki $P$ v programu. Ker so regije konceptualno potenčne množice posoj na posamezni točki, si lahko relacijo razložimo tako, da regija $R_1$ vsebuje vse posoje, ki jih vsebuje $R_2$, zato $R_2$ inducira več omejitev na uporabi mest, ki so izposojena. Relacija mora veljati na sredini stavka ($M("stmt")$), ki inducira njen nastanek. Na primer, na sredini stavka `let a: &'1 i32 = &'2 b;` zapišemo $('2, '1, P) in jevsebovanazacetno$ .
+Natančneje, če velja $(R_1, R_2, P) in jevsebovanazacetno$ pomeni, da je $R_1$ podmnožica regije $R_2$ na točki $P$ v programu. Ker so regije konceptualno potenčne množice posoj na posamezni točki, si lahko relacijo razložimo tako, da regija $R_2$ vsebuje vse posoje, ki jih vsebuje $R_1$, zato $R_2$ inducira več omejitev na uporabi mest, ki so izposojena. Relacija mora veljati na sredini stavka ($M("stmt")$), ki inducira njen nastanek. Na primer, na sredini stavka `let a: &'1 i32 = &'2 b;` zapišemo $('2, '1, P) in jevsebovanazacetno$ .
 
 _Opomba:_ V primerih programov bomo uporabljali oznako `<:`, ki predstavlja vsebovanost med tipi #angl[subtyping relation].
 
 #remark(title: "Povezava z NLL")[
-  V NLL so regije predstavljene kot množice točk oziroma stavkov, kjer je vrednost, ki vsebuje regijo v svojem tipu, veljavna. Torej `'a: 'b` pomeni, da mora biti `'a` veljavna vsaj toliko časa kot `'b`. V angleščini bi temu rekli _'a preživi_ #angl[outlives] _'b_. Drugače povedano, množica točk 'b bi bila podmnožica 'a, kar pa je ravno obratno zapisano kot v Poloniusu. Ključna razlika je, da so regije v Poloniusu množice posoj, ne pa točk. Intuitivno lahko rečemo, da vsaka nova posoja prinese dodatne omejitve k uporabi in ustvarjanju referenc. Zato je smiselno, da je v Poloniusu regija `'a` podmnožica regije `'b`, saj mora vsebovati _vsaj_ vse omejitve, ki jih mora upoštevati `'b`.
+  V NLL so regije predstavljene kot množice točk oziroma stavkov, kjer je vrednost, ki vsebuje regijo v svojem tipu, veljavna. Torej `'a: 'b` pomeni, da mora biti `'a` veljavna vsaj toliko časa kot `'b`. V angleščini bi temu rekli _'a preživi_ #angl[outlives] _'b_. Drugače povedano, množica točk 'b bi bila podmnožica 'a, kar pa je ravno obratno zapisano kot v Poloniusu. Ključna razlika je, da so regije v Poloniusu množice posoj, ne pa točk. Intuitivno lahko rečemo, da vsaka nova posoja prinese dodatne omejitve k uporabi in ustvarjanju referenc. Zato je smiselno, da je v Poloniusu regija `'a` podmnožica regije `'b`, saj potem mora upoštevati isto ali manj omejitev kot `'b`.
 ]
 
 #figure(
@@ -1037,14 +1037,14 @@ Poglejmo še, kako se napaka dokončno javi na @listing:error[programu]. Če je 
 
 == Vizualna reprezentacija delovanja Poloniusa
 
-Da si lažje predstavljamo, kako se različne relacije povezujejo, bomo v tem razdelku prikazali diagram vseh relacij in povezav med njimi. Graf je zelo podoben tistemu iz @stjernaModellingRustsReference2020, vendar poenostavljen, saj se naša naloga ukvarja samo z bistvom Poloniusa in ne z njegovo implementacijo. Puščica, ki kaže iz prve relacije v drugo, pomeni, da se za izpeljavo druge relacije zanašamo na prvo.
+Da si lažje predstavljamo, kako se različne relacije povezujejo, bomo v tem razdelku prikazali @diagram-relacije-poloniusa[diagram], ki prikazuje vse relacije in povezave med njimi. Diagram je zelo podoben tistemu iz @stjernaModellingRustsReference2020, vendar poenostavljen, saj se naša naloga ukvarja samo z bistvom Poloniusa in ne z njegovo implementacijo. Puščica, ki kaže iz prve relacije v drugo, pomeni, da se za izpeljavo druge relacije zanašamo na prvo.
 
 
 #figure(
   scale(80%, polonius-diagram),
   supplement: "Diagram",
   caption: "Relacije Poloniusa. Z rdečo so označene začetne relacije, z vijolično pa izpeljane.",
-)
+) <diagram-relacije-poloniusa>
 #pagebreak()
 #v(1fr)
 #figure(
@@ -1087,7 +1087,7 @@ Trenutna implementacija preverjevalnika izposoj NLL je v nekaterih primerih prev
 
 V nasprotju z NLL, ki je formalno definiran znotraj RFC dokumenta @2094nllRustRFC, je bila Poloniusova definicija od začetka neformalna in prepletena z implementacijo. Polonius je bil napisan v Datalogu, ki je podmnožica Prologa, nato pa v Rustu. Ekipa, ki ga je implementirala, se nikoli ni ukvarjala s točnim opisom njegovega delovanja in do pred kratkim je bil eden redkih virov formalne specifikacije magistrska naloga Amande Stjerne @stjernaModellingRustsReference2020, ki je ena izmed razvijalcev Rusta. Šele v zadnjem letu se je pojavil projekt `a-mir-formality`, ki želi sestaviti uradno specifikacijo za Rustov sistem tipov in preverjevalnik izposoj (vključno s Poloniusom) @BorrowCheckingAmirformalityb.
 
-Cilj te naloge je bil formulirati alternativo Datalog implementaciji Poloniusa na formalen matematičen način, da bi omogočili lažje razumevanje tega kompleksnega sistema. Datalog implementacija Poloniusa je bila prvotna formulacija Poloniusa v @RustlangPolonius2026a in je idejno sledila prvotni spletni objavi N.D. Matsakisa. Kasneje se je Polonius premaknil v glavno vejo Rustovega prevajalnika in trenutno se v njem nahaja v prilagojeni obliki, ki zamenja nekaj moči preverjanja pravilnosti za hitrost prevajanja. Naša formulacija se v načinu delovanja ujema z Datalog implementacijo, vendar je za razumevanje nekoliko poenostavljena.
+Cilj te naloge je bil formulirati alternativo Datalog implementaciji Poloniusa na formalen matematičen način, da bi omogočili lažje razumevanje tega kompleksnega sistema. Datalog implementacija Poloniusa je bila prvotna formulacija Poloniusa v @RustlangPolonius2026a in je idejno sledila prvotni spletni objavi N.D. Matsakisa. Kasneje se je Polonius premaknil v glavno vejo Rustovega prevajalnika in trenutno se v njem nahaja v razvojni obliki, ki zamenja nekaj moči preverjanja pravilnosti za hitrost prevajanja. Naša formulacija se v načinu delovanja ujema z Datalog implementacijo, vendar je za razumevanje nekoliko poenostavljena.
 
 Formulacijo smo oblikovali s pomočjo množic in relacij, definiranih nad njimi. Osnovne množice so predstavljale Rustove strukture v prevajalniku, s pomočjo katerih se definirajo začetne relacije, ki so dejstva, iz katerih izhaja celotna analiza.
 
