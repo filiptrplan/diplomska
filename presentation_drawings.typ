@@ -184,38 +184,38 @@
 
   node(
     (0, 0),
-    code-node[`let mut x = 22;` \ ${}$],
+    code-node[`let mut x: i32 = 22;` \ ${}$],
     name: <l2aktivna>,
   ),
   node(
     (1, 0),
-    code-node[`let mut v = vec![];` \ ${r0}$],
+    code-node[`let mut v: Vec<&'0 i32> = vec![];` \ ${r0}$],
     name: <l3aktivna>,
   ),
   node(
     (2, 0),
-    code-node[`let r = &'3 mut v;` \ ${r0, r1, r2, r3}$],
+    code-node[`let r: &'1 mut Vec<&'2 i32> = &'3 mut v;` \ ${r0, r1, r2, r3}$],
     name: <l4aktivna>,
   ),
   node(
-    (3, 0),
-    code-node[`let p = &'4 x;` \ ${r0, r1, r2, r3, r4, r5}$],
+    (2, 1.35),
+    code-node[`let p: &'5 i32 = &'4 x;` \ ${r0, r1, r2, r3, r4, r5}$],
     name: <l5aktivna>,
   ),
   node(
-    (3, 1.35),
+    (1.25, 1.35),
     code-node[`r.push(p);` \ ${r0, r1, r2, r3, r4, r5}$],
     name: <l6aktivna>,
   ),
   node(
-    (2, 1.35),
+    (0.7, 1.35),
     code-node[`x += 1;` \ ${r0, r4}$],
     shape: rect,
     name: <l7aktivna>,
   ),
   node(
-    (1, 1.35),
-    code-node[`take(v);` \ ${r0, r4, r6}$],
+    (0, 1.35),
+    code-node[`take::<Vec<&'6 i32>>(v);` \ ${r0, r4, r6}$],
     name: <l8aktivna>,
   ),
 
@@ -236,23 +236,23 @@
   node-corner-radius: 3pt,
 
   node(
-    (0.3, 0),
-    code-node[`let mut x = 22;`],
+    (1, -0.2),
+    code-node[`let mut x: i32 = 22;`],
     name: <l1vsebovana>,
   ),
   node(
-    (1.2, 0),
-    code-node[`let mut v = vec![];`],
+    (1, 0.2),
+    code-node[`let mut v: Vec<&'0 i32> = vec![];`],
     name: <l3vsebovana>,
   ),
   node(
     (2, 0),
-    code-node[`let r = &'3 mut v;` \ #l4vsebovana],
+    code-node[`let r: &'1 mut Vec<&'2 i32> = &'3 mut v;` \ #l4vsebovana],
     name: <l4vsebovana>,
   ),
   node(
     (3, 0),
-    code-node[`let p = &'4 x;` \ #l5vsebovana],
+    code-node[`let p: &'5 i32 = &'4 x;` \ #l5vsebovana],
     name: <l5vsebovana>,
   ),
   node(
@@ -268,7 +268,7 @@
   ),
   node(
     (1, 1.35),
-    code-node[`take(v);` \ #l8vsebovana],
+    code-node[`take::<Vec<&'6 i32>>(v);` \ #l8vsebovana],
     name: <l8vsebovana>,
     shape: rect,
   ),
@@ -283,17 +283,17 @@
 
 #let l4zahteva = cetz.canvas({
   import cetz.draw: *
-  on-layer(0, { content((0, 0), name: "L0", [`L0: &mut v`]) })
+  on-layer(0, { content((0, 0), name: "L0", [`L0: &'3 mut v`]) })
   region-subset("L0", "3", 0)
   region-subset("3", "1", 1)
 })
 
 #let l5zahteva = cetz.canvas({
   import cetz.draw: *
-  on-layer(0, { content((0, 0), name: "L0", [`L0: &mut v`]) })
+  on-layer(0, { content((0, 0), name: "L0", [`L0: &'3 mut v`]) })
   region-subset("L0", "3", 0)
   region-subset("3", "1", 1)
-  on-layer(0, { content((3, 0), name: "L1", [`L1: &x`]) })
+  on-layer(0, { content((3, 0), name: "L1", [`L1: &'4 x`]) })
   region-subset("L1", "4", 2)
   region-subset("4", "5", 3)
 })
@@ -301,10 +301,10 @@
 #let l6zahteva = cetz.canvas({
   import cetz.draw: *
   let r02 = "0 == '2"
-  on-layer(0, { content((0, 0), name: "L0", [`L0: &mut v`]) })
+  on-layer(0, { content((0, 0), name: "L0", [`L0: &'3 mut v`]) })
   region-subset("L0", "3", 0)
   region-subset("3", "1", 1)
-  on-layer(0, { content((3, 0), name: "L1", [`L1: &x`]) })
+  on-layer(0, { content((3, 0), name: "L1", [`L1: &'4 x`]) })
   region-subset("L1", "4", 2)
   region-subset("4", "5", 3)
   region-subset("5", r02, 4)
@@ -313,10 +313,10 @@
 #let l8zahteva = cetz.canvas({
   import cetz.draw: *
   let r02 = "0 == '2"
-  on-layer(0, { content((0, 0), name: "L0", [`L0: &mut v`]) })
+  on-layer(0, { content((0, 0), name: "L0", [`L0: &'3 mut v`]) })
   region-subset("L0", "3", 0)
   region-subset("3", "1", 1)
-  on-layer(0, { content((4, 0), name: "L1", [`L1: &x`]) })
+  on-layer(0, { content((4, 0), name: "L1", [`L1: &'4 x`]) })
   region-subset("L1", "4", 2)
   region-subset("4", "5", 3)
   region-subset("5", r02, 4)
@@ -332,23 +332,23 @@
   node-corner-radius: 3pt,
 
   node(
-    (0.7, 0),
-    code-node[`let mut x = 22;`],
+    (1, -0.2),
+    code-node[`let mut x: i32 = 22;`],
     name: <l1zahteva>,
   ),
   node(
-    (1.3, 0),
-    code-node[`let mut v = vec![];`],
+    (1, 0.2),
+    code-node[`let mut v: Vec<&'0 i32> = vec![];`],
     name: <l3zahteva>,
   ),
   node(
     (2, 0),
-    code-node[`let r = &'3 mut v;` \ #l4zahteva],
+    code-node[`let r: &'1 mut Vec<&'2 i32> = &'3 mut v;` \ #l4zahteva],
     name: <l4zahteva>,
   ),
   node(
     (3, 0),
-    code-node[`let p = &'4 x;` \ #l5zahteva],
+    code-node[`let p: &'5 i32 = &'4 x;` \ #l5zahteva],
     name: <l5zahteva>,
   ),
   node(
@@ -364,7 +364,7 @@
   ),
   node(
     (1, 1.35),
-    code-node[`take(v);` \ #l8zahteva],
+    code-node[`take::<Vec<&'6 i32>>(v);` \ #l8zahteva],
     name: <l8zahteva>,
   ),
 

@@ -267,16 +267,10 @@ println!("{}", a); // NAPAKA
 
 == Graf poteka
 
-- Polonius ne analizira neposredno izvorne kode, ampak poenostavljeno vmesno predstavitev programa
-- Program predstavimo kot *graf poteka*
-- Vozlišča predstavljajo točke v programu, povezave pa možne prehode izvajanja
-- Relacije Poloniusa so zato vezane na posamezne točke grafa
-
-#pause
-
-#align(center)[
-  $ P -> Q quad "pomeni: po točki" P "lahko sledi točka" Q $
-]
+- Polonius ne analizira neposredno izvorne kode, ampak deluje na MIRu (vmesni kodi)
+- MIR predstavimo kot *graf poteka*
+- Vozlišča predstavljajo stavke v programu, povezave pa možne prehode med njimi
+- Relacije Poloniusa so zato vezane na posamezne točke grafa (uporabljamo izraz točko namesto vozlišča)
 
 == Pravila preverjevalnika izposoj
 
@@ -351,7 +345,7 @@ Pravilo zahteva, da aktivna referenca nikoli ne kaže na mesto, ki je bilo že s
 
 - `je_vsebovana_zacetno`: začetna vsebovanost med regijama
 - `regija_posojena`: posoja se ustvari in pripada regiji
-- `regija_aktivna_na`: regija je aktivna na točki programa
+- `regija_aktivna_na`: regija je aktivna na točki
 - `posoja_prekinjena_na`: posoja je na točki prekinjena
 - `posoja_razveljavljena_na`: dejanje na točki razveljavi pogoje posoje
 
