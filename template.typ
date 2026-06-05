@@ -8,9 +8,9 @@
 #let Huge(cont) = text(size: 24.88pt, cont)
 #let titfont(cont) = strong(LARGE(cont))
 #let autfont(cont) = Large(cont)
-#let CcImageCc(scale) = image("cc_cc_30.pdf", width: scale * 20pt)
-#let CcImageBy(scale) = image("cc_by_30.pdf", width: scale * 20pt)
-#let CcImageSa(scale) = image("cc_sa_30.pdf", width: scale * 20pt)
+#let CcImageCc(scale) = image("cc_cc_30.svg", width: scale * 20pt)
+#let CcImageBy(scale) = image("cc_by_30.svg", width: scale * 20pt)
+#let CcImageSa(scale) = image("cc_sa_30.svg", width: scale * 20pt)
 #let end_of_template = state("end_of_template", false)
 #let last_chapter_page = state("last_chapter_page", 0)
 #let chapter(breakpage: true, title) = context [

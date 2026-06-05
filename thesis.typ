@@ -85,11 +85,11 @@
   year: "2026",
   faculty: "Fakulteta za računalništvo in informatiko",
   description: [
-    Naloga matematično formalizira novo različico Rustovega preverjevalnika izposoj s pomočjo množic in relacij na preprost in razumljiv način.
+    Preverjevalnik izposoj je eden od ključnih delov prevajalnika za Rust, s katerimi se preverja pomnilniško varnost prevajanih programov. Polonius, najnovejši preverjevalnik izposoj, ni nikjer tehnično opisan. Edina točna specifikacija je kar implementacija v trenutnem prevajalniku. Preučite dostopno literaturo in predvsem tudi izvorno kodo Poloniusa v prevajalniku za Rust ter kar se da natančno formalno opišite delovanje Poloniusa.
   ],
   title_en: "Formalization of the Original Formulation of Polonius",
   description_en: [
-    The thesis provides a mathematical formalization of the new version of Rust's borrow checker using sets and relations in a simple and understandable manner.
+    The borrow checker is one of the key components of the Rust compiler used to ensure the memory safety of compiled programs. Polonius, the newest borrow checker, is not technically described anywhere. Its only precise specification is its implementation in the current compiler. Study the available literature and, in particular, the source code of Polonius in the Rust compiler, and provide as precise a formal description of Polonius as possible.
   ],
   abstract_sl: [
     Naloga zastavi matematično formalizacijo Poloniusa, preverjevalnika izposoj za programski jezik Rust. Posebnost Rusta je njegov sistem tipov, ki prevajalniku z ustreznimi pravili o izposojevanju omogoča zagotavljanje pomnilniške varnosti že v času prevajanja. Trenutna implementacija preverjevalnika izposoj, imenovana NLL, je v nekaterih primerih preveč konzervativna, zato so razvijalci Rusta uvedli novo različico, imenovano Polonius, ki je osnovana na bolj natančni analizi toka podatkov. Polonius sicer nikjer ni uradno definiran, viri o njem so razpršeni, zato je cilj te naloge postaviti matematičen okvir, skozi katerega lahko razumemo to novo različico. Tega se lotimo z uporabo množic in izjav, tako da pravila, ki so bila zastavljena v raznih virih, opišemo s pomočjo predikatov ter pravil sklepanja. Končni izdelek je poenostavljen, vendar formalen opis Poloniusa.

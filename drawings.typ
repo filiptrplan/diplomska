@@ -89,7 +89,7 @@
 
 #let aktivnosti-regij-intuition2 = cetz.canvas({
   import cetz.draw: *
-  content((0, 0), anchor: "north-west", image("example_intuition.pdf", page: 1))
+  content((0, 0), anchor: "north-west", image("example_intuition.svg"))
   let draw-line(start-line, end-line, x, color-idx, region, dir: "right") = {
     let line-height = 0.545
     let color = colors.at(color-idx)
