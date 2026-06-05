@@ -83,7 +83,8 @@
   study_program: [INTERDISCIPLINARNI UNIVERZITETNI \ ŠTUDIJSKI PROGRAM PRVE STOPNJE \ RAČUNALNIŠTVO IN MATEMATIKA],
   mentor: "doc. dr. Boštjan Slivnik",
   year: "2026",
-  faculty: "Fakulteta za računalništvo in informatiko",
+  faculty: [Fakulteta za računalništvo in informatiko \
+    Fakulteta za matematiko in fiziko],
   description: [
     Preverjevalnik izposoj je eden od ključnih delov prevajalnika za Rust, s katerimi se preverja pomnilniško varnost prevajanih programov. Polonius, najnovejši preverjevalnik izposoj, ni nikjer tehnično opisan. Edina točna specifikacija je kar implementacija v trenutnem prevajalniku. Preučite dostopno literaturo in predvsem tudi izvorno kodo Poloniusa v prevajalniku za Rust ter kar se da natančno formalno opišite delovanje Poloniusa.
   ],
