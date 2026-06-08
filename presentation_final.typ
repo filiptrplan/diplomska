@@ -101,6 +101,10 @@ Obstajata dve vrsti referenc (zapis `&x`):
 
 == Regije
 
+#definition(title: "Regije", [
+  Regije si lahko predstavljamo kot življenjske dobe referenc. Natančneje so to množice posoj, ki so interne strukture prevajalnika, ki se uporabljajo za sledenje izvorom referenc.
+])
+
 = Polonius
 
 == Motivacija
@@ -272,3 +276,9 @@ $ P in "napaka" <==> \ exists L: (P,L) in "posoja_razveljavljena_na" and (L,P) i
 #pause
 
 V primeru se pri `x += 1` razveljavi posoja `L1`, ki je še vedno aktivna, zato Polonius javi napako.
+
+= Zakjuček
+
+- V delu smo formalizirali delovanje Poloniusa na razumljiv način
+- Naš cilj ni bil natančno opisati semantike trenutne implementacije
+- Delo na formalizaciji Poloniusa se tudi nadaljuje v okviru projekta `a-mir-formality` Rustove razvijalske ekipe
