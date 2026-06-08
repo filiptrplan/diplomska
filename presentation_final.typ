@@ -33,7 +33,7 @@
     title: [Formalizacija originalne formulacije Poloniusa],
     subtitle: [Predstavitev diplomske naloge],
     author: [Filip Trplan],
-    date: datetime(year: 2026, month: 6, day: 1),
+    date: datetime(year: 2026, month: 6, day: 9),
     institution: [Univerza v Ljubljani],
   ),
 )
