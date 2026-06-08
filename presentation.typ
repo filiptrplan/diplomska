@@ -45,9 +45,9 @@
 
 == Par predpostavk...
 
-+ Osnovno znanje Rusta in njegove sintakse #pause
-+ Osnove prevajalnikov in upravljanja pomnilnika #pause
-+ Rust različica `1.95.0` #pause
++ Osnovno znanje Rusta in njegove sintakse
++ Osnove prevajalnikov in upravljanja pomnilnika
++ Rust različica `1.95.0`
 + Velikokrat se bomo zanašali na nepopolne vire ali izvorno kodo prevajalnika
 
 == Preden začnemo
@@ -57,7 +57,7 @@ moramo še razjasniti dva pojma.
 #definition[
   *Varen program* je program, ki ne povzroča pomnilniških napak. ]
 
-#pause
+
 
 #definition[
   *Veljaven program* pa je program, ki ustreza Rustovim pravilom lastništva in izposojanja.
@@ -70,7 +70,7 @@ moramo še razjasniti dva pojma.
 - Komponenta prevajalnika: *preverjevalnik izposoj*
 - Pravila *lastništva*
 
-#pause
+
 
 #columns(2)[
   #showybox(
@@ -90,7 +90,7 @@ moramo še razjasniti dva pojma.
     ],
   )
   #colbreak()
-  #pause
+
   #showybox(
     title: "Slabosti",
     frame: (
@@ -120,7 +120,7 @@ moramo še razjasniti dva pojma.
 - Polonius do sedaj nikoli uradno formalno opisan
 - Magistrska naloga Amande Stjerne
 - Originalne spletne objave
-- Implementacija v Rustovem prevajalniku #pause
+- Implementacija v Rustovem prevajalniku
 - *Želimo na matematično formalen način opisati konceptualno delovanje Poloniusa*
 
 = Preverjevalnik izposoj
@@ -129,11 +129,11 @@ moramo še razjasniti dva pojma.
 
 Rustovo upravljanje pomnilnika temelji na treh pravilih:
 
-- Vsaka vrednost ima svojega *lastnika* #pause
-- Za vsako vrednost lahko obstaja le en lastnik hkrati #pause
+- Vsaka vrednost ima svojega *lastnika*
+- Za vsako vrednost lahko obstaja le en lastnik hkrati
 - Ko lastnik zapusti doseg, se vrednost sprosti
 
-#pause
+
 
 Lastnik je torej leva vrednost, na katero je vrednost trenutno vezana.
 
@@ -293,7 +293,7 @@ $
 $
 Pravilo zagotavlja, da uporabljamo samo mesta, ki so na dani točki zagotovo inicializirana.
 
-#pause
+
 
 #text(size: 15pt)[*Move-Deinit*]
 $
@@ -411,11 +411,9 @@ Relacija `zahteva` pove, katere regije na posamezni točki zahtevajo veljavnost 
 
 $ (L,P) in "posoja_aktivna_na" <==> \ exists R: (R,P) in "regija_aktivna_na" and (R,L,P) in "zahteva" $
 
-#pause
 
 $ P in "napaka" <==> \ exists L: (P,L) in "posoja_razveljavljena_na" and (L,P) in "posoja_aktivna_na" $
 
-#pause
 
 V primeru se pri `x += 1` razveljavi posoja `L1`, ki je še vedno aktivna, zato Polonius javi napako.
 
