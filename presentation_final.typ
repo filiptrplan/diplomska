@@ -69,7 +69,7 @@ moramo še razjasniti dva pojma.
 
 == Zgodovina razvoja preverjevalnika izposoj
 
-- Sprva bil zelo osnoven, zavrnil veliko veljavnih programov
+- Sprva bil zelo osnoven, zavrnil veliko varnih programov
 - *NLL* (non-lexical lifetimes) ga nadgradi
 - Trenutno v uporabi NLL
 - Naslednja generacija: *Polonius*
@@ -82,9 +82,9 @@ moramo še razjasniti dva pojma.
 - Implementacija v Rustovem prevajalniku #pause
 - *Želimo na matematično formalen način opisati konceptualno delovanje Poloniusa*
 
-= Preverjevalnik izposoj
+= Polonius
 
-== Deljene reference
+== Par pojmov
 
 Obstajata dve vrsti referenc (zapis `&x`):
 
@@ -92,20 +92,14 @@ Obstajata dve vrsti referenc (zapis `&x`):
   To so reference, ki nam omogočajo, da ustvarimo več referenc na isto mesto hkrati. Zato morajo biti tudi _nespremenljive_, kar pomeni, da podatkov na referenciranem mestu ne smemo spreminjati. To pravilo mora veljati, da je uporaba tovrstnih referenc varna.
 ])
 
-== Unikatne reference
-
 #definition(
   title: "Unikatne reference",
   [ To so reference, ki zagotovijo, da obstaja samo ena referenca na mesto hkrati. Občasno želimo tudi spreminjati vrednost, na katero kaže referenca preko te reference. Zato uvedemo unikatne reference, ki so posledično _spremenljive_. Pravilo, ki ohranja pomnilniško varnost, se glasi: če obstaja unikatna referenca na pomnilniško mesto, na to mesto ne sme kazati nobena druga aktivna referenca (deljena ali unikatna). Aktivnost reference tukaj pomeni isto kot aktivnost spremenljivke.],
 )
 
-== Regije
-
 #definition(title: "Regije", [
   Regije si lahko predstavljamo kot življenjske dobe referenc. Natančneje so to množice posoj, ki so interne strukture prevajalnika, ki se uporabljajo za sledenje izvorom referenc.
 ])
-
-= Polonius
 
 == Motivacija
 
@@ -179,18 +173,6 @@ Obstajata dve vrsti referenc (zapis `&x`):
   - Ref-Live
 
 
-== Shared-Readonly
-
-Pravilo o uporabi deljenih referenc
-
-#text(size: 15pt)[*Shared-Readonly*]
-$
-  exists.not L = ("_", tau, O), m: \
-  "PosojaAktivna"(L,p) and tau = "shrd" and \
-  "Prekrivanje"(m, O) and "RazveljaviDeljeno"(m,p)
-$
-Pravilo pove, da skozi aktivno deljeno referenco mesto lahko le beremo, ne pa tudi spreminjamo.
-
 == Diagram relacij
 
 #v(1fr)
@@ -198,25 +180,6 @@ Pravilo pove, da skozi aktivno deljeno referenco mesto lahko le beremo, ne pa tu
   #scale(75%, polonius-diagram-original)
 ]
 #v(1fr)
-
-== Začetne relacije
-
-- `je_vsebovana_zacetno`: začetna vsebovanost med regijama
-- `regija_posojena`: posoja se ustvari in pripada regiji
-- `regija_aktivna_na`: regija je aktivna na točki
-- `posoja_prekinjena_na`: posoja je na točki prekinjena
-- `posoja_razveljavljena_na`: dejanje na točki razveljavi pogoje posoje
-
-== Izpeljane relacije
-
-- `je_vsebovana`: razširjena vsebovanost med regijami
-  - dobimo jo iz začetne vsebovanosti, tranzitivnosti in propagacije
-- `zahteva`: regija zahteva, da pogoji posoje veljajo
-  - posoje se širijo po relaciji vsebovanosti
-- `posoja_aktivna_na`: posoja je aktivna na točki
-  - aktivna regija zahteva to posojo
-- `napaka`: točka, kjer javimo napako
-  - aktivna posoja je na isti točki razveljavljena
 
 == Primer
 
@@ -269,11 +232,7 @@ Relacija `zahteva` pove, katere regije na posamezni točki zahtevajo veljavnost 
 
 $ (L,P) in "posoja_aktivna_na" <==> \ exists R: (R,P) in "regija_aktivna_na" and (R,L,P) in "zahteva" $
 
-#pause
-
 $ P in "napaka" <==> \ exists L: (P,L) in "posoja_razveljavljena_na" and (L,P) in "posoja_aktivna_na" $
-
-#pause
 
 V primeru se pri `x += 1` razveljavi posoja `L1`, ki je še vedno aktivna, zato Polonius javi napako.
 
