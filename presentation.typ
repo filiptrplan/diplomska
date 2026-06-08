@@ -418,3 +418,18 @@ $ P in "napaka" <==> \ exists L: (P,L) in "posoja_razveljavljena_na" and (L,P) i
 #pause
 
 V primeru se pri `x += 1` razveljavi posoja `L1`, ki je še vedno aktivna, zato Polonius javi napako.
+
+= Slovar pojmov
+
+- *Varen program*: program, ki ne povzroča pomnilniških napak
+- *Veljaven program*: program, ki ustreza Rustovim pravilom lastništva in izposojanja
+- *Lastništvo*: nabor pravil, s katerimi Rust upravlja pomnilnik
+- *Preverjevalnik izposoj*: del prevajalnika, ki ta pravila preverja
+- *Mesto*: zapis, ki določa lokacijo v pomnilniku
+- *Deljena referenca* (`&T`): dovoljuje več hkratnih referenc, vendar samo branje
+- *Unikatna referenca* (`&mut T`): zahteva izključen dostop in dovoljuje spreminjanje
+- *Življenjska doba* (`'a`): del tipa reference, ki določa, kje mora biti referenca veljavna
+- *Regija*: Poloniusova abstrakcija življenjske dobe
+- *Aktivna regija*: regija, ki jo bomo v nadaljevanju programa še potrebovali
+- *Posoja* (`loan`): interni zapis o ustvarjeni referenci in njenem izvoru
+- *Izvor posoje* (`origin`): mesto, iz katerega nastane referenca
